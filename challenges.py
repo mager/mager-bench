@@ -1,5 +1,7 @@
 """Benchmark challenges — each is a coding task sent verbatim to each model."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 

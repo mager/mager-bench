@@ -1,12 +1,16 @@
 """Model provider adapters — one class per API."""
 
+from __future__ import annotations
+
 import os
 from abc import ABC, abstractmethod
 
 # Models available if the right API key is set
 AVAILABLE_MODELS = [
     "claude-opus-4-8",
+    "claude-sonnet-5",
     "claude-sonnet-4-6",
+    "claude-haiku-4-5",
     "gpt-4o",
     "gpt-4o-mini",
     "gemini-2.0-flash",
@@ -62,7 +66,9 @@ class GeminiProvider(Provider):
 
 _MODEL_MAP = {
     "claude-opus-4-8": ("anthropic", "claude-opus-4-8"),
+    "claude-sonnet-5": ("anthropic", "claude-sonnet-5"),
     "claude-sonnet-4-6": ("anthropic", "claude-sonnet-4-6"),
+    "claude-haiku-4-5": ("anthropic", "claude-haiku-4-5"),
     "gpt-4o": ("openai", "gpt-4o"),
     "gpt-4o-mini": ("openai", "gpt-4o-mini"),
     "gemini-2.0-flash": ("gemini", "gemini-2.0-flash"),

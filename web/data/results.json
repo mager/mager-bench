@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-07-13T15:27:45.889916+00:00",
+  "judge": "claude-sonnet-5",
+  "models": [
+    {
+      "id": "claude-haiku-4-5",
+      "name": "Claude Haiku 4.5",
+      "average": 7.6,
+      "avg_speed_ms": 9440,
+      "challenges": [
+        {
+          "name": "fizzbuzz",
+          "description": "Baseline correctness + code style",
+          "correctness": 10,
+          "quality": 9,
+          "documentation": 10,
+          "total": 9.7,
+          "speed_ms": 6454,
+          "notes": "Correct, clean, idiomatic implementation with thorough docstring, examples, and even added input validation beyond requirements."
+        },
+        {
+          "name": "readme-writer",
+          "description": "Pure documentation ability — no code at all",
+          "correctness": 9,
+          "quality": 9,
+          "documentation": 9,
+          "total": 9,
+          "speed_ms": 12085,
+          "notes": "Comprehensive, well-organized README covering all required sections with accurate flag documentation, clear examples, and proper Markdown/code-block formatting, though it invents extra details (hashing, exit codes) not specified in the prompt.'"
+        },
+        {
+          "name": "refactor",
+          "description": "Code clarity + whether the model can explain its changes",
+          "correctness": 10,
+          "quality": 8,
+          "documentation": 8,
+          "total": 8.7,
+          "speed_ms": 4445,
+          "notes": "Correct and clean refactor with meaningful names and idiomatic comprehension, but keeping 'x' as a loop variable is a minor quality lapse and the explanation table, while accurate, is fairly generic/boilerplate rather than deeply specific."
+        },
+        {
+          "name": "binary-search",
+          "description": "Algorithm + full docstring (Args/Returns/Raises + examples)",
+          "correctness": 8,
+          "quality": 6.5,
+          "documentation": 9,
+          "total": 7.8,
+          "speed_ms": 13145,
+          "notes": "Correct binary search logic and good edge-case handling, but the added `sorted(arr)` validation each call turns the algorithm into O(n log n), contradicting the claimed O(log n) efficiency and undermining the point of binary search; documentation is thorough and examples are accurate."
+        },
+        {
+          "name": "api-client",
+          "description": "Class design + error handling + type hints + docs",
+          "correctness": 1,
+          "quality": 3,
+          "documentation": 4,
+          "total": 2.7,
+          "speed_ms": 11073,
+          "notes": "Response is cut off mid-implementation (post method incomplete, no usage example at bottom), making the code non-functional despite good structure and docstrings up to that point."
+        }
+      ]
+    }
+  ]
+}

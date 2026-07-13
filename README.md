@@ -1,40 +1,50 @@
 # mager-bench
 
-A coding model benchmark that rates AI models on correctness, code quality, documentation, and speed.
+A personal coding model benchmark. Five tasks I actually care about, run against any combination of models, scored by an LLM judge on correctness, code quality, and documentation. When a new model drops, run `python bench.py` and see where it stands.
 
-Uses LLM-as-judge (Claude Sonnet) to score responses across 5 challenges. Models compete head-to-head on the same prompts.
+The idea is [Simon Willison's pelican-on-a-bicycle test](https://simonwillison.net/tags/pelican-riding-a-bicycle/), but for code: you don't need a giant eval suite to have opinions about models — you need something small and consistent that you run yourself, every time.
+
+**Live dashboard:** [mager-bench-web.vercel.app](https://mager-bench-web.vercel.app) — currently showing Claude Haiku 4.5 (avg **7.6**/10). Same data as JSON at [`/api/results`](https://mager-bench-web.vercel.app/api/results).
 
 ## Challenges
 
 | Name | What it tests |
 |------|--------------|
-| `fizzbuzz` | Basic correctness + code style |
-| `binary-search` | Algorithm + full docstring |
-| `api-client` | Class design + error handling + docs |
-| `readme-writer` | Documentation ability directly |
-| `refactor` | Code clarity + explanation quality |
+| `fizzbuzz` | Baseline correctness + code style |
+| `binary-search` | Algorithm + full docstring (Args/Returns/Raises + examples) |
+| `api-client` | Class design + error handling + type hints + docs |
+| `readme-writer` | Pure documentation ability — no code at all |
+| `refactor` | Code clarity + whether the model can explain its changes |
 
 ## Setup
 
 ```bash
 pip install -r requirements.txt
 cp .env.example .env
-# fill in the API keys for models you want to test
+# fill in the API keys for the models you want to test
 ```
+
+Models run if their key is present, and are skipped if not — an `ANTHROPIC_API_KEY` is always required because the judge is a Claude model.
 
 ## Usage
 
 ```bash
-# run all challenges against all configured models
+# run all challenges against all configured models (models run in parallel)
 python bench.py
 
 # specific models
-python bench.py --models claude-opus-4-8,gpt-4o
+python bench.py --models claude-sonnet-5,gpt-4o
 
 # one challenge
 python bench.py --challenge binary-search
 
-# save results to JSON
+# score with a different judge (any Anthropic model ID)
+python bench.py --judge claude-opus-4-8
+
+# one model at a time — cleaner latency numbers
+python bench.py --serial
+
+# save results to JSON (includes judge + timestamp for provenance)
 python bench.py --output results.json
 
 # list available models / challenges
@@ -42,20 +52,62 @@ python bench.py --list-models
 python bench.py --list-challenges
 ```
 
+Built-in model IDs: `claude-opus-4-8`, `claude-sonnet-5`, `claude-sonnet-4-6`, `claude-haiku-4-5`, `gpt-4o`, `gpt-4o-mini`, `gemini-2.0-flash`, `gemini-2.5-pro`.
+
+## Example output
+
+```
+── binary-search ──────────────────────────────────
+  claude-sonnet-5: total=9.0  (4213ms)
+  gpt-4o: total=7.7  (3187ms)
+  claude-haiku-4-5: total=7.3  (2094ms)
+
+═══ RESULTS ═══════════════════════════════════════════════════
+Judge: claude-sonnet-5
+Model                          Challenge            Correct Quality    Docs    Speed   Total
+──────────────────────────────────────────────────────────────────────────────────────────
+claude-sonnet-5                binary-search            9.0     9.0     9.0   4213ms     9.0
+gpt-4o                         binary-search            8.0     8.0     7.0   3187ms     7.7
+...
+```
+
 ## Scoring
 
-Each response is scored 0–10 on three dimensions by Claude Sonnet:
+Each response goes to an LLM judge (default: `claude-sonnet-5`) that reads it against the challenge's rubric and scores three dimensions from 0–10:
 
-- **Correctness** — does the code actually solve the problem?
+- **Correctness** — does the code actually solve the problem, including edge cases?
 - **Code Quality** — idiomatic, clean, well-structured?
-- **Documentation** — docstrings, comments, examples?
+- **Documentation** — docstrings, comments, examples — useful, not boilerplate?
 
-**Total** = average of the three. Speed (ms) is measured separately and shown but doesn't affect the score.
+**Total** = average of the three. Speed (ms) is measured separately and shown but doesn't affect the score. The judge uses [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs), so scores always come back as schema-valid JSON — no regex parsing of model chatter.
+
+## Web dashboard
+
+`web/` is a small Next.js app (deployed on Vercel) that renders the latest `results.json` as a scorecard/leaderboard, and re-exposes it as JSON at `GET /api/results`.
+
+```bash
+# after running bench.py --output results.json at the repo root:
+cd web
+node scripts/sync-results.mjs   # reshapes ../results.json -> web/data/results.json
+npm run dev                     # or: vercel --prod to redeploy
+```
+
+The dashboard currently shows one model at a time (Haiku, for now) — run more models through `bench.py`, re-sync, and they'll stack up on the leaderboard.
+
+## Caveats (read before quoting numbers)
+
+- **The judge is a model too.** By default Claude scores everyone, including other Claude models. If that bothers you (it should, a little), re-run with `--judge` set to a different model and compare. Rankings have been stable across judges in my runs, but verify for yours.
+- **Single-run variance is real.** One run is a vibe check, not a leaderboard. Scores on the same model can move ±1 point between runs.
+- **These are my tasks.** That's the point. Fork it and replace the challenges with the five things *you* keep asking models to do.
 
 ## Adding challenges
 
-Add a new `Challenge` to `CHALLENGES` in `challenges.py` with a `name`, `description`, `prompt`, and a `rubric` dict with `correctness`, `quality`, and `documentation` keys describing what to look for.
+Add a new `Challenge` to `CHALLENGES` in `challenges.py` with a `name`, `description`, `prompt`, and a `rubric` dict with `correctness`, `quality`, and `documentation` keys describing what the judge should look for.
 
 ## Adding models
 
-Add a new entry to `_MODEL_MAP` and `_KEY_MAP` in `providers.py`, then implement or reuse a `Provider` subclass.
+Add an entry to `AVAILABLE_MODELS` and `_MODEL_MAP` in `providers.py`, then implement or reuse a `Provider` subclass (Anthropic, OpenAI, and Gemini adapters are included).
+
+## License
+
+MIT
