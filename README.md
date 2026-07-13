@@ -94,6 +94,16 @@ npm run dev                     # or: vercel --prod to redeploy
 
 The dashboard currently shows one model at a time (Haiku, for now) — run more models through `bench.py`, re-sync, and they'll stack up on the leaderboard.
 
+Each challenge also has its own definition page at `/challenges/<name>` — the exact prompt, the rubric per dimension, and how every model that's run it scored. If `challenges.py` changes, re-export `web/data/challenges.json`:
+
+```bash
+python3 -c "
+import json, dataclasses
+from challenges import CHALLENGES
+print(json.dumps([dataclasses.asdict(c) for c in CHALLENGES], indent=2))
+" > web/data/challenges.json
+```
+
 ## Caveats (read before quoting numbers)
 
 - **The judge is a model too.** By default Claude scores everyone, including other Claude models. If that bothers you (it should, a little), re-run with `--judge` set to a different model and compare. Rankings have been stable across judges in my runs, but verify for yours.

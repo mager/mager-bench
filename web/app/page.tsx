@@ -1,3 +1,4 @@
+import Link from "next/link";
 import resultsData from "@/data/results.json";
 
 type Challenge = {
@@ -29,12 +30,34 @@ function formatDate(iso: string) {
   return new Date(iso).toUTCString().replace("GMT", "UTC");
 }
 
-function scoreLabel(score: number) {
-  if (score >= 8.5) return "EXCELLENT";
-  if (score >= 7) return "SOLID";
-  if (score >= 5) return "MIXED";
-  return "REGRESSION";
+type Tier = "excellent" | "solid" | "mixed" | "regression";
+
+function tier(score: number): Tier {
+  if (score >= 8.5) return "excellent";
+  if (score >= 7) return "solid";
+  if (score >= 5) return "mixed";
+  return "regression";
 }
+
+const TIER_LABEL: Record<Tier, string> = {
+  excellent: "EXCELLENT",
+  solid: "SOLID",
+  mixed: "MIXED",
+  regression: "REGRESSION",
+};
+
+const TIER_STYLE: Record<Tier, { dot: string; text: string; glow: string }> = {
+  excellent: { dot: "bg-green", text: "text-green", glow: "glow-green" },
+  solid: { dot: "bg-amber", text: "text-amber", glow: "glow" },
+  mixed: { dot: "bg-amber-dim", text: "text-amber-dim", glow: "" },
+  regression: { dot: "bg-alert", text: "text-alert", glow: "glow-alert" },
+};
+
+const DIMENSION_STYLE = {
+  correctness: { dot: "bg-green", text: "text-green" },
+  quality: { dot: "bg-magenta", text: "text-magenta" },
+  documentation: { dot: "bg-cyan", text: "text-cyan" },
+} as const;
 
 export default function Home() {
   const top = data.models[0];
@@ -55,17 +78,31 @@ export default function Home() {
             </span>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-amber-dim">
-            Five tasks I actually care about, scored by an LLM judge on correctness, code
-            quality, and documentation.{" "}
+            Five tasks I actually care about, scored by an LLM judge on{" "}
+            <span className="font-semibold text-green">correctness</span>,{" "}
+            <span className="font-semibold text-magenta">code quality</span>, and{" "}
+            <span className="font-semibold text-cyan">documentation</span>. A benchmark
+            models have to earn.
+          </p>
+          <nav className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-amber-dim">
+            <a className="hover:text-amber-bright" href="#leaderboard">
+              leaderboard
+            </a>
+            <Link className="hover:text-amber-bright" href="/challenges">
+              challenges →
+            </Link>
+            <a className="hover:text-amber-bright" href="#api">
+              api
+            </a>
             <a
-              className="text-amber underline decoration-dotted underline-offset-4 hover:text-amber-bright"
+              className="hover:text-amber-bright"
               href="https://github.com/mager/mager-bench"
               target="_blank"
               rel="noreferrer"
             >
               source →
             </a>
-          </p>
+          </nav>
         </header>
 
         <section
@@ -101,7 +138,7 @@ export default function Home() {
           </dl>
         </section>
 
-        <section className="rise" style={{ animationDelay: "140ms" }}>
+        <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
           <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-amber-dim">leaderboard</h2>
           <div className="overflow-x-auto border border-amber-faint">
             <table className="w-full min-w-[480px] border-collapse text-sm">
@@ -114,14 +151,27 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {data.models.map((m, i) => (
-                  <tr key={m.id} className="border-b border-amber-faint/60 last:border-0">
-                    <td className="px-4 py-3 text-amber-dim">{String(i + 1).padStart(2, "0")}</td>
-                    <td className="px-4 py-3 font-medium">{m.name}</td>
-                    <td className="glow px-4 py-3 text-right">{m.average.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-right text-amber-dim">{m.avg_speed_ms}ms</td>
-                  </tr>
-                ))}
+                {data.models.map((m, i) => {
+                  const style = TIER_STYLE[tier(m.average)];
+                  return (
+                    <tr
+                      key={m.id}
+                      className="lift border-b border-amber-faint/60 last:border-0"
+                    >
+                      <td className="px-4 py-3 text-amber-dim">{String(i + 1).padStart(2, "0")}</td>
+                      <td className="px-4 py-3 font-medium">
+                        <span className="inline-flex items-center gap-2">
+                          <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+                          {m.name}
+                        </span>
+                      </td>
+                      <td className={`px-4 py-3 text-right ${style.text} ${style.glow}`}>
+                        {m.average.toFixed(1)}
+                      </td>
+                      <td className="px-4 py-3 text-right text-amber-dim">{m.avg_speed_ms}ms</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -135,13 +185,23 @@ export default function Home() {
             {top.name} — challenge breakdown
           </h2>
           {top.challenges.map((c) => {
-            const isAlert = c.total < 5;
+            const t = tier(c.total);
+            const style = TIER_STYLE[t];
             return (
-              <article key={c.name} className="border border-amber-faint bg-bg-raised/40 px-4 py-4">
+              <article
+                key={c.name}
+                className="lift border border-amber-faint bg-bg-raised/40 px-4 py-4"
+              >
                 <div className="flex items-center gap-3">
-                  <h3 className="whitespace-nowrap font-mono text-base font-semibold tracking-wide text-amber-bright">
+                  <Link
+                    href={`/challenges/${c.name}`}
+                    className="group whitespace-nowrap font-mono text-base font-semibold tracking-wide text-amber-bright hover:text-amber"
+                  >
                     {c.name}
-                  </h3>
+                    <span className="ml-1.5 inline-block text-amber-dim transition-transform group-hover:translate-x-0.5">
+                      →
+                    </span>
+                  </Link>
                   <div
                     className="h-px flex-1"
                     style={{
@@ -149,32 +209,47 @@ export default function Home() {
                         "repeating-linear-gradient(to right, var(--amber-dim) 0, var(--amber-dim) 4px, transparent 4px, transparent 8px)",
                     }}
                   />
-                  <span
-                    className={`font-display text-2xl ${isAlert ? "glow-alert text-alert" : "glow"}`}
-                  >
+                  <span className={`font-display text-2xl ${style.text} ${style.glow}`}>
                     {c.total.toFixed(1)}
                   </span>
                 </div>
                 <p className="mt-1.5 text-sm leading-relaxed text-amber-dim">{c.description}</p>
 
                 <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-amber-dim">
-                  <span>
-                    correctness <b className="font-semibold text-amber-bright">{c.correctness.toFixed(1)}</b>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.correctness.dot}`} />
+                    correctness{" "}
+                    <b className={`font-semibold ${DIMENSION_STYLE.correctness.text}`}>
+                      {c.correctness.toFixed(1)}
+                    </b>
                   </span>
-                  <span>
-                    quality <b className="font-semibold text-amber-bright">{c.quality.toFixed(1)}</b>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.quality.dot}`} />
+                    quality{" "}
+                    <b className={`font-semibold ${DIMENSION_STYLE.quality.text}`}>
+                      {c.quality.toFixed(1)}
+                    </b>
                   </span>
-                  <span>
-                    documentation <b className="font-semibold text-amber-bright">{c.documentation.toFixed(1)}</b>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.documentation.dot}`}
+                    />
+                    documentation{" "}
+                    <b className={`font-semibold ${DIMENSION_STYLE.documentation.text}`}>
+                      {c.documentation.toFixed(1)}
+                    </b>
                   </span>
                   <span>{c.speed_ms}ms</span>
-                  {isAlert && (
-                    <span className="glow-alert text-alert">⚠ {scoreLabel(c.total)}</span>
+                  {t !== "solid" && (
+                    <span className={`${style.text} ${style.glow}`}>
+                      {t === "excellent" ? "▲" : t === "regression" ? "⚠" : "●"} {TIER_LABEL[t]}
+                    </span>
                   )}
                 </div>
 
-                <p className="mt-3 border-l-2 border-amber-faint pl-3 text-sm leading-relaxed text-amber">
-                  # {c.notes}
+                <p className="mt-3 bg-bg/50 px-3 py-2 text-sm leading-relaxed text-amber">
+                  <span className="text-amber-dim"># </span>
+                  {c.notes}
                 </p>
               </article>
             );
@@ -182,7 +257,8 @@ export default function Home() {
         </section>
 
         <section
-          className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4 text-xs"
+          id="api"
+          className="rise scroll-mt-6 border border-amber-faint bg-bg-raised/40 px-4 py-4 text-xs"
           style={{ animationDelay: "260ms" }}
         >
           <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-amber-dim">api</h2>
@@ -206,7 +282,10 @@ export default function Home() {
           style={{ animationDelay: "320ms" }}
         >
           <span>mager-bench</span>
-          <span className="cursor">READY</span>
+          <Link href="/challenges" className="hover:text-amber-bright">
+            think a model can pass all five? →
+          </Link>
+          <span className="cursor">AWAITING CHALLENGER</span>
         </footer>
       </div>
     </div>

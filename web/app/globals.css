@@ -8,6 +8,16 @@
   --amber-dim: #a4790f;
   --amber-faint: #4a3608;
   --alert: #ff4433;
+
+  /* ANSI-terminal-inspired accents — one hue per rubric dimension.
+     Held at the same lightness/chroma as --amber so every accent glows
+     with equal intensity; only hue changes. */
+  --green: oklch(78% 0.17 152);
+  --green-dim: oklch(55% 0.12 152);
+  --magenta: oklch(74% 0.2 335);
+  --magenta-dim: oklch(52% 0.14 335);
+  --cyan: oklch(78% 0.13 220);
+  --cyan-dim: oklch(55% 0.1 220);
 }
 
 @theme inline {
@@ -18,6 +28,12 @@
   --color-amber-dim: var(--amber-dim);
   --color-amber-faint: var(--amber-faint);
   --color-alert: var(--alert);
+  --color-green: var(--green);
+  --color-green-dim: var(--green-dim);
+  --color-magenta: var(--magenta);
+  --color-magenta-dim: var(--magenta-dim);
+  --color-cyan: var(--cyan);
+  --color-cyan-dim: var(--cyan-dim);
   --font-display: var(--font-vt323);
   --font-mono: var(--font-plex-mono);
 }
@@ -141,7 +157,62 @@ body::after {
     0 0 24px rgba(255, 68, 51, 0.4);
 }
 
+.glow-green {
+  text-shadow:
+    0 0 6px oklch(78% 0.17 152 / 0.6),
+    0 0 20px oklch(78% 0.17 152 / 0.3);
+}
+
+.glow-magenta {
+  text-shadow:
+    0 0 6px oklch(74% 0.2 335 / 0.6),
+    0 0 20px oklch(74% 0.2 335 / 0.3);
+}
+
+.glow-cyan {
+  text-shadow:
+    0 0 6px oklch(78% 0.13 220 / 0.6),
+    0 0 20px oklch(78% 0.13 220 / 0.3);
+}
+
+.lift {
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.lift:hover {
+  transform: translateY(-2px);
+  border-color: var(--amber-dim);
+  background-color: color-mix(in oklch, var(--bg-raised) 85%, var(--amber) 6%);
+}
+
 ::selection {
   background: var(--amber);
   color: var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-flicker,
+  .rise {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cursor::after {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .lift {
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .lift:hover {
+    transform: none;
+  }
 }
