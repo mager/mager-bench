@@ -39,12 +39,14 @@ export default function ChallengesIndex() {
       <div className="mx-auto flex max-w-4xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h1 className="glow font-display text-4xl tracking-wide sm:text-5xl">challenges</h1>
-            <Link href="/" className="text-xs text-amber-dim hover:text-amber-bright">
+            <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
+              challenges
+            </h1>
+            <Link href="/" className="text-xs text-fg-dim hover:text-amber-bright">
               ← leaderboard
             </Link>
           </div>
-          <p className="max-w-xl text-sm leading-relaxed text-amber-dim">
+          <p className="max-w-xl text-sm leading-relaxed text-fg">
             The five tasks every model runs. Full prompt, full rubric, no black box — click
             into any of them to see exactly what&apos;s being judged.
           </p>
@@ -61,19 +63,27 @@ export default function ChallengesIndex() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <span className="text-xs text-amber-dim">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="text-xs text-fg-dim">{String(i + 1).padStart(2, "0")}</span>
                     <h2 className="font-mono text-base font-semibold tracking-wide text-amber-bright group-hover:text-amber">
                       {c.name}
                     </h2>
                   </div>
                   {best && (
-                    <span className="glow font-display text-xl leading-none">
+                    <span
+                      className={`font-display text-xl leading-none ${
+                        best.total > 9.5
+                          ? "text-green glow-green"
+                          : best.total >= 7
+                            ? "text-amber glow"
+                            : "text-alert glow-alert"
+                      }`}
+                    >
                       {best.total.toFixed(1)}
                     </span>
                   )}
                 </div>
-                <p className="text-sm leading-relaxed text-amber-dim">{c.description}</p>
-                <span className="mt-1 text-xs text-amber-dim">
+                <p className="text-sm leading-relaxed text-fg-dim">{c.description}</p>
+                <span className="mt-1 text-xs text-fg-dim">
                   {best ? (
                     <>
                       best so far: <span className="text-amber">{best.model}</span>

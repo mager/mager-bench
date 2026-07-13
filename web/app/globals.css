@@ -9,6 +9,13 @@
   --amber-faint: #4a3608;
   --alert: #ff4433;
 
+  /* Readable body text lives here, not on amber — amber is saturated
+     enough that at body-copy sizes (and under the scanline/glow effects)
+     it reads as fatiguing even though it clears WCAG numerically. Amber
+     stays reserved for brand/accent/interactive elements. */
+  --fg: #e8e1cf;
+  --fg-dim: #a79c86;
+
   /* ANSI-terminal-inspired accents — one hue per rubric dimension.
      Held at the same lightness/chroma as --amber so every accent glows
      with equal intensity; only hue changes. */
@@ -28,6 +35,8 @@
   --color-amber-dim: var(--amber-dim);
   --color-amber-faint: var(--amber-faint);
   --color-alert: var(--alert);
+  --color-fg: var(--fg);
+  --color-fg-dim: var(--fg-dim);
   --color-green: var(--green);
   --color-green-dim: var(--green-dim);
   --color-magenta: var(--magenta);
@@ -49,7 +58,7 @@ body {
 
 body {
   background: radial-gradient(ellipse at 50% -10%, #1c1206 0%, var(--bg) 55%, #030201 100%);
-  color: var(--amber);
+  color: var(--fg);
 }
 
 /* scanlines */
@@ -142,13 +151,6 @@ body::after {
   text-shadow:
     0 0 6px rgba(255, 176, 0, 0.55),
     0 0 18px rgba(255, 176, 0, 0.25);
-}
-
-.glow-strong {
-  text-shadow:
-    0 0 10px rgba(255, 176, 0, 0.8),
-    0 0 34px rgba(255, 176, 0, 0.45),
-    0 0 70px rgba(255, 176, 0, 0.2);
 }
 
 .glow-alert {

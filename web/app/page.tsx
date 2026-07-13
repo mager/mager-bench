@@ -30,27 +30,24 @@ function formatDate(iso: string) {
   return new Date(iso).toUTCString().replace("GMT", "UTC");
 }
 
-type Tier = "excellent" | "solid" | "mixed" | "regression";
+type Tier = "green" | "yellow" | "red";
 
 function tier(score: number): Tier {
-  if (score >= 8.5) return "excellent";
-  if (score >= 7) return "solid";
-  if (score >= 5) return "mixed";
-  return "regression";
+  if (score > 9.5) return "green";
+  if (score >= 7) return "yellow";
+  return "red";
 }
 
 const TIER_LABEL: Record<Tier, string> = {
-  excellent: "EXCELLENT",
-  solid: "SOLID",
-  mixed: "MIXED",
-  regression: "REGRESSION",
+  green: "TOP SCORE",
+  yellow: "SOLID",
+  red: "LOW SCORE",
 };
 
 const TIER_STYLE: Record<Tier, { dot: string; text: string; glow: string }> = {
-  excellent: { dot: "bg-green", text: "text-green", glow: "glow-green" },
-  solid: { dot: "bg-amber", text: "text-amber", glow: "glow" },
-  mixed: { dot: "bg-amber-dim", text: "text-amber-dim", glow: "" },
-  regression: { dot: "bg-alert", text: "text-alert", glow: "glow-alert" },
+  green: { dot: "bg-green", text: "text-green", glow: "glow-green" },
+  yellow: { dot: "bg-amber", text: "text-amber", glow: "glow" },
+  red: { dot: "bg-alert", text: "text-alert", glow: "glow-alert" },
 };
 
 const DIMENSION_STYLE = {
@@ -70,21 +67,21 @@ export default function Home() {
           style={{ animationDelay: "0ms" }}
         >
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h1 className="glow font-display text-4xl tracking-wide sm:text-5xl">
+            <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
               mager-bench
             </h1>
-            <span className="text-xs text-amber-dim">
+            <span className="text-xs text-fg-dim">
               v1.0 // personal coding-model benchmark
             </span>
           </div>
-          <p className="max-w-xl text-sm leading-relaxed text-amber-dim">
+          <p className="max-w-xl text-sm leading-relaxed text-fg">
             Five tasks I actually care about, scored by an LLM judge on{" "}
             <span className="font-semibold text-green">correctness</span>,{" "}
             <span className="font-semibold text-magenta">code quality</span>, and{" "}
             <span className="font-semibold text-cyan">documentation</span>. A benchmark
             models have to earn.
           </p>
-          <nav className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-amber-dim">
+          <nav className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-fg-dim">
             <a className="hover:text-amber-bright" href="#leaderboard">
               leaderboard
             </a>
@@ -110,40 +107,42 @@ export default function Home() {
           style={{ animationDelay: "80ms" }}
         >
           <div className="crt-flicker">
-            <div className="text-xs uppercase tracking-[0.3em] text-amber-dim">{top.name}</div>
-            <div className="glow-strong font-display text-[6.5rem] leading-none sm:text-[9rem]">
+            <div className="text-xs uppercase tracking-[0.3em] text-fg-dim">{top.name}</div>
+            <div
+              className={`font-display text-[6.5rem] leading-none sm:text-[9rem] ${TIER_STYLE[tier(top.average)].text} ${TIER_STYLE[tier(top.average)].glow}`}
+            >
               {top.average.toFixed(1)}
             </div>
-            <div className="text-sm uppercase tracking-[0.3em] text-amber-dim">
+            <div className="text-sm uppercase tracking-[0.3em] text-fg-dim">
               / 10 average score
             </div>
           </div>
           <dl className="grid grid-cols-2 gap-x-10 gap-y-4 text-sm sm:text-right">
             <div>
-              <dt className="text-xs uppercase tracking-wider text-amber-dim">avg latency</dt>
+              <dt className="text-xs uppercase tracking-wider text-fg-dim">avg latency</dt>
               <dd className="mt-0.5 font-medium">{top.avg_speed_ms}ms</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wider text-amber-dim">challenges</dt>
+              <dt className="text-xs uppercase tracking-wider text-fg-dim">challenges</dt>
               <dd className="mt-0.5 font-medium">{top.challenges.length}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wider text-amber-dim">judge</dt>
+              <dt className="text-xs uppercase tracking-wider text-fg-dim">judge</dt>
               <dd className="mt-0.5 font-medium">{data.judge}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wider text-amber-dim">last run</dt>
+              <dt className="text-xs uppercase tracking-wider text-fg-dim">last run</dt>
               <dd className="mt-0.5 font-medium">{formatDate(data.generated_at)}</dd>
             </div>
           </dl>
         </section>
 
         <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
-          <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-amber-dim">leaderboard</h2>
+          <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-fg-dim">leaderboard</h2>
           <div className="overflow-x-auto border border-amber-faint">
             <table className="w-full min-w-[480px] border-collapse text-sm">
               <thead>
-                <tr className="border-b border-amber-faint text-left text-xs uppercase tracking-wider text-amber-dim">
+                <tr className="border-b border-amber-faint text-left text-xs uppercase tracking-wider text-fg-dim">
                   <th className="px-4 py-3 font-normal">#</th>
                   <th className="px-4 py-3 font-normal">model</th>
                   <th className="px-4 py-3 text-right font-normal">avg score</th>
@@ -158,7 +157,7 @@ export default function Home() {
                       key={m.id}
                       className="lift border-b border-amber-faint/60 last:border-0"
                     >
-                      <td className="px-4 py-3 text-amber-dim">{String(i + 1).padStart(2, "0")}</td>
+                      <td className="px-4 py-3 text-fg-dim">{String(i + 1).padStart(2, "0")}</td>
                       <td className="px-4 py-3 font-medium">
                         <span className="inline-flex items-center gap-2">
                           <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
@@ -168,20 +167,20 @@ export default function Home() {
                       <td className={`px-4 py-3 text-right ${style.text} ${style.glow}`}>
                         {m.average.toFixed(1)}
                       </td>
-                      <td className="px-4 py-3 text-right text-amber-dim">{m.avg_speed_ms}ms</td>
+                      <td className="px-4 py-3 text-right text-fg-dim">{m.avg_speed_ms}ms</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-amber-dim">
+          <p className="mt-2 text-xs text-fg-dim">
             more models land here as they get run — see the CLI.
           </p>
         </section>
 
         <section className="rise flex flex-col gap-4" style={{ animationDelay: "200ms" }}>
-          <h2 className="text-xs uppercase tracking-[0.3em] text-amber-dim">
+          <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
             {top.name} — challenge breakdown
           </h2>
           {top.challenges.map((c) => {
@@ -213,9 +212,9 @@ export default function Home() {
                     {c.total.toFixed(1)}
                   </span>
                 </div>
-                <p className="mt-1.5 text-sm leading-relaxed text-amber-dim">{c.description}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-fg">{c.description}</p>
 
-                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-amber-dim">
+                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-fg-dim">
                   <span className="inline-flex items-center gap-1.5">
                     <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.correctness.dot}`} />
                     correctness{" "}
@@ -240,14 +239,14 @@ export default function Home() {
                     </b>
                   </span>
                   <span>{c.speed_ms}ms</span>
-                  {t !== "solid" && (
+                  {t !== "yellow" && (
                     <span className={`${style.text} ${style.glow}`}>
-                      {t === "excellent" ? "▲" : t === "regression" ? "⚠" : "●"} {TIER_LABEL[t]}
+                      {t === "green" ? "▲" : "⚠"} {TIER_LABEL[t]}
                     </span>
                   )}
                 </div>
 
-                <p className="mt-3 bg-bg/50 px-3 py-2 text-sm leading-relaxed text-amber">
+                <p className="mt-3 bg-bg/50 px-3 py-2 text-sm leading-relaxed text-fg">
                   <span className="text-amber-dim"># </span>
                   {c.notes}
                 </p>
@@ -261,8 +260,8 @@ export default function Home() {
           className="rise scroll-mt-6 border border-amber-faint bg-bg-raised/40 px-4 py-4 text-xs"
           style={{ animationDelay: "260ms" }}
         >
-          <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-amber-dim">api</h2>
-          <p className="text-amber-dim">
+          <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">api</h2>
+          <p className="text-fg-dim">
             $ curl{" "}
             <a
               className="text-amber underline decoration-dotted underline-offset-4 hover:text-amber-bright"
@@ -272,13 +271,13 @@ export default function Home() {
             </a>{" "}
             → 200 OK
           </p>
-          <p className="mt-1 text-amber-dim">
+          <p className="mt-1 text-fg-dim">
             Same data behind this page, as JSON. Cached 1h at the edge.
           </p>
         </section>
 
         <footer
-          className="rise flex flex-wrap items-center justify-between gap-2 border-t border-amber-faint pt-4 text-xs text-amber-dim"
+          className="rise flex flex-wrap items-center justify-between gap-2 border-t border-amber-faint pt-4 text-xs text-fg-dim"
           style={{ animationDelay: "320ms" }}
         >
           <span>mager-bench</span>

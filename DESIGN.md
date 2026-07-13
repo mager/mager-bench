@@ -4,6 +4,8 @@ description: CRT amber terminal dashboard for a personal coding-model benchmark,
 colors:
   bg: "#070502"
   bg-raised: "#120b04"
+  fg: "#e8e1cf"
+  fg-dim: "#a79c86"
   amber: "#ffb000"
   amber-bright: "#ffd479"
   amber-dim: "#a4790f"
@@ -43,13 +45,11 @@ components:
   leaderboard-row:
     backgroundColor: "{colors.bg}"
     textColor: "{colors.amber}"
-  score-excellent:
+  score-green:
     textColor: "{colors.green}"
-  score-solid:
+  score-yellow:
     textColor: "{colors.amber}"
-  score-mixed:
-    textColor: "{colors.amber-dim}"
-  score-regression:
+  score-red:
     textColor: "{colors.alert}"
 ---
 
@@ -66,14 +66,24 @@ are seasoning on top of body text that must clear WCAG AA on its own.
 Anti-references: generic SaaS eval-dashboard cream/gray cards, sterile
 MLPerf/HuggingFace-leaderboard tables, corporate AI-benchmark marketing
 sites, and — importantly — a *too-committed* retro skin where the aesthetic
-wins and scores become hard to read (an earlier legibility pass corrected
-exactly that failure mode; see Do's and Don'ts).
+wins and scores become hard to read (two separate legibility passes have
+corrected exactly that failure mode: capping VT323 to headline sizes, and
+later moving default body copy off saturated amber onto `--fg`; see Do's
+and Don'ts).
 
 ## Colors
 
+**`--fg` / `--fg-dim`** are the default readable text colors — body copy,
+descriptions, prompts, rubric text, labels, meta chrome. Amber is visually
+loud enough that at body-copy sizes, under the scanline/glow effects, it
+reads as fatiguing even when it numerically clears WCAG AA. `--fg` is used
+for anything meant to be read closely; `--fg-dim` for secondary/meta text
+(timestamps, section labels, table chrome).
+
 **Amber** (`--amber` / `--amber-bright` / `--amber-dim` / `--amber-faint`)
-is the dominant brand color — headings, the hero score, chrome, default
-body text. It owns roughly 60%+ of colored surface.
+is reserved for brand and interactive elements now, not default body text:
+headings, links/hover states, the "yellow" score tier, and terminal-chrome
+glyphs (`$`, `#`, dotted rules).
 
 Three ANSI-terminal-inspired accents give each rubric dimension its own
 identity wherever scores are broken down: **green** = correctness, **magenta**
@@ -83,14 +93,14 @@ deliberate coded system, not random color. They appear as small dots +
 bold values next to metric labels — categorical encoding, not a severity
 signal.
 
-Separately, **total-score tiers** use a traffic-light read: green glow for
-EXCELLENT (≥8.5), default amber for SOLID/MIXED (5–8.5), red/alert glow for
-REGRESSION (<5). This is a different color *system* from the dimension
-accents above (severity vs. category) and only appears on aggregate/total
-numbers, never on the per-dimension values, so the two systems don't
-collide visually.
+Separately, every score/rating in the app — including the hero average —
+uses a three-band traffic-light tier: **green** for scores over 9.5,
+**amber/"yellow"** for 7–9.5, **red/alert** for anything below 7. This is a
+different color *system* from the dimension accents above (severity vs.
+category) and only appears on aggregate/total numbers, never on the
+per-dimension values, so the two systems don't collide visually.
 
-`--alert` (red) is reserved for regression scores only — never decorative.
+`--alert` (red) is reserved for sub-7 scores only — never decorative.
 
 ## Typography
 
@@ -125,19 +135,28 @@ in for elevation on interactive/important text instead of box-shadow.
   atop the prompt `<pre>` block on challenge pages, mimicking a terminal
   titlebar — the one place decorative color is allowed to be purely
   atmospheric, since it doesn't compete with data.
-- **Glow classes**: `.glow` (amber), `.glow-strong` (hero only), `.glow-alert`
-  (red), `.glow-green`, `.glow-magenta`, `.glow-cyan` — paired 1:1 with the
-  matching `text-*` color, always on already-colored text, never added on
-  its own for decoration.
+- **Glow classes**: `.glow` (amber), `.glow-alert` (red), `.glow-green`,
+  `.glow-magenta`, `.glow-cyan` — paired 1:1 with the matching `text-*`
+  color, always on already-colored text, never added on its own for
+  decoration. The hero average uses the same tier glow as every other
+  score display (no separate "hero-only" glow variant), so its color and
+  intensity shift with the tier system instead of staying fixed amber.
 
 ## Do's and Don'ts
 
 **Do**
 - Keep VT323 to headline sizes only; body/metric text stays in IBM Plex Mono.
+- Default body copy, descriptions, and prompt/rubric text to `--fg` (or
+  `--fg-dim` for secondary/meta text) — not amber. Amber is for brand,
+  interactive, and tier-colored elements only, so it stays legible instead
+  of fatiguing at reading sizes.
 - Use green/magenta/cyan only as the correctness/quality/documentation
   identity — don't introduce a fourth categorical hue without a fourth
   category to justify it.
-- Reserve the green/amber/red tier system for aggregate/total scores.
+- Apply the green/amber(yellow)/red tier system to every score/rating
+  shown, including the hero average — not just the per-challenge totals —
+  so a score's color always means the same thing everywhere it appears:
+  green >9.5, amber/yellow 7–9.5, red <7.
 - Respect `prefers-reduced-motion` on every animation (flicker, rise,
   cursor blink, lift) — instant/no-transform fallback, not just "less."
 
@@ -146,7 +165,10 @@ in for elevation on interactive/important text instead of box-shadow.
   cards or callouts (an earlier version of the notes block did this — fixed
   to a background-tint + `#` prefix instead). Full hairline borders or
   background tints only.
+- Don't color body/prose text amber, even at "bright" variants — two
+  separate rounds of user feedback flagged amber-at-reading-size as hard
+  to read; `--fg`/`--fg-dim` exist specifically so this doesn't recur.
 - Don't let glow/scanline effects drop body text below 4.5:1 contrast.
 - Don't add more accent hues "for delight" — the three dimension colors
-  plus the amber/red tier system is the complete palette; more would
+  plus the green/amber/red tier system is the complete palette; more would
   dilute the coded meaning.

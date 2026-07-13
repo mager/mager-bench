@@ -51,9 +51,8 @@ export async function generateMetadata({
 }
 
 function tier(score: number) {
-  if (score >= 8.5) return { text: "text-green", glow: "glow-green" };
+  if (score > 9.5) return { text: "text-green", glow: "glow-green" };
   if (score >= 7) return { text: "text-amber", glow: "glow" };
-  if (score >= 5) return { text: "text-amber-dim", glow: "" };
   return { text: "text-alert", glow: "glow-alert" };
 }
 
@@ -78,32 +77,32 @@ export default async function ChallengePage({
     <div className="min-h-screen px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
-          <Link href="/challenges" className="text-xs text-amber-dim hover:text-amber-bright">
+          <Link href="/challenges" className="text-xs text-fg-dim hover:text-amber-bright">
             ← all challenges
           </Link>
-          <h1 className="glow font-display text-4xl tracking-wide sm:text-5xl">
+          <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
             {challenge.name}
           </h1>
-          <p className="max-w-xl text-sm leading-relaxed text-amber-dim">{challenge.description}</p>
+          <p className="max-w-xl text-sm leading-relaxed text-fg">{challenge.description}</p>
         </header>
 
         <section className="rise flex flex-col gap-2" style={{ animationDelay: "80ms" }}>
-          <h2 className="text-xs uppercase tracking-[0.3em] text-amber-dim">the prompt</h2>
+          <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">the prompt</h2>
           <div className="border border-amber-faint bg-bg-raised/40">
-            <div className="flex items-center gap-2 border-b border-amber-faint px-4 py-2 text-xs text-amber-dim">
+            <div className="flex items-center gap-2 border-b border-amber-faint px-4 py-2 text-xs text-fg-dim">
               <span className="h-2.5 w-2.5 rounded-full bg-alert/70" />
               <span className="h-2.5 w-2.5 rounded-full bg-amber/70" />
               <span className="h-2.5 w-2.5 rounded-full bg-green/70" />
               <span className="ml-2">$ cat {challenge.name}.prompt</span>
             </div>
-            <pre className="overflow-x-auto whitespace-pre-wrap px-4 py-4 text-sm leading-relaxed text-amber">
+            <pre className="overflow-x-auto whitespace-pre-wrap px-4 py-4 text-sm leading-relaxed text-fg">
 {challenge.prompt}
             </pre>
           </div>
         </section>
 
         <section className="rise flex flex-col gap-3" style={{ animationDelay: "140ms" }}>
-          <h2 className="text-xs uppercase tracking-[0.3em] text-amber-dim">rubric</h2>
+          <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">rubric</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {(["correctness", "quality", "documentation"] as const).map((dim) => (
               <div key={dim} className="border border-amber-faint bg-bg-raised/40 px-3 py-3">
@@ -113,16 +112,16 @@ export default async function ChallengePage({
                     {dim}
                   </span>
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-amber-dim">{challenge.rubric[dim]}</p>
+                <p className="mt-2 text-sm leading-relaxed text-fg">{challenge.rubric[dim]}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="rise flex flex-col gap-3" style={{ animationDelay: "200ms" }}>
-          <h2 className="text-xs uppercase tracking-[0.3em] text-amber-dim">results</h2>
+          <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">results</h2>
           {rows.length === 0 ? (
-            <p className="text-sm text-amber-dim">No model has run this challenge yet.</p>
+            <p className="text-sm text-fg-dim">No model has run this challenge yet.</p>
           ) : (
             <div className="flex flex-col gap-3">
               {rows.map((r) => {
@@ -144,7 +143,7 @@ export default async function ChallengePage({
                         {r.total.toFixed(1)}
                       </span>
                     </div>
-                    <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-amber-dim">
+                    <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-fg-dim">
                       <span className="inline-flex items-center gap-1.5">
                         <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.correctness.dot}`} />
                         correctness{" "}
@@ -168,7 +167,7 @@ export default async function ChallengePage({
                       </span>
                       <span>{r.speed_ms}ms</span>
                     </div>
-                    <p className="mt-3 bg-bg/50 px-3 py-2 text-sm leading-relaxed text-amber">
+                    <p className="mt-3 bg-bg/50 px-3 py-2 text-sm leading-relaxed text-fg">
                       <span className="text-amber-dim"># </span>
                       {r.notes}
                     </p>
@@ -179,7 +178,7 @@ export default async function ChallengePage({
           )}
         </section>
 
-        <footer className="rise flex items-center justify-between border-t border-amber-faint pt-4 text-xs text-amber-dim">
+        <footer className="rise flex items-center justify-between border-t border-amber-faint pt-4 text-xs text-fg-dim">
           <Link href="/challenges" className="hover:text-amber-bright">
             ← all challenges
           </Link>
