@@ -137,9 +137,9 @@ export default function Home() {
           {top.challenges.map((c) => {
             const isAlert = c.total < 5;
             return (
-              <article key={c.name} className="border border-amber-faint bg-bg-raised/40 px-4 py-3">
+              <article key={c.name} className="border border-amber-faint bg-bg-raised/40 px-4 py-4">
                 <div className="flex items-center gap-3">
-                  <h3 className="whitespace-nowrap font-display text-lg tracking-wide">
+                  <h3 className="whitespace-nowrap font-mono text-base font-semibold tracking-wide text-amber-bright">
                     {c.name}
                   </h3>
                   <div
@@ -155,17 +155,17 @@ export default function Home() {
                     {c.total.toFixed(1)}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-amber-dim">{c.description}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-amber-dim">{c.description}</p>
 
-                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-amber-dim">
+                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-amber-dim">
                   <span>
-                    correctness <b className="text-amber">{c.correctness.toFixed(1)}</b>
+                    correctness <b className="font-semibold text-amber-bright">{c.correctness.toFixed(1)}</b>
                   </span>
                   <span>
-                    quality <b className="text-amber">{c.quality.toFixed(1)}</b>
+                    quality <b className="font-semibold text-amber-bright">{c.quality.toFixed(1)}</b>
                   </span>
                   <span>
-                    documentation <b className="text-amber">{c.documentation.toFixed(1)}</b>
+                    documentation <b className="font-semibold text-amber-bright">{c.documentation.toFixed(1)}</b>
                   </span>
                   <span>{c.speed_ms}ms</span>
                   {isAlert && (
@@ -173,7 +173,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <p className="mt-3 border-l-2 border-amber-faint pl-3 text-xs italic text-amber-dim">
+                <p className="mt-3 border-l-2 border-amber-faint pl-3 text-sm leading-relaxed text-amber">
                   # {c.notes}
                 </p>
               </article>
