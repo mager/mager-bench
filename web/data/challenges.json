@@ -88,5 +88,25 @@
       "quality": "Is the query readable — CTEs named clearly, columns aliased cleanly? Is there a single final SELECT rather than redundant nesting? Are aggregate functions used correctly?",
       "documentation": "Does each CTE have a comment explaining what it computes? Are column aliases self-explanatory? Is the overall query structure easy to follow top-to-bottom?"
     }
+  },
+  {
+    "name": "go-test",
+    "description": "Write idiomatic Go table-driven tests — tests knowledge of Go testing conventions",
+    "prompt": "Write a Go test file for the following function:\n\n```go\n// WordCount returns a map of each unique word in s to the number\n// of times it appears. Words are case-insensitive and separated by\n// whitespace. Punctuation attached to words is stripped.\nfunc WordCount(s string) map[string]int\n```\n\nRequirements:\n- Package: `wordcount` (test file: `wordcount_test.go`)\n- Use Go's standard `testing` package — no third-party libraries\n- Use a table-driven test with a `[]struct{ name, input string; want map[string]int }` slice\n- Include at least 6 test cases: empty string, single word, mixed case, punctuation, repeated words, multi-word sentence\n- Use `t.Run(tc.name, ...)` for subtests so failures are identifiable\n- Use `reflect.DeepEqual` or `maps.Equal` to compare maps\n- Add a benchmark `BenchmarkWordCount` that runs on a realistic sentence",
+    "rubric": {
+      "correctness": "Do the 6+ test cases cover empty input, case-insensitivity, punctuation stripping, and repeated words with correct expected counts? Is the map comparison correct (not == on maps)? Does the benchmark compile and follow Go benchmark conventions (b.N loop)?",
+      "quality": "Is the table-driven pattern used correctly (slice of structs, not parallel variables)? Are subtests used with t.Run? Is the test file in the right package? Is the code idiomatic Go?",
+      "documentation": "Are test case names descriptive ('empty string', 'mixed case punctuation')? Is there a comment on the test function explaining what it covers? Is the benchmark named and commented correctly?"
+    }
+  },
+  {
+    "name": "elixir-test",
+    "description": "Write idiomatic Elixir ExUnit tests — tests knowledge of Elixir testing conventions",
+    "prompt": "Write an ExUnit test module for the following Elixir function:\n\n```elixir\ndefmodule StringUtils do\n  @doc \"\"\"\n  Truncates a string to at most `max_len` characters.\n  If truncated, appends `suffix` (default: \"...\").\n  Returns the original string if it is already within `max_len`.\n  Raises ArgumentError if max_len is negative.\n  \"\"\"\n  @spec truncate(String.t(), non_neg_integer(), String.t()) :: String.t()\n  def truncate(str, max_len, suffix \\\\ \"...\")\nend\n```\n\nRequirements:\n- Module name: `StringUtilsTest`, `use ExUnit.Case`\n- Use `describe` blocks to group related cases\n- At least 2 `describe` blocks: one for happy path, one for edge/error cases\n- At least 8 test cases total covering: string shorter than limit, exact length, longer string (suffix appended), empty string, custom suffix, max_len of 0, negative max_len (should raise), unicode string\n- Use `assert`, `assert_raise`, and pattern matching appropriately\n- Add at least one doctest-style `## Examples` in a module comment showing usage",
+    "rubric": {
+      "correctness": "Do the 8+ tests cover all specified cases with correct expected values? Does `assert_raise ArgumentError` correctly test the negative max_len case? Are unicode string lengths handled via `String.length/1`, not `byte_size/1`?",
+      "quality": "Are `describe` blocks used to group related tests logically? Are test names written as plain English specs? Is the module correctly structured with `use ExUnit.Case`?",
+      "documentation": "Are describe block labels and test names readable as a spec? Is the module-level Examples comment present and accurate? Does the overall file read like idiomatic Elixir test documentation?"
+    }
   }
 ]
