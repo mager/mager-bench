@@ -72,10 +72,11 @@ def _clamp(value) -> float:
 
 
 def _extract_text(msg) -> str:
+    # skip thinking blocks (extended thinking models emit these before text)
     for block in msg.content:
         if block.type == "text":
             return block.text.strip()
-    raise ValueError(f"no text block in judge response (stop_reason={msg.stop_reason})")
+    raise ValueError(f"no text block in judge response (stop_reason={msg.stop_reason}, blocks={[b.type for b in msg.content]})")
 
 
 def _strip_fences(raw: str) -> str:
@@ -104,24 +105,12 @@ def score_response(
 
     try:
         client = _get_client()
-        try:
-            # Preferred path: structured outputs guarantee schema-valid JSON.
-            msg = client.messages.create(
-                model=judge_model,
-                max_tokens=2048,
-                output_config={"format": {"type": "json_schema", "schema": JUDGE_SCHEMA}},
-                messages=[{"role": "user", "content": prompt}],
-            )
-            raw = _extract_text(msg)
-        except anthropic.BadRequestError:
-            # Judge models without structured-output support fall back to
-            # prompt-enforced JSON with fence stripping.
-            msg = client.messages.create(
-                model=judge_model,
-                max_tokens=2048,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            raw = _strip_fences(_extract_text(msg))
+        msg = client.messages.create(
+            model=judge_model,
+            max_tokens=4096,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = _strip_fences(_extract_text(msg))
 
         scores = json.loads(raw)
         return {

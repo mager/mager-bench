@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-13T15:27:45.889916+00:00",
+  "generated_at": "2026-07-16T21:16:56.558231+00:00",
   "judge": "claude-sonnet-5",
   "models": [
     {
-      "id": "claude-haiku-4-5",
-      "name": "Claude Haiku 4.5",
-      "average": 7.6,
-      "avg_speed_ms": 9440,
+      "id": "claude-sonnet-4-6",
+      "name": "Claude Sonnet 4.6",
+      "average": 7.1,
+      "avg_speed_ms": 23102,
       "challenges": [
         {
           "name": "fizzbuzz",
@@ -15,8 +15,8 @@
           "quality": 9,
           "documentation": 10,
           "total": 9.7,
-          "speed_ms": 6454,
-          "notes": "Correct, clean, idiomatic implementation with thorough docstring, examples, and even added input validation beyond requirements."
+          "speed_ms": 13689,
+          "notes": "Correct, clean, idiomatic implementation with thorough docstring, doctest-style examples, sensible input validation, and helpful usage demos, though extra validation exceeds task scope slightly."
         },
         {
           "name": "readme-writer",
@@ -25,38 +25,98 @@
           "quality": 9,
           "documentation": 9,
           "total": 9,
-          "speed_ms": 12085,
-          "notes": "Comprehensive, well-organized README covering all required sections with accurate flag documentation, clear examples, and proper Markdown/code-block formatting, though it invents extra details (hashing, exit codes) not specified in the prompt.'"
+          "speed_ms": 26268,
+          "notes": "Comprehensive, well-organized README covering all required sections with correct flag documentation, clear examples, and proper Markdown/code-block usage, though it invents extra details (e.g., MD5, placeholder repo links) not specified in the prompt."
         },
         {
           "name": "refactor",
           "description": "Code clarity + whether the model can explain its changes",
-          "correctness": 10,
-          "quality": 8,
-          "documentation": 8,
-          "total": 8.7,
-          "speed_ms": 4445,
-          "notes": "Correct and clean refactor with meaningful names and idiomatic comprehension, but keeping 'x' as a loop variable is a minor quality lapse and the explanation table, while accurate, is fairly generic/boilerplate rather than deeply specific."
+          "correctness": 9,
+          "quality": 9,
+          "documentation": 9,
+          "total": 9,
+          "speed_ms": 15452,
+          "notes": "Accurate, well-documented refactor with meaningful names, idiomatic comprehension, correct type hints, and specific, non-generic explanations for each change."
         },
         {
           "name": "binary-search",
           "description": "Algorithm + full docstring (Args/Returns/Raises + examples)",
-          "correctness": 8,
-          "quality": 6.5,
+          "correctness": 9,
+          "quality": 8,
           "documentation": 9,
-          "total": 7.8,
-          "speed_ms": 13145,
-          "notes": "Correct binary search logic and good edge-case handling, but the added `sorted(arr)` validation each call turns the algorithm into O(n log n), contradicting the claimed O(log n) efficiency and undermining the point of binary search; documentation is thorough and examples are accurate."
+          "total": 8.7,
+          "speed_ms": 30328,
+          "notes": "Correct O(log n) binary search with overflow-safe mid calculation and solid edge-case handling, though the added O(n) sortedness check slightly undermines efficiency and the response ends with a truncated 'sample output' section; documentation is thorough with accurate docstring examples and meaningful comments."
+        },
+        {
+          "name": "async-fetch",
+          "description": "Async concurrency patterns + retry/timeout handling",
+          "correctness": 8,
+          "quality": 8,
+          "documentation": 9,
+          "total": 8.3,
+          "speed_ms": 29212,
+          "notes": "Solid implementation with proper concurrency, per-request timeout, exponential backoff, and never-raise behavior, though the response is truncated mid-explanation and uses a slightly odd backoff scheme (0s on first attempt) plus TCPConnector(limit=0) which removes any concurrency control.'"
+        },
+        {
+          "name": "elixir-test",
+          "description": "ExUnit describe blocks + assert_raise + unicode handling",
+          "correctness": 8,
+          "quality": 7,
+          "documentation": 9,
+          "total": 8,
+          "speed_ms": 23942,
+          "notes": "patched after judge fix"
+        },
+        {
+          "name": "sql",
+          "description": "CTE + window function fluency on a real schema",
+          "correctness": 8,
+          "quality": 6,
+          "documentation": 6,
+          "total": 6.7,
+          "speed_ms": 16174,
+          "notes": "patched after judge fix"
+        },
+        {
+          "name": "test-writing",
+          "description": "Edge-case thinking + pytest parametrize discipline",
+          "correctness": 3,
+          "quality": 5,
+          "documentation": 8,
+          "total": 5.3,
+          "speed_ms": 28558,
+          "notes": "Well-designed, thorough parametrized happy-path and error tests with accurate arithmetic and clear naming, but the response is truncated mid-function ('with pyt'), producing a syntax error that would prevent the test suite from even being collected."
+        },
+        {
+          "name": "debug",
+          "description": "Careful reading + correctness reasoning over broken code",
+          "correctness": 6,
+          "quality": 5,
+          "documentation": 5,
+          "total": 5.3,
+          "speed_ms": 24025,
+          "notes": "patched after judge fix"
+        },
+        {
+          "name": "go-test",
+          "description": "Idiomatic Go table-driven tests + benchmark",
+          "correctness": 4,
+          "quality": 5,
+          "documentation": 7,
+          "total": 5.3,
+          "speed_ms": 18838,
+          "notes": "Test cases and benchmark are well-designed and exceed the requirement, but the file incorrectly declares package wordcount_test and reimplements a stub WordCount that always returns nil, meaning the delivered file will fail most subtests unless manually edited to remove the stub and fix the package, contradicting the stated 'package: wordcount' requirement."
         },
         {
           "name": "api-client",
           "description": "Class design + error handling + type hints + docs",
           "correctness": 1,
           "quality": 3,
-          "documentation": 4,
-          "total": 2.7,
-          "speed_ms": 11073,
-          "notes": "Response is cut off mid-implementation (post method incomplete, no usage example at bottom), making the code non-functional despite good structure and docstrings up to that point."
+          "documentation": 5,
+          "total": 3,
+          "speed_ms": 27637,
+          "notes": "Response is truncated mid-method, missing the post() method entirely and the usage example, so the code doesn't even run as-is despite otherwise clean structure and good docstrings for what exists."
         }
       ]
     }

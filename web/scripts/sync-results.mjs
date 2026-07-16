@@ -11,6 +11,12 @@ const DESCRIPTIONS = {
   "api-client": "Class design + error handling + type hints + docs",
   "readme-writer": "Pure documentation ability — no code at all",
   refactor: "Code clarity + whether the model can explain its changes",
+  "test-writing": "Edge-case thinking + pytest parametrize discipline",
+  debug: "Careful reading + correctness reasoning over broken code",
+  "async-fetch": "Async concurrency patterns + retry/timeout handling",
+  sql: "CTE + window function fluency on a real schema",
+  "go-test": "Idiomatic Go table-driven tests + benchmark",
+  "elixir-test": "ExUnit describe blocks + assert_raise + unicode handling",
 };
 
 const DISPLAY_NAMES = {
