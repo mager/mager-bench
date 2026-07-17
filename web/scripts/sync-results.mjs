@@ -17,6 +17,7 @@ const DESCRIPTIONS = {
   sql: "CTE + window function fluency on a real schema",
   "go-test": "Idiomatic Go table-driven tests + benchmark",
   "elixir-test": "ExUnit describe blocks + assert_raise + unicode handling",
+  doom: "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
 };
 
 const DISPLAY_NAMES = {

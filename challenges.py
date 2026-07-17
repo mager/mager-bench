@@ -368,6 +368,88 @@ CHALLENGES: list[Challenge] = [
             ),
         },
     ),
+    Challenge(
+        name="doom",
+        description="Build a Doom-style raycasting FPS engine in a single HTML file — the mager-bench signature challenge",
+        prompt=(
+            "Implement a first-person 3D raycasting engine in a single self-contained HTML file "
+            "with no external libraries, no external images, and no CDN scripts. "
+            "This is the hardest challenge in the benchmark. Partial credit is given per requirement met.\n\n"
+
+            "## Rendering\n"
+            "- DDA (Digital Differential Analysis) raycasting — not a simplified ray-box approximation\n"
+            "- Fish-eye correction applied to all wall distances\n"
+            "- **Procedurally generated wall textures** using canvas math only (no image files, no data URIs): "
+            "at least 3 distinct texture patterns (e.g. checkerboard, brick, stripe) assigned to different wall types in the map\n"
+            "- Perspective-correct texture mapping onto wall columns\n"
+            "- Distance-based shading: walls darken smoothly as they recede (multiply shade by 1/distance, clamped)\n"
+            "- Ceiling rendered as a flat dark color; floor as a slightly lighter flat color\n"
+            "- Target: 60fps at 640×480 internal resolution scaled to fill the browser window\n\n"
+
+            "## Map\n"
+            "- Hard-coded map of at least 16×16 cells encoded as a 2D array\n"
+            "- Non-trivial layout: at least 3 distinct rooms connected by corridors, one dead end, one secret area\n"
+            "- At least 3 wall types (mapped to the 3 texture patterns)\n"
+            "- One door cell (wall type 4) that opens when the player is within 1.5 cells and presses E; "
+            "opened doors become passable and render as open archways\n"
+            "- One exit cell — reaching it displays a 'LEVEL COMPLETE — [MM:SS]' overlay\n"
+            "- Player spawn position defined in the map; facing toward the first corridor\n\n"
+
+            "## Player\n"
+            "- WASD movement with smooth speed (moveSpeed: 3 cells/sec, rotSpeed: 2 rad/sec)\n"
+            "- Mouse-look for horizontal rotation using the Pointer Lock API (click canvas to lock)\n"
+            "- Collision detection: AABB against all solid walls (player radius: 0.2 cells)\n"
+            "- Field of view: 66 degrees\n\n"
+
+            "## Z-buffer\n"
+            "- Maintain a per-column Z-buffer (array of wall distances) for correct depth ordering\n"
+            "- Use it to clip any future sprite/overlay rendering to avoid drawing behind walls\n\n"
+
+            "## HUD\n"
+            "- Minimap in top-left corner: draw map cells as colored squares, player as a dot with a "
+            "direction arrow; scale: 6px per cell\n"
+            "- FPS counter (rolling average over last 30 frames) in top-right corner\n"
+            "- 'Press E to open door' hint rendered in the center-bottom when a door is within 1.5 cells\n\n"
+
+            "## Code quality\n"
+            "- Single HTML file, all JS inline in <script> tags, all CSS inline in <style>\n"
+            "- requestAnimationFrame game loop with delta-time movement\n"
+            "- Organized into clearly named functions: initMap(), castRay(), drawWallColumn(), "
+            "drawHUD(), drawMinimap(), gameLoop(), handleInput()\n"
+            "- No god-object — game state in a plain JS object, renderer functions take state as argument\n\n"
+
+            "Scoring: the judge scores each major section (rendering, map, player, HUD, code) independently. "
+            "A beautiful but mathematically wrong perspective loses on correctness. "
+            "A correct raycaster with unreadable code loses on quality. "
+            "Both must be right to score above 8."
+        ),
+        rubric={
+            "correctness": (
+                "Does the raycaster use real DDA with fish-eye correction? "
+                "Are wall textures perspective-correct (texture column selected based on exact hit position)? "
+                "Is distance shading applied (not just flat colors)? "
+                "Does the door open on E and become passable? "
+                "Does collision detection prevent wall clipping? "
+                "Does reaching the exit show the LEVEL COMPLETE overlay with time? "
+                "Is the Z-buffer maintained per column? "
+            ),
+            "quality": (
+                "Is the game loop delta-time based (not frame-count based)? "
+                "Does mouse look use Pointer Lock API correctly? "
+                "Is the code organized into the named functions (initMap, castRay, drawWallColumn, drawHUD, etc.)? "
+                "Is game state a plain JS object rather than scattered globals? "
+                "Does the minimap show player position + direction correctly? "
+                "Does the FPS counter use a rolling average? "
+                "Is movement smooth (no jitter, correct WASD diagonals)?"
+            ),
+            "documentation": (
+                "Are the named functions present and clearly scoped? "
+                "Are magic numbers (FOV, moveSpeed, rotSpeed, minimap scale) named as constants? "
+                "Is the map array readable — can you see the room layout by looking at the array? "
+                "Are the three texture types distinguishable in code (not just wall type 1/2/3 with no explanation)?"
+            ),
+        },
+    ),
 ]
 
 _BY_NAME = {c.name: c for c in CHALLENGES}
