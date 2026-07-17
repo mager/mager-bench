@@ -8,8 +8,8 @@ const modelCount = results.models.length;
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-amber-faint">
-      <div className="mx-auto flex max-w-4xl flex-col gap-2 px-4 py-5 text-xs text-fg-dim sm:px-8">
+    <footer className="border-t border-amber-faint px-4 sm:px-8">
+      <div className="mx-auto flex max-w-4xl flex-col gap-2 py-5 text-xs text-fg-dim">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span>
             mager-bench // {challengeCount} challenges · {modelCount}{" "}

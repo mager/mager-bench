@@ -11,8 +11,8 @@ const NAV_LINKS = [
 export function SiteHeader() {
   const pathname = usePathname();
   return (
-    <header className="border-b border-amber-faint">
-      <div className="mx-auto flex max-w-4xl flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-3 sm:px-8">
+    <header className="border-b border-amber-faint px-4 sm:px-8">
+      <div className="mx-auto flex max-w-4xl flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
         <Link
           href="/"
           className="glow font-display text-xl tracking-wide text-amber hover:text-amber-bright"
