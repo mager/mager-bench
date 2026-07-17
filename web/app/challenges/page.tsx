@@ -42,9 +42,8 @@ export default function ChallengesIndex() {
             challenges
           </h1>
           <p className="max-w-xl text-sm leading-relaxed text-fg">
-            The {challenges.length}{" "}
-            tasks every model runs. Full prompt, full rubric, no black box — click
-            into any of them to see exactly what&apos;s being judged.
+            The {challenges.length} tasks every model runs. Full prompt, full rubric, no black
+            box — click into any of them to see exactly what&apos;s being judged.
           </p>
         </header>
 

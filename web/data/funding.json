@@ -1,0 +1,109 @@
+{
+  "headline": "fund the bench",
+  "tagline": "Free models run on free tiers. Paid models need gas money. Pitch in and we run the evals the community wants to see.",
+  "goal_cents": 10000,
+  "raised_cents": 0,
+  "currency": "USD",
+  "sponsors_url": "https://github.com/sponsors/mager",
+  "coffee_url": "https://www.buymeacoffee.com/mager",
+  "open_collective_url": null,
+  "links": [
+    {
+      "label": "GitHub Sponsors",
+      "href": "https://github.com/sponsors/mager",
+      "primary": true
+    },
+    {
+      "label": "Buy Me a Coffee",
+      "href": "https://www.buymeacoffee.com/mager",
+      "primary": false
+    }
+  ],
+  "tiers": [
+    {
+      "id": "coffee",
+      "name": "one coffee",
+      "amount_cents": 500,
+      "perks": [
+        "your handle in the sponsors roll",
+        "keeps free-tier runs humming"
+      ]
+    },
+    {
+      "id": "sprint",
+      "name": "eval sprint",
+      "amount_cents": 2500,
+      "perks": [
+        "fund one full 12-challenge run of a paid model",
+        "name the model in the request queue",
+        "sponsors roll + shoutout in the next results drop"
+      ]
+    },
+    {
+      "id": "season",
+      "name": "season pass",
+      "amount_cents": 10000,
+      "perks": [
+        "fund a month of new-model drops",
+        "vote on the next signature challenge",
+        "name on the dashboard footer for 30 days"
+      ]
+    }
+  ],
+  "wishlist": [
+    {
+      "model_id": "claude-opus-4-8",
+      "name": "Claude Opus 4.8",
+      "tier": "paid",
+      "why": "top-shelf coding model — expensive per full 12-challenge suite",
+      "est_cost_cents": 800,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "claude-sonnet-5",
+      "name": "Claude Sonnet 5",
+      "tier": "paid",
+      "why": "current frontier mid-tier; needs a fresh multi-run pass",
+      "est_cost_cents": 400,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "gpt-4o",
+      "name": "GPT-4o",
+      "tier": "paid",
+      "why": "OpenAI flagship — community keeps asking for a head-to-head",
+      "est_cost_cents": 500,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "gemini-2.5-pro",
+      "name": "Gemini 2.5 Pro",
+      "tier": "paid",
+      "why": "long-context coding muscle, paid quota",
+      "est_cost_cents": 350,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "llama-3.3-70b",
+      "name": "Llama 3.3 70B (Groq)",
+      "tier": "free",
+      "why": "free via Groq — just needs someone to press go",
+      "est_cost_cents": 0,
+      "status": "ready"
+    },
+    {
+      "model_id": "gemini-2.0-flash",
+      "name": "Gemini 2.0 Flash",
+      "tier": "free",
+      "why": "free AI Studio quota — free judge + free subject",
+      "est_cost_cents": 0,
+      "status": "ready"
+    }
+  ],
+  "principles": [
+    "Free-tier models (Groq Llama, Gemini Flash) always run first — no card required.",
+    "Crowdfunded dollars only buy API tokens for published evals, never ads or merch.",
+    "Every funded run ships raw responses + rubric scores in results.json. Show the work.",
+    "You can still fork and run paid models yourself — crowdfunding is optional fuel."
+  ]
+}

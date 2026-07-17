@@ -25,6 +25,9 @@ export function SiteFooter() {
             <Link className="hover:text-amber-bright" href="/challenges">
               challenges
             </Link>
+            <Link className="hover:text-amber-bright" href="/fund">
+              fund the bench
+            </Link>
             <a className="hover:text-amber-bright" href="/api/results">
               api
             </a>

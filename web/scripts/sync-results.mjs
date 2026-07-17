@@ -1,9 +1,18 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const raw = JSON.parse(readFileSync(path.join(__dirname, "../../results.json"), "utf8"));
+const root = path.join(__dirname, "../..");
+const rawPath = path.join(root, "results.json");
+const fundingPath = path.join(__dirname, "../data/funding.json");
+
+if (!existsSync(rawPath)) {
+  console.error("missing ../../results.json — run: python bench.py --output results.json");
+  process.exit(1);
+}
+
+const raw = JSON.parse(readFileSync(rawPath, "utf8"));
 
 const DESCRIPTIONS = {
   fizzbuzz: "Baseline correctness + code style",
@@ -28,7 +37,24 @@ const DISPLAY_NAMES = {
   "gpt-4o": "GPT-4o",
   "gpt-4o-mini": "GPT-4o mini",
   "gemini-2.0-flash": "Gemini 2.0 Flash",
+  "gemini-2.5-flash": "Gemini 2.5 Flash",
   "gemini-2.5-pro": "Gemini 2.5 Pro",
+  "llama-3.3-70b": "Llama 3.3 70B",
+  "llama-3.1-8b": "Llama 3.1 8B",
+};
+
+const TIERS = {
+  "llama-3.3-70b": "free",
+  "llama-3.1-8b": "free",
+  "gemini-2.0-flash": "free",
+  "gemini-2.5-flash": "free",
+  "claude-haiku-4-5": "cheap",
+  "gpt-4o-mini": "cheap",
+  "claude-sonnet-4-6": "paid",
+  "claude-sonnet-5": "paid",
+  "claude-opus-4-8": "paid",
+  "gpt-4o": "paid",
+  "gemini-2.5-pro": "paid",
 };
 
 const byModel = new Map();
@@ -43,12 +69,19 @@ const models = [...byModel.entries()]
     const avgSpeedMs = Math.round(
       challenges.reduce((sum, c) => sum + c.speed_ms, 0) / challenges.length
     );
+    const stds = challenges.map((c) => c.stddev).filter((x) => typeof x === "number");
+    const avgStd =
+      stds.length > 0 ? Math.round((stds.reduce((a, b) => a + b, 0) / stds.length) * 100) / 100 : null;
     return {
       id,
       name: DISPLAY_NAMES[id] ?? id,
+      tier: TIERS[id] ?? "unknown",
       average: Math.round(average * 10) / 10,
       avg_speed_ms: avgSpeedMs,
+      avg_stddev: avgStd,
+      runs: challenges[0]?.runs ?? raw.runs ?? 1,
       challenges: challenges
+        .slice()
         .sort((a, b) => b.total_score - a.total_score)
         .map((c) => ({
           name: c.challenge,
@@ -59,17 +92,41 @@ const models = [...byModel.entries()]
           total: c.total_score,
           speed_ms: c.speed_ms,
           notes: c.notes,
+          stddev: c.stddev ?? null,
+          runs: c.runs ?? 1,
         })),
     };
   })
   .sort((a, b) => b.average - a.average);
 
+let funding = null;
+if (existsSync(fundingPath)) {
+  funding = JSON.parse(readFileSync(fundingPath, "utf8"));
+  // mark wishlist items that already appear on the leaderboard
+  const present = new Set(models.map((m) => m.id));
+  funding = {
+    ...funding,
+    wishlist: (funding.wishlist || []).map((w) => ({
+      ...w,
+      status: present.has(w.model_id) ? "scored" : w.status,
+    })),
+  };
+}
+
 const out = {
   generated_at: raw.generated_at,
   judge: raw.judge,
+  judges: raw.judges ?? (raw.judge ? String(raw.judge).split("+") : []),
+  runs: raw.runs ?? 1,
+  tier: raw.tier ?? null,
   models,
+  funding,
 };
 
 mkdirSync(path.join(__dirname, "../data"), { recursive: true });
 writeFileSync(path.join(__dirname, "../data/results.json"), JSON.stringify(out, null, 2) + "\n");
-console.log(`wrote data/results.json (${models.length} model${models.length === 1 ? "" : "s"})`);
+console.log(
+  `wrote data/results.json (${models.length} model${models.length === 1 ? "" : "s"}: ${models
+    .map((m) => m.id)
+    .join(", ")})`
+);

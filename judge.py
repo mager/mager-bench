@@ -1,41 +1,20 @@
-"""LLM-as-judge: uses Claude to score model responses on each dimension."""
+"""LLM-as-judge: scores model responses on each dimension.
+
+Judges are regular providers — Gemini Flash / Groq Llama keep scoring free.
+Pass multiple judges to average scores and reduce single-model bias.
+"""
 
 from __future__ import annotations
 
-import os
 import json
-import anthropic
+import re
+import statistics
+from typing import Iterable
+
 from challenges import Challenge
+from providers import get_provider, pick_default_judge, display_name
 
-DEFAULT_JUDGE_MODEL = "claude-sonnet-5"
-
-_client: anthropic.Anthropic | None = None
-
-
-def _get_client() -> anthropic.Anthropic:
-    global _client
-    if _client is None:
-        _client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    return _client
-
-
-# Structured-output schema — the API guarantees the judge's reply parses as
-# exactly this shape. Numeric ranges can't be expressed in the schema subset,
-# so scores are clamped to 0-10 after parsing.
-JUDGE_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "correctness": {"type": "number", "description": "Score from 0 to 10"},
-        "quality": {"type": "number", "description": "Score from 0 to 10"},
-        "documentation": {"type": "number", "description": "Score from 0 to 10"},
-        "notes": {
-            "type": "string",
-            "description": "One sentence summary of key strengths or weaknesses",
-        },
-    },
-    "required": ["correctness", "quality", "documentation", "notes"],
-    "additionalProperties": False,
-}
+DEFAULT_JUDGE_MODEL = "gemini-2.0-flash"  # free by default; overridden if unconfigured
 
 JUDGE_PROMPT = """You are an expert code reviewer judging a model's response to a coding challenge.
 
@@ -55,7 +34,7 @@ Model's response:
 
 Score each dimension from 0 to 10. Be critical and precise — reserve 9-10 for genuinely excellent work.
 
-Respond ONLY with valid JSON in this exact shape:
+Respond ONLY with valid JSON in this exact shape (no markdown fences, no commentary):
 {{
   "correctness": <number 0-10>,
   "quality": <number 0-10>,
@@ -71,54 +50,119 @@ def _clamp(value) -> float:
         return 0.0
 
 
-def _extract_text(msg) -> str:
-    # skip thinking blocks (extended thinking models emit these before text)
-    for block in msg.content:
-        if block.type == "text":
-            return block.text.strip()
-    raise ValueError(f"no text block in judge response (stop_reason={msg.stop_reason}, blocks={[b.type for b in msg.content]})")
-
-
 def _strip_fences(raw: str) -> str:
+    raw = raw.strip()
     if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
+        parts = raw.split("```")
+        if len(parts) >= 2:
+            raw = parts[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
     return raw.strip()
+
+
+def _extract_json(raw: str) -> dict:
+    """Parse judge JSON, with a brace-slice fallback for chatty models."""
+    cleaned = _strip_fences(raw)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        match = re.search(r"\{[\s\S]*\}", cleaned)
+        if not match:
+            raise
+        return json.loads(match.group(0))
+
+
+def _normalize(scores: dict) -> dict:
+    return {
+        "correctness": _clamp(scores.get("correctness")),
+        "quality": _clamp(scores.get("quality")),
+        "documentation": _clamp(scores.get("documentation")),
+        "notes": str(scores.get("notes", "")),
+    }
 
 
 def score_response(
     challenge: Challenge,
     response: str,
     model_id: str,
-    judge_model: str = DEFAULT_JUDGE_MODEL,
+    judge_model: str | None = None,
 ) -> dict:
-    """Ask the judge model to score a response. Returns dict with correctness/quality/documentation/notes."""
+    """Ask one judge model to score a response."""
+    judge_model = judge_model or pick_default_judge()
     prompt = JUDGE_PROMPT.format(
         challenge_name=challenge.name,
         prompt=challenge.prompt,
         rubric_correctness=challenge.rubric["correctness"],
         rubric_quality=challenge.rubric["quality"],
         rubric_documentation=challenge.rubric["documentation"],
-        response=response[:6000],  # trim very long responses
+        response=response[:6000],
     )
 
-    try:
-        client = _get_client()
-        msg = client.messages.create(
-            model=judge_model,
-            max_tokens=4096,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = _strip_fences(_extract_text(msg))
-
-        scores = json.loads(raw)
+    provider = get_provider(judge_model)
+    if not provider:
+        msg = f"judge {judge_model} not configured"
+        print(f"\n  [judge error for {model_id}]: {msg}")
         return {
-            "correctness": _clamp(scores.get("correctness")),
-            "quality": _clamp(scores.get("quality")),
-            "documentation": _clamp(scores.get("documentation")),
-            "notes": str(scores.get("notes", "")),
+            "correctness": 0,
+            "quality": 0,
+            "documentation": 0,
+            "notes": f"judge error: {msg}",
+            "judge": judge_model,
         }
+
+    try:
+        raw = provider.complete(prompt, max_tokens=1024)
+        scores = _normalize(_extract_json(raw))
+        scores["judge"] = judge_model
+        return scores
     except Exception as e:
-        print(f"\n  [judge error for {model_id}]: {e}")
-        return {"correctness": 0, "quality": 0, "documentation": 0, "notes": f"judge error: {e}"}
+        print(f"\n  [judge error for {model_id} via {judge_model}]: {e}")
+        return {
+            "correctness": 0,
+            "quality": 0,
+            "documentation": 0,
+            "notes": f"judge error: {e}",
+            "judge": judge_model,
+        }
+
+
+def score_response_multi(
+    challenge: Challenge,
+    response: str,
+    model_id: str,
+    judges: Iterable[str],
+) -> dict:
+    """Score with multiple judges and average the numeric dimensions.
+
+    Notes become a short panel: `judge: note; judge2: note2`.
+    """
+    judge_list = [j.strip() for j in judges if j and j.strip()]
+    if not judge_list:
+        judge_list = [pick_default_judge()]
+
+    if len(judge_list) == 1:
+        return score_response(challenge, response, model_id, judge_list[0])
+
+    panels: list[dict] = []
+    for j in judge_list:
+        panels.append(score_response(challenge, response, model_id, j))
+
+    correctness = statistics.fmean(p["correctness"] for p in panels)
+    quality = statistics.fmean(p["quality"] for p in panels)
+    documentation = statistics.fmean(p["documentation"] for p in panels)
+    notes_parts = []
+    for p in panels:
+        j = p.get("judge", "?")
+        n = (p.get("notes") or "").strip()
+        if n:
+            notes_parts.append(f"{display_name(j)}: {n}")
+
+    return {
+        "correctness": round(correctness, 2),
+        "quality": round(quality, 2),
+        "documentation": round(documentation, 2),
+        "notes": " | ".join(notes_parts)[:800],
+        "judge": "+".join(judge_list),
+        "judge_panel": panels,
+    }

@@ -1,12 +1,20 @@
 {
   "generated_at": "2026-07-17T00:53:52.000902+00:00",
   "judge": "claude-sonnet-5",
+  "judges": [
+    "claude-sonnet-5"
+  ],
+  "runs": 1,
+  "tier": null,
   "models": [
     {
       "id": "claude-haiku-4-5",
       "name": "Claude Haiku 4.5",
+      "tier": "cheap",
       "average": 6.9,
       "avg_speed_ms": 8275,
+      "avg_stddev": null,
+      "runs": 1,
       "challenges": [
         {
           "name": "fizzbuzz",
@@ -16,7 +24,9 @@
           "documentation": 9,
           "total": 9,
           "speed_ms": 6149,
-          "notes": "Correct, clean, well-documented solution with extra ValueError handling not required by the spec but reasonable; docstring example formatting (wrapped list) is slightly misleading vs actual doctest output but harmless since not run as doctest."
+          "notes": "Correct, clean, well-documented solution with extra ValueError handling not required by the spec but reasonable; docstring example formatting (wrapped list) is slightly misleading vs actual doctest output but harmless since not run as doctest.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "binary-search",
@@ -26,7 +36,9 @@
           "documentation": 9,
           "total": 9,
           "speed_ms": 11549,
-          "notes": "Correct, overflow-safe binary search with clean logic, thorough docstring/comments, and good extra test coverage beyond the required 3 examples, though duplicates aren't explicitly tested."
+          "notes": "Correct, overflow-safe binary search with clean logic, thorough docstring/comments, and good extra test coverage beyond the required 3 examples, though duplicates aren't explicitly tested.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "refactor",
@@ -36,7 +48,9 @@
           "documentation": 8,
           "total": 9,
           "speed_ms": 4800,
-          "notes": "Correct, idiomatic refactor with meaningful names, type hints, and a clear docstring/example; the explanation is specific but includes an unsubstantiated performance claim (10-15% speedup)."
+          "notes": "Correct, idiomatic refactor with meaningful names, type hints, and a clear docstring/example; the explanation is specific but includes an unsubstantiated performance claim (10-15% speedup).",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "readme-writer",
@@ -46,7 +60,9 @@
           "documentation": 9,
           "total": 8.7,
           "speed_ms": 9906,
-          "notes": "Comprehensive, well-organized README covering all required sections with clear examples, though some invented details (hash/line-count logic, placeholder GitHub URL) go beyond the stated scope."
+          "notes": "Comprehensive, well-organized README covering all required sections with clear examples, though some invented details (hash/line-count logic, placeholder GitHub URL) go beyond the stated scope.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "test-writing",
@@ -56,7 +72,9 @@
           "documentation": 8,
           "total": 7.7,
           "speed_ms": 11698,
-          "notes": "Comprehensive parametrized happy-path and error coverage with correct arithmetic, but the response cuts off mid-test with an unfinished/no-op assertion, and uses classes despite the 'plain functions' requirement, slightly hurting quality."
+          "notes": "Comprehensive parametrized happy-path and error coverage with correct arithmetic, but the response cuts off mid-test with an unfinished/no-op assertion, and uses classes despite the 'plain functions' requirement, slightly hurting quality.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "go-test",
@@ -66,7 +84,9 @@
           "documentation": 6,
           "total": 7.7,
           "speed_ms": 7056,
-          "notes": "Comprehensive table-driven tests with correct map comparison via maps.Equal and a proper benchmark loop, but lacks a doc comment on TestWordCount and makes some debatable assumptions about punctuation/apostrophe handling."
+          "notes": "Comprehensive table-driven tests with correct map comparison via maps.Equal and a proper benchmark loop, but lacks a doc comment on TestWordCount and makes some debatable assumptions about punctuation/apostrophe handling.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "async-fetch",
@@ -76,7 +96,9 @@
           "documentation": 8,
           "total": 7.3,
           "speed_ms": 9035,
-          "notes": "Solid overall (proper session reuse, per-request ClientTimeout, asyncio.gather, error containment) but backoff is linear (0.5*(n+1)) rather than truly exponential, and persistent 5xx failures after retries exhaust silently return status with error=None; retry logic is also duplicated across multiple except blocks instead of being unified."
+          "notes": "Solid overall (proper session reuse, per-request ClientTimeout, asyncio.gather, error containment) but backoff is linear (0.5*(n+1)) rather than truly exponential, and persistent 5xx failures after retries exhaust silently return status with error=None; retry logic is also duplicated across multiple except blocks instead of being unified.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "sql",
@@ -86,7 +108,9 @@
           "documentation": 9,
           "total": 7,
           "speed_ms": 4904,
-          "notes": "Logic for revenue, avg, and top_customer (via DISTINCT ON) is correct, but revenue_pct is computed with a CROSS JOIN CTE rather than an actual window function (SUM(...) OVER()), directly violating an explicit requirement despite the model's rationalization; comments and explanations are clear and well-organized otherwise."
+          "notes": "Logic for revenue, avg, and top_customer (via DISTINCT ON) is correct, but revenue_pct is computed with a CROSS JOIN CTE rather than an actual window function (SUM(...) OVER()), directly violating an explicit requirement despite the model's rationalization; comments and explanations are clear and well-organized otherwise.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "elixir-test",
@@ -96,7 +120,9 @@
           "documentation": 6,
           "total": 6,
           "speed_ms": 6951,
-          "notes": "patched after judge fix"
+          "notes": "patched after judge fix",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "debug",
@@ -106,7 +132,9 @@
           "documentation": 6,
           "total": 5.7,
           "speed_ms": 6280,
-          "notes": "Correctly identifies the count>1 filter and empty-string bugs and passes all test cases, but 'Bug 3' is not a distinct third defect—it's the same buggy line and fix as Bug 1 restated, so the model effectively only found 2 genuine bugs despite the task requiring 3."
+          "notes": "Correctly identifies the count>1 filter and empty-string bugs and passes all test cases, but 'Bug 3' is not a distinct third defect—it's the same buggy line and fix as Bug 1 restated, so the model effectively only found 2 genuine bugs despite the task requiring 3.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "api-client",
@@ -116,7 +144,9 @@
           "documentation": 5,
           "total": 5,
           "speed_ms": 10540,
-          "notes": "Well-structured and thoroughly documented up to the point of truncation, but the response cuts off mid-docstring in the post method, omitting its body and the required usage example entirely, and it never uses a requests.Session for connection reuse."
+          "notes": "Well-structured and thoroughly documented up to the point of truncation, but the response cuts off mid-docstring in the post method, omitting its body and the required usage example entirely, and it never uses a requests.Session for connection reuse.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "doom",
@@ -126,15 +156,20 @@
           "documentation": 1,
           "total": 0.7,
           "speed_ms": 10435,
-          "notes": "Response is severely truncated mid-function, leaving out nearly all rendering, player, HUD, and code logic — completely unusable and unscoreable as a working implementation."
+          "notes": "Response is severely truncated mid-function, leaving out nearly all rendering, player, HUD, and code logic — completely unusable and unscoreable as a working implementation.",
+          "stddev": null,
+          "runs": 1
         }
       ]
     },
     {
       "id": "claude-sonnet-4-6",
       "name": "Claude Sonnet 4.6",
+      "tier": "paid",
       "average": 6.6,
       "avg_speed_ms": 23408,
+      "avg_stddev": null,
+      "runs": 1,
       "challenges": [
         {
           "name": "fizzbuzz",
@@ -144,7 +179,9 @@
           "documentation": 10,
           "total": 9.7,
           "speed_ms": 13689,
-          "notes": "Correct, clean, idiomatic implementation with thorough docstring, doctest-style examples, sensible input validation, and helpful usage demos, though extra validation exceeds task scope slightly."
+          "notes": "Correct, clean, idiomatic implementation with thorough docstring, doctest-style examples, sensible input validation, and helpful usage demos, though extra validation exceeds task scope slightly.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "readme-writer",
@@ -154,7 +191,9 @@
           "documentation": 9,
           "total": 9,
           "speed_ms": 26268,
-          "notes": "Comprehensive, well-organized README covering all required sections with correct flag documentation, clear examples, and proper Markdown/code-block usage, though it invents extra details (e.g., MD5, placeholder repo links) not specified in the prompt."
+          "notes": "Comprehensive, well-organized README covering all required sections with correct flag documentation, clear examples, and proper Markdown/code-block usage, though it invents extra details (e.g., MD5, placeholder repo links) not specified in the prompt.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "refactor",
@@ -164,7 +203,9 @@
           "documentation": 9,
           "total": 9,
           "speed_ms": 15452,
-          "notes": "Accurate, well-documented refactor with meaningful names, idiomatic comprehension, correct type hints, and specific, non-generic explanations for each change."
+          "notes": "Accurate, well-documented refactor with meaningful names, idiomatic comprehension, correct type hints, and specific, non-generic explanations for each change.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "binary-search",
@@ -174,7 +215,9 @@
           "documentation": 9,
           "total": 8.7,
           "speed_ms": 30328,
-          "notes": "Correct O(log n) binary search with overflow-safe mid calculation and solid edge-case handling, though the added O(n) sortedness check slightly undermines efficiency and the response ends with a truncated 'sample output' section; documentation is thorough with accurate docstring examples and meaningful comments."
+          "notes": "Correct O(log n) binary search with overflow-safe mid calculation and solid edge-case handling, though the added O(n) sortedness check slightly undermines efficiency and the response ends with a truncated 'sample output' section; documentation is thorough with accurate docstring examples and meaningful comments.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "async-fetch",
@@ -184,7 +227,9 @@
           "documentation": 9,
           "total": 8.3,
           "speed_ms": 29212,
-          "notes": "Solid implementation with proper concurrency, per-request timeout, exponential backoff, and never-raise behavior, though the response is truncated mid-explanation and uses a slightly odd backoff scheme (0s on first attempt) plus TCPConnector(limit=0) which removes any concurrency control.'"
+          "notes": "Solid implementation with proper concurrency, per-request timeout, exponential backoff, and never-raise behavior, though the response is truncated mid-explanation and uses a slightly odd backoff scheme (0s on first attempt) plus TCPConnector(limit=0) which removes any concurrency control.'",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "elixir-test",
@@ -194,7 +239,9 @@
           "documentation": 9,
           "total": 8,
           "speed_ms": 23942,
-          "notes": "patched after judge fix"
+          "notes": "patched after judge fix",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "sql",
@@ -204,7 +251,9 @@
           "documentation": 6,
           "total": 6.7,
           "speed_ms": 16174,
-          "notes": "patched after judge fix"
+          "notes": "patched after judge fix",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "test-writing",
@@ -214,7 +263,9 @@
           "documentation": 8,
           "total": 5.3,
           "speed_ms": 28558,
-          "notes": "Well-designed, thorough parametrized happy-path and error tests with accurate arithmetic and clear naming, but the response is truncated mid-function ('with pyt'), producing a syntax error that would prevent the test suite from even being collected."
+          "notes": "Well-designed, thorough parametrized happy-path and error tests with accurate arithmetic and clear naming, but the response is truncated mid-function ('with pyt'), producing a syntax error that would prevent the test suite from even being collected.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "debug",
@@ -224,7 +275,9 @@
           "documentation": 5,
           "total": 5.3,
           "speed_ms": 24025,
-          "notes": "patched after judge fix"
+          "notes": "patched after judge fix",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "go-test",
@@ -234,7 +287,9 @@
           "documentation": 7,
           "total": 5.3,
           "speed_ms": 18838,
-          "notes": "Test cases and benchmark are well-designed and exceed the requirement, but the file incorrectly declares package wordcount_test and reimplements a stub WordCount that always returns nil, meaning the delivered file will fail most subtests unless manually edited to remove the stub and fix the package, contradicting the stated 'package: wordcount' requirement."
+          "notes": "Test cases and benchmark are well-designed and exceed the requirement, but the file incorrectly declares package wordcount_test and reimplements a stub WordCount that always returns nil, meaning the delivered file will fail most subtests unless manually edited to remove the stub and fix the package, contradicting the stated 'package: wordcount' requirement.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "api-client",
@@ -244,7 +299,9 @@
           "documentation": 5,
           "total": 3,
           "speed_ms": 27637,
-          "notes": "Response is truncated mid-method, missing the post() method entirely and the usage example, so the code doesn't even run as-is despite otherwise clean structure and good docstrings for what exists."
+          "notes": "Response is truncated mid-method, missing the post() method entirely and the usage example, so the code doesn't even run as-is despite otherwise clean structure and good docstrings for what exists.",
+          "stddev": null,
+          "runs": 1
         },
         {
           "name": "doom",
@@ -254,9 +311,120 @@
           "documentation": 1,
           "total": 0.7,
           "speed_ms": 26772,
-          "notes": ""
+          "notes": "",
+          "stddev": null,
+          "runs": 1
         }
       ]
     }
-  ]
+  ],
+  "funding": {
+    "headline": "fund the bench",
+    "tagline": "Free models run on free tiers. Paid models need gas money. Pitch in and we run the evals the community wants to see.",
+    "goal_cents": 10000,
+    "raised_cents": 0,
+    "currency": "USD",
+    "sponsors_url": "https://github.com/sponsors/mager",
+    "coffee_url": "https://www.buymeacoffee.com/mager",
+    "open_collective_url": null,
+    "links": [
+      {
+        "label": "GitHub Sponsors",
+        "href": "https://github.com/sponsors/mager",
+        "primary": true
+      },
+      {
+        "label": "Buy Me a Coffee",
+        "href": "https://www.buymeacoffee.com/mager",
+        "primary": false
+      }
+    ],
+    "tiers": [
+      {
+        "id": "coffee",
+        "name": "one coffee",
+        "amount_cents": 500,
+        "perks": [
+          "your handle in the sponsors roll",
+          "keeps free-tier runs humming"
+        ]
+      },
+      {
+        "id": "sprint",
+        "name": "eval sprint",
+        "amount_cents": 2500,
+        "perks": [
+          "fund one full 12-challenge run of a paid model",
+          "name the model in the request queue",
+          "sponsors roll + shoutout in the next results drop"
+        ]
+      },
+      {
+        "id": "season",
+        "name": "season pass",
+        "amount_cents": 10000,
+        "perks": [
+          "fund a month of new-model drops",
+          "vote on the next signature challenge",
+          "name on the dashboard footer for 30 days"
+        ]
+      }
+    ],
+    "wishlist": [
+      {
+        "model_id": "claude-opus-4-8",
+        "name": "Claude Opus 4.8",
+        "tier": "paid",
+        "why": "top-shelf coding model — expensive per full 12-challenge suite",
+        "est_cost_cents": 800,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "claude-sonnet-5",
+        "name": "Claude Sonnet 5",
+        "tier": "paid",
+        "why": "current frontier mid-tier; needs a fresh multi-run pass",
+        "est_cost_cents": 400,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "gpt-4o",
+        "name": "GPT-4o",
+        "tier": "paid",
+        "why": "OpenAI flagship — community keeps asking for a head-to-head",
+        "est_cost_cents": 500,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "gemini-2.5-pro",
+        "name": "Gemini 2.5 Pro",
+        "tier": "paid",
+        "why": "long-context coding muscle, paid quota",
+        "est_cost_cents": 350,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "llama-3.3-70b",
+        "name": "Llama 3.3 70B (Groq)",
+        "tier": "free",
+        "why": "free via Groq — just needs someone to press go",
+        "est_cost_cents": 0,
+        "status": "ready"
+      },
+      {
+        "model_id": "gemini-2.0-flash",
+        "name": "Gemini 2.0 Flash",
+        "tier": "free",
+        "why": "free AI Studio quota — free judge + free subject",
+        "est_cost_cents": 0,
+        "status": "ready"
+      }
+    ],
+    "principles": [
+      "Free-tier models (Groq Llama, Gemini Flash) always run first — no card required.",
+      "Crowdfunded dollars only buy API tokens for published evals, never ads or merch.",
+      "Every funded run ships raw responses + rubric scores in results.json. Show the work.",
+      "You can still fork and run paid models yourself — crowdfunding is optional fuel."
+    ]
+  }
 }
