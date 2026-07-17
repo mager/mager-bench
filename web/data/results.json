@@ -1,12 +1,140 @@
 {
-  "generated_at": "2026-07-16T21:16:56.558231+00:00",
+  "generated_at": "2026-07-17T00:53:52.000902+00:00",
   "judge": "claude-sonnet-5",
   "models": [
     {
+      "id": "claude-haiku-4-5",
+      "name": "Claude Haiku 4.5",
+      "average": 6.9,
+      "avg_speed_ms": 8275,
+      "challenges": [
+        {
+          "name": "fizzbuzz",
+          "description": "Baseline correctness + code style",
+          "correctness": 9,
+          "quality": 9,
+          "documentation": 9,
+          "total": 9,
+          "speed_ms": 6149,
+          "notes": "Correct, clean, well-documented solution with extra ValueError handling not required by the spec but reasonable; docstring example formatting (wrapped list) is slightly misleading vs actual doctest output but harmless since not run as doctest."
+        },
+        {
+          "name": "binary-search",
+          "description": "Algorithm + full docstring (Args/Returns/Raises + examples)",
+          "correctness": 9,
+          "quality": 9,
+          "documentation": 9,
+          "total": 9,
+          "speed_ms": 11549,
+          "notes": "Correct, overflow-safe binary search with clean logic, thorough docstring/comments, and good extra test coverage beyond the required 3 examples, though duplicates aren't explicitly tested."
+        },
+        {
+          "name": "refactor",
+          "description": "Code clarity + whether the model can explain its changes",
+          "correctness": 10,
+          "quality": 9,
+          "documentation": 8,
+          "total": 9,
+          "speed_ms": 4800,
+          "notes": "Correct, idiomatic refactor with meaningful names, type hints, and a clear docstring/example; the explanation is specific but includes an unsubstantiated performance claim (10-15% speedup)."
+        },
+        {
+          "name": "readme-writer",
+          "description": "Pure documentation ability — no code at all",
+          "correctness": 8,
+          "quality": 9,
+          "documentation": 9,
+          "total": 8.7,
+          "speed_ms": 9906,
+          "notes": "Comprehensive, well-organized README covering all required sections with clear examples, though some invented details (hash/line-count logic, placeholder GitHub URL) go beyond the stated scope."
+        },
+        {
+          "name": "test-writing",
+          "description": "Edge-case thinking + pytest parametrize discipline",
+          "correctness": 8,
+          "quality": 7,
+          "documentation": 8,
+          "total": 7.7,
+          "speed_ms": 11698,
+          "notes": "Comprehensive parametrized happy-path and error coverage with correct arithmetic, but the response cuts off mid-test with an unfinished/no-op assertion, and uses classes despite the 'plain functions' requirement, slightly hurting quality."
+        },
+        {
+          "name": "go-test",
+          "description": "Idiomatic Go table-driven tests + benchmark",
+          "correctness": 8,
+          "quality": 9,
+          "documentation": 6,
+          "total": 7.7,
+          "speed_ms": 7056,
+          "notes": "Comprehensive table-driven tests with correct map comparison via maps.Equal and a proper benchmark loop, but lacks a doc comment on TestWordCount and makes some debatable assumptions about punctuation/apostrophe handling."
+        },
+        {
+          "name": "async-fetch",
+          "description": "Async concurrency patterns + retry/timeout handling",
+          "correctness": 7,
+          "quality": 7,
+          "documentation": 8,
+          "total": 7.3,
+          "speed_ms": 9035,
+          "notes": "Solid overall (proper session reuse, per-request ClientTimeout, asyncio.gather, error containment) but backoff is linear (0.5*(n+1)) rather than truly exponential, and persistent 5xx failures after retries exhaust silently return status with error=None; retry logic is also duplicated across multiple except blocks instead of being unified."
+        },
+        {
+          "name": "sql",
+          "description": "CTE + window function fluency on a real schema",
+          "correctness": 5,
+          "quality": 7,
+          "documentation": 9,
+          "total": 7,
+          "speed_ms": 4904,
+          "notes": "Logic for revenue, avg, and top_customer (via DISTINCT ON) is correct, but revenue_pct is computed with a CROSS JOIN CTE rather than an actual window function (SUM(...) OVER()), directly violating an explicit requirement despite the model's rationalization; comments and explanations are clear and well-organized otherwise."
+        },
+        {
+          "name": "elixir-test",
+          "description": "ExUnit describe blocks + assert_raise + unicode handling",
+          "correctness": 5,
+          "quality": 7,
+          "documentation": 6,
+          "total": 6,
+          "speed_ms": 6951,
+          "notes": "patched after judge fix"
+        },
+        {
+          "name": "debug",
+          "description": "Careful reading + correctness reasoning over broken code",
+          "correctness": 5,
+          "quality": 6,
+          "documentation": 6,
+          "total": 5.7,
+          "speed_ms": 6280,
+          "notes": "Correctly identifies the count>1 filter and empty-string bugs and passes all test cases, but 'Bug 3' is not a distinct third defect—it's the same buggy line and fix as Bug 1 restated, so the model effectively only found 2 genuine bugs despite the task requiring 3."
+        },
+        {
+          "name": "api-client",
+          "description": "Class design + error handling + type hints + docs",
+          "correctness": 4,
+          "quality": 6,
+          "documentation": 5,
+          "total": 5,
+          "speed_ms": 10540,
+          "notes": "Well-structured and thoroughly documented up to the point of truncation, but the response cuts off mid-docstring in the post method, omitting its body and the required usage example entirely, and it never uses a requests.Session for connection reuse."
+        },
+        {
+          "name": "doom",
+          "description": "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
+          "correctness": 0,
+          "quality": 1,
+          "documentation": 1,
+          "total": 0.7,
+          "speed_ms": 10435,
+          "notes": "Response is severely truncated mid-function, leaving out nearly all rendering, player, HUD, and code logic — completely unusable and unscoreable as a working implementation."
+        }
+      ]
+    },
+    {
       "id": "claude-sonnet-4-6",
       "name": "Claude Sonnet 4.6",
-      "average": 7.1,
-      "avg_speed_ms": 23102,
+      "average": 6.6,
+      "avg_speed_ms": 23408,
       "challenges": [
         {
           "name": "fizzbuzz",
@@ -117,6 +245,16 @@
           "total": 3,
           "speed_ms": 27637,
           "notes": "Response is truncated mid-method, missing the post() method entirely and the usage example, so the code doesn't even run as-is despite otherwise clean structure and good docstrings for what exists."
+        },
+        {
+          "name": "doom",
+          "description": "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
+          "correctness": 0,
+          "quality": 1,
+          "documentation": 1,
+          "total": 0.7,
+          "speed_ms": 26772,
+          "notes": ""
         }
       ]
     }
