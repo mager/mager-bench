@@ -1,10 +1,10 @@
 # mager-bench
 
-A personal coding model benchmark. Five tasks I actually care about, run against any combination of models, scored by an LLM judge on correctness, code quality, and documentation. When a new model drops, run `python bench.py` and see where it stands.
+A personal coding model benchmark. Twelve tasks I actually care about — from FizzBuzz to a Doom-style raycaster in a single HTML file — run against any combination of models, scored by an LLM judge on correctness, code quality, and documentation. When a new model drops, run `python bench.py` and see where it stands.
 
 The idea is [Simon Willison's pelican-on-a-bicycle test](https://simonwillison.net/tags/pelican-riding-a-bicycle/), but for code: you don't need a giant eval suite to have opinions about models — you need something small and consistent that you run yourself, every time.
 
-**Live dashboard:** [mager-bench-web.vercel.app](https://mager-bench-web.vercel.app) — currently showing Claude Haiku 4.5 (avg **7.6**/10). Same data as JSON at [`/api/results`](https://mager-bench-web.vercel.app/api/results).
+**Live dashboard:** [mager-bench-web.vercel.app](https://mager-bench-web.vercel.app) — Claude Haiku 4.5 (avg **6.9**/10) currently leads Claude Sonnet 4.6 (**6.6**) across all 12 challenges. Same data as JSON at [`/api/results`](https://mager-bench-web.vercel.app/api/results).
 
 ## Challenges
 
@@ -15,6 +15,13 @@ The idea is [Simon Willison's pelican-on-a-bicycle test](https://simonwillison.n
 | `api-client` | Class design + error handling + type hints + docs |
 | `readme-writer` | Pure documentation ability — no code at all |
 | `refactor` | Code clarity + whether the model can explain its changes |
+| `test-writing` | Pytest tests for a provided function — edge-case thinking + assertion quality |
+| `debug` | Find and fix 3 bugs in broken Python — careful reading + correctness reasoning |
+| `async-fetch` | Async Python: concurrent HTTP fetching with timeout and retry |
+| `sql` | Complex SQL with CTEs, window functions, and aggregations |
+| `go-test` | Idiomatic Go table-driven tests — Go testing conventions |
+| `elixir-test` | Idiomatic Elixir ExUnit tests — Elixir testing conventions |
+| `doom` | A Doom-style raycasting FPS engine in a single HTML file — the signature challenge |
 
 ## Setup
 
@@ -92,7 +99,7 @@ node scripts/sync-results.mjs   # reshapes ../results.json -> web/data/results.j
 npm run dev                     # or: vercel --prod to redeploy
 ```
 
-The dashboard currently shows one model at a time (Haiku, for now) — run more models through `bench.py`, re-sync, and they'll stack up on the leaderboard.
+The dashboard leaderboard stacks every model in `results.json` — run more models through `bench.py`, re-sync, redeploy, and they show up ranked.
 
 Each challenge also has its own definition page at `/challenges/<name>` — the exact prompt, the rubric per dimension, and how every model that's run it scored. If `challenges.py` changes, re-export `web/data/challenges.json`:
 
@@ -108,7 +115,7 @@ print(json.dumps([dataclasses.asdict(c) for c in CHALLENGES], indent=2))
 
 - **The judge is a model too.** By default Claude scores everyone, including other Claude models. If that bothers you (it should, a little), re-run with `--judge` set to a different model and compare. Rankings have been stable across judges in my runs, but verify for yours.
 - **Single-run variance is real.** One run is a vibe check, not a leaderboard. Scores on the same model can move ±1 point between runs.
-- **These are my tasks.** That's the point. Fork it and replace the challenges with the five things *you* keep asking models to do.
+- **These are my tasks.** That's the point. Fork it and replace the challenges with the things *you* keep asking models to do.
 
 ## Adding challenges
 

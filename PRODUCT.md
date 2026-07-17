@@ -14,8 +14,9 @@ to read scores and, ideally, click into *why* a model scored what it scored.
 
 ## Product Purpose
 
-mager-bench is a small, opinionated, personally-curated benchmark: five
-coding tasks Mager actually cares about, run against any model, scored by
+mager-bench is a small, opinionated, personally-curated benchmark: a dozen
+coding tasks Mager actually cares about (from FizzBuzz to a single-file Doom
+raycaster), run against any model, scored by
 an LLM judge on correctness, code quality, and documentation. The web
 dashboard is the public face of that CLI tool — a leaderboard plus, crucially,
 a transparent paper trail (challenge prompt, rubric, and the model's actual
@@ -51,7 +52,7 @@ pass, not a dry spreadsheet.
    rubric, and model response — no black-box numbers.
 2. **One consistent nerdy-terminal voice.** Amber CRT aesthetic, applied
    deliberately across every new surface (not just the homepage).
-3. **Small and honest.** This is a 5-task personal bench, not an enterprise
+3. **Small and honest.** This is a small personal bench, not an enterprise
    eval suite — lean into that self-aware, scrappy framing rather than
    inflating it with corporate polish.
 4. **Legible first, glow second.** Retro effects (scanlines, flicker, text
