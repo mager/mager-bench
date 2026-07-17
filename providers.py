@@ -15,6 +15,8 @@ AVAILABLE_MODELS = [
     "gpt-4o-mini",
     "gemini-2.0-flash",
     "gemini-2.5-pro",
+    "llama-3.3-70b",
+    "llama-3.1-8b",
 ]
 
 
@@ -53,6 +55,26 @@ class OpenAIProvider(Provider):
         return resp.choices[0].message.content or ""
 
 
+class GroqProvider(Provider):
+    """Groq exposes an OpenAI-compatible API, so reuse the OpenAI SDK."""
+
+    def __init__(self, model: str) -> None:
+        from openai import OpenAI
+        self.client = OpenAI(
+            api_key=os.environ["GROQ_API_KEY"],
+            base_url="https://api.groq.com/openai/v1",
+        )
+        self.model = model
+
+    def complete(self, prompt: str) -> str:
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            max_tokens=2048,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return resp.choices[0].message.content or ""
+
+
 class GeminiProvider(Provider):
     def __init__(self, model: str) -> None:
         import google.generativeai as genai
@@ -73,12 +95,15 @@ _MODEL_MAP = {
     "gpt-4o-mini": ("openai", "gpt-4o-mini"),
     "gemini-2.0-flash": ("gemini", "gemini-2.0-flash"),
     "gemini-2.5-pro": ("gemini", "gemini-2.5-pro"),
+    "llama-3.3-70b": ("groq", "llama-3.3-70b-versatile"),
+    "llama-3.1-8b": ("groq", "llama-3.1-8b-instant"),
 }
 
 _KEY_MAP = {
     "anthropic": "ANTHROPIC_API_KEY",
     "openai": "OPENAI_API_KEY",
     "gemini": "GEMINI_API_KEY",
+    "groq": "GROQ_API_KEY",
 }
 
 
@@ -94,6 +119,8 @@ def get_provider(model_id: str) -> Provider | None:
         return AnthropicProvider(model_name)
     if family == "openai":
         return OpenAIProvider(model_name)
+    if family == "groq":
+        return GroqProvider(model_name)
     if family == "gemini":
         return GeminiProvider(model_name)
     return None
