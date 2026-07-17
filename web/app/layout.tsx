@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { VT323, IBM_Plex_Mono } from "next/font/google";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import challengesData from "@/data/challenges.json";
 import "./globals.css";
 
 const display = VT323({
@@ -14,10 +17,11 @@ const mono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
 });
 
+const challengeCount = (challengesData as unknown[]).length;
+
 export const metadata: Metadata = {
   title: "mager-bench",
-  description:
-    "A personal coding-model benchmark — five tasks scored by an LLM judge, run against Claude Haiku 4.5 and more.",
+  description: `A personal coding-model benchmark — ${challengeCount} tasks scored by an LLM judge on correctness, code quality, and documentation.`,
 };
 
 export default function RootLayout({
@@ -27,7 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable} h-full`}>
-      <body className="h-full font-mono antialiased">{children}</body>
+      <body className="flex min-h-full flex-col font-mono antialiased">
+        <SiteHeader />
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

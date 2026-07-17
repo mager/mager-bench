@@ -35,19 +35,15 @@ function topScoreFor(name: string) {
 
 export default function ChallengesIndex() {
   return (
-    <div className="min-h-screen px-4 py-10 sm:px-8 md:py-16">
+    <div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-4xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
-              challenges
-            </h1>
-            <Link href="/" className="text-xs text-fg-dim hover:text-amber-bright">
-              ← leaderboard
-            </Link>
-          </div>
+          <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
+            challenges
+          </h1>
           <p className="max-w-xl text-sm leading-relaxed text-fg">
-            The five tasks every model runs. Full prompt, full rubric, no black box — click
+            The {challenges.length}{" "}
+            tasks every model runs. Full prompt, full rubric, no black box — click
             into any of them to see exactly what&apos;s being judged.
           </p>
         </header>

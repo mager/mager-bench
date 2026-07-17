@@ -74,7 +74,7 @@ export default async function ChallengePage({
     .sort((a, b) => b.total - a.total);
 
   return (
-    <div className="min-h-screen px-4 py-10 sm:px-8 md:py-16">
+    <div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
           <Link href="/challenges" className="text-xs text-fg-dim hover:text-amber-bright">
@@ -178,14 +178,6 @@ export default async function ChallengePage({
           )}
         </section>
 
-        <footer className="rise flex items-center justify-between border-t border-amber-faint pt-4 text-xs text-fg-dim">
-          <Link href="/challenges" className="hover:text-amber-bright">
-            ← all challenges
-          </Link>
-          <Link href="/" className="hover:text-amber-bright">
-            leaderboard →
-          </Link>
-        </footer>
       </div>
     </div>
   );

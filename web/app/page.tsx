@@ -60,7 +60,7 @@ export default function Home() {
   const top = data.models[0];
 
   return (
-    <div className="min-h-screen px-4 py-10 sm:px-8 md:py-16">
+    <div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-4xl flex-col gap-10">
         <header
           className="rise flex flex-col gap-2 border-b border-amber-faint pb-5"
@@ -75,31 +75,12 @@ export default function Home() {
             </span>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-fg">
-            Five tasks I actually care about, scored by an LLM judge on{" "}
+            {top.challenges.length} tasks I actually care about, scored by an LLM judge on{" "}
             <span className="font-semibold text-green">correctness</span>,{" "}
             <span className="font-semibold text-magenta">code quality</span>, and{" "}
             <span className="font-semibold text-cyan">documentation</span>. A benchmark
             models have to earn.
           </p>
-          <nav className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-fg-dim">
-            <a className="hover:text-amber-bright" href="#leaderboard">
-              leaderboard
-            </a>
-            <Link className="hover:text-amber-bright" href="/challenges">
-              challenges →
-            </Link>
-            <a className="hover:text-amber-bright" href="#api">
-              api
-            </a>
-            <a
-              className="hover:text-amber-bright"
-              href="https://github.com/mager/mager-bench"
-              target="_blank"
-              rel="noreferrer"
-            >
-              source →
-            </a>
-          </nav>
         </header>
 
         <section
@@ -276,16 +257,6 @@ export default function Home() {
           </p>
         </section>
 
-        <footer
-          className="rise flex flex-wrap items-center justify-between gap-2 border-t border-amber-faint pt-4 text-xs text-fg-dim"
-          style={{ animationDelay: "320ms" }}
-        >
-          <span>mager-bench</span>
-          <Link href="/challenges" className="hover:text-amber-bright">
-            think a model can pass all five? →
-          </Link>
-          <span className="cursor">AWAITING CHALLENGER</span>
-        </footer>
       </div>
     </div>
   );
