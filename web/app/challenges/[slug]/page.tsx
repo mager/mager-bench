@@ -68,9 +68,9 @@ export default async function ChallengePage({
   const rows = results.models
     .map((m) => {
       const c = m.challenges.find((x) => x.name === challenge.name);
-      return c ? { model: m.name, ...c } : null;
+      return c ? { model: m.name, modelId: m.id, ...c } : null;
     })
-    .filter((x): x is ChallengeResult & { model: string } => x !== null)
+    .filter((x): x is ChallengeResult & { model: string; modelId: string } => x !== null)
     .sort((a, b) => b.total - a.total);
 
   return (
@@ -171,6 +171,12 @@ export default async function ChallengePage({
                       <span className="text-amber-dim"># </span>
                       {r.notes}
                     </p>
+                    <Link
+                      href={`/models/${r.modelId}/${challenge.name}`}
+                      className="mt-3 inline-block text-xs text-amber hover:text-amber-bright"
+                    >
+                      inspect full trace →
+                    </Link>
                   </article>
                 );
               })}

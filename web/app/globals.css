@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #070502;
-  --bg-raised: #120b04;
+  /* True-black base: the phosphor hues do the glowing, the tube stays off.
+     bg-raised keeps a warm cast so panels read as lit glass, not gray cards. */
+  --bg: #000000;
+  --bg-raised: #100a03;
   --amber: #ffb000;
   --amber-bright: #ffd479;
   --amber-dim: #a4790f;
-  --amber-faint: #4a3608;
+  --amber-faint: #57400a;
   --alert: #ff4433;
 
   /* Readable body text lives here, not on amber — amber is saturated
@@ -57,7 +59,7 @@ body {
 }
 
 body {
-  background: radial-gradient(ellipse at 50% -10%, #1c1206 0%, var(--bg) 55%, #030201 100%);
+  background: radial-gradient(ellipse at 50% -10%, #150d02 0%, var(--bg) 62%, #000000 100%);
   color: var(--fg);
 }
 
@@ -149,32 +151,37 @@ body::after {
 
 .glow {
   text-shadow:
-    0 0 6px rgba(255, 176, 0, 0.55),
-    0 0 18px rgba(255, 176, 0, 0.25);
+    0 0 5px rgba(255, 176, 0, 0.7),
+    0 0 20px rgba(255, 176, 0, 0.35),
+    0 0 48px rgba(255, 176, 0, 0.16);
 }
 
 .glow-alert {
   text-shadow:
-    0 0 8px rgba(255, 68, 51, 0.75),
-    0 0 24px rgba(255, 68, 51, 0.4);
+    0 0 6px rgba(255, 68, 51, 0.8),
+    0 0 22px rgba(255, 68, 51, 0.45),
+    0 0 48px rgba(255, 68, 51, 0.2);
 }
 
 .glow-green {
   text-shadow:
-    0 0 6px oklch(78% 0.17 152 / 0.6),
-    0 0 20px oklch(78% 0.17 152 / 0.3);
+    0 0 5px oklch(78% 0.17 152 / 0.7),
+    0 0 20px oklch(78% 0.17 152 / 0.35),
+    0 0 48px oklch(78% 0.17 152 / 0.16);
 }
 
 .glow-magenta {
   text-shadow:
-    0 0 6px oklch(74% 0.2 335 / 0.6),
-    0 0 20px oklch(74% 0.2 335 / 0.3);
+    0 0 5px oklch(74% 0.2 335 / 0.7),
+    0 0 20px oklch(74% 0.2 335 / 0.35),
+    0 0 48px oklch(74% 0.2 335 / 0.16);
 }
 
 .glow-cyan {
   text-shadow:
-    0 0 6px oklch(78% 0.13 220 / 0.6),
-    0 0 20px oklch(78% 0.13 220 / 0.3);
+    0 0 5px oklch(78% 0.13 220 / 0.7),
+    0 0 20px oklch(78% 0.13 220 / 0.35),
+    0 0 48px oklch(78% 0.13 220 / 0.16);
 }
 
 .lift {

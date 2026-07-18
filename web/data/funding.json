@@ -4,18 +4,18 @@
   "goal_cents": 10000,
   "raised_cents": 0,
   "currency": "USD",
-  "sponsors_url": "https://github.com/sponsors/mager",
+  "sponsors_url": null,
   "coffee_url": "https://www.buymeacoffee.com/mager",
   "open_collective_url": null,
   "links": [
     {
-      "label": "GitHub Sponsors",
-      "href": "https://github.com/sponsors/mager",
+      "label": "Buy Me a Coffee",
+      "href": "https://www.buymeacoffee.com/mager",
       "primary": true
     },
     {
-      "label": "Buy Me a Coffee",
-      "href": "https://www.buymeacoffee.com/mager",
+      "label": "GitHub Sponsors (coming soon)",
+      "href": null,
       "primary": false
     }
   ],
@@ -55,7 +55,7 @@
       "model_id": "claude-opus-4-8",
       "name": "Claude Opus 4.8",
       "tier": "paid",
-      "why": "top-shelf coding model — expensive per full 12-challenge suite",
+      "why": "top-shelf coding model \u2014 expensive per full 12-challenge suite",
       "est_cost_cents": 800,
       "status": "unfunded"
     },
@@ -71,7 +71,7 @@
       "model_id": "gpt-4o",
       "name": "GPT-4o",
       "tier": "paid",
-      "why": "OpenAI flagship — community keeps asking for a head-to-head",
+      "why": "OpenAI flagship \u2014 community keeps asking for a head-to-head",
       "est_cost_cents": 500,
       "status": "unfunded"
     },
@@ -87,7 +87,7 @@
       "model_id": "llama-3.3-70b",
       "name": "Llama 3.3 70B (Groq)",
       "tier": "free",
-      "why": "free via Groq — just needs someone to press go",
+      "why": "free via Groq \u2014 just needs someone to press go",
       "est_cost_cents": 0,
       "status": "ready"
     },
@@ -95,15 +95,15 @@
       "model_id": "gemini-2.0-flash",
       "name": "Gemini 2.0 Flash",
       "tier": "free",
-      "why": "free AI Studio quota — free judge + free subject",
+      "why": "free AI Studio quota \u2014 free judge + free subject",
       "est_cost_cents": 0,
       "status": "ready"
     }
   ],
   "principles": [
-    "Free-tier models (Groq Llama, Gemini Flash) always run first — no card required.",
+    "Free-tier models (Groq Llama, Gemini Flash) always run first \u2014 no card required.",
     "Crowdfunded dollars only buy API tokens for published evals, never ads or merch.",
     "Every funded run ships raw responses + rubric scores in results.json. Show the work.",
-    "You can still fork and run paid models yourself — crowdfunding is optional fuel."
+    "You can still fork and run paid models yourself \u2014 crowdfunding is optional fuel."
   ]
 }

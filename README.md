@@ -86,8 +86,8 @@ With `--runs N`, totals are means and the table shows ±σ. With `--judges a,b`,
 Paid models (Opus, GPT-4o, …) stay on a public wishlist until funded. See **[FUND.md](./FUND.md)** and the live `/fund` page. Dollars only buy API tokens for published evals — every funded run ships raw responses in `results.json`.
 
 ```
-GitHub Sponsors  →  https://github.com/sponsors/mager
 Buy Me a Coffee  →  https://www.buymeacoffee.com/mager
+GitHub Sponsors  →  coming soon
 ```
 
 ## Web dashboard

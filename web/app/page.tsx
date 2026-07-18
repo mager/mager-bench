@@ -249,6 +249,13 @@ export default function Home() {
               <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
                 <span className="text-amber-bright">{model.name}</span>
                 {" — "}challenge breakdown
+                {" · "}
+                <Link
+                  href={`/models/${model.id}`}
+                  className="normal-case tracking-normal text-amber hover:text-amber-bright"
+                >
+                  inspect traces →
+                </Link>
               </h2>
               <div className="flex items-center gap-3 text-xs text-fg-dim">
                 <span className={`uppercase tracking-wider ${COST_TIER_STYLE[model.tier ?? "unknown"]}`}>

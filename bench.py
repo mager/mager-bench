@@ -63,6 +63,9 @@ class Result:
     runs: int = 1
     stddev: float | None = None
     scores_per_run: list[float] = field(default_factory=list)
+    # full per-run paper trail: every run's response + scores survives
+    # aggregation so each trace stays inspectable on the dashboard
+    run_details: list[dict] = field(default_factory=list)
 
 
 def run_model_on_challenge(
@@ -102,6 +105,18 @@ def run_model_on_challenge(
         run=run,
         runs=1,
         scores_per_run=[total],
+        run_details=[
+            {
+                "run": run,
+                "correctness": scores["correctness"],
+                "quality": scores["quality"],
+                "documentation": scores["documentation"],
+                "total": total,
+                "speed_ms": elapsed_ms,
+                "notes": scores.get("notes", ""),
+                "response": response,
+            }
+        ],
     )
     run_tag = f" r{run}" if run > 1 else ""
     return result, f"{model_id}{run_tag}: total={total:.1f}  ({elapsed_ms}ms)"
@@ -120,6 +135,7 @@ def aggregate_runs(results: list[Result]) -> list[Result]:
             continue
         # keep the longest response (usually last) for paper-trail
         best = max(group, key=lambda x: len(x.response))
+        group_sorted = sorted(group, key=lambda x: x.run)
         totals = [g.total_score for g in group]
         mean_total = round(statistics.fmean(totals), 1)
         std = round(statistics.pstdev(totals), 2) if len(totals) > 1 else 0.0
@@ -139,6 +155,7 @@ def aggregate_runs(results: list[Result]) -> list[Result]:
                 runs=len(group),
                 stddev=std,
                 scores_per_run=totals,
+                run_details=[d for g in group_sorted for d in g.run_details],
             )
         )
     return out

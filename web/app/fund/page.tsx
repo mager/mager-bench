@@ -15,7 +15,7 @@ type Funding = {
   goal_cents: number;
   raised_cents: number;
   currency: string;
-  links: { label: string; href: string; primary?: boolean }[];
+  links: { label: string; href: string | null; primary?: boolean }[];
   tiers: {
     id: string;
     name: string;
@@ -91,21 +91,30 @@ export default function FundPage() {
             />
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            {funding.links.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                target="_blank"
-                rel="noreferrer"
-                className={
-                  l.primary
-                    ? "border border-amber bg-amber/15 px-4 py-2 text-sm font-medium text-amber-bright hover:bg-amber/25"
-                    : "border border-amber-faint px-4 py-2 text-sm text-fg hover:border-amber-dim hover:text-amber-bright"
-                }
-              >
-                {l.label} →
-              </a>
-            ))}
+            {funding.links.map((l) =>
+              l.href ? (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={
+                    l.primary
+                      ? "border border-amber bg-amber/15 px-4 py-2 text-sm font-medium text-amber-bright hover:bg-amber/25"
+                      : "border border-amber-faint px-4 py-2 text-sm text-fg hover:border-amber-dim hover:text-amber-bright"
+                  }
+                >
+                  {l.label} →
+                </a>
+              ) : (
+                <span
+                  key={l.label}
+                  className="border border-amber-faint/60 px-4 py-2 text-sm text-fg-dim"
+                >
+                  {l.label}
+                </span>
+              )
+            )}
           </div>
         </section>
 

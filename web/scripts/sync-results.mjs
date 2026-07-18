@@ -94,6 +94,23 @@ const models = [...byModel.entries()]
           notes: c.notes,
           stddev: c.stddev ?? null,
           runs: c.runs ?? 1,
+          // per-run paper trail; older results.json files predate run_details,
+          // so synthesize a single-run trace from the flat fields
+          run_details:
+            Array.isArray(c.run_details) && c.run_details.length > 0
+              ? c.run_details
+              : [
+                  {
+                    run: 1,
+                    correctness: c.correctness,
+                    quality: c.quality,
+                    documentation: c.documentation,
+                    total: c.total_score,
+                    speed_ms: c.speed_ms,
+                    notes: c.notes,
+                    response: c.response ?? "",
+                  },
+                ],
         })),
     };
   })

@@ -2,14 +2,14 @@
 name: mager-bench
 description: CRT amber terminal dashboard for a personal coding-model benchmark, with ANSI-inspired accent colors per rubric dimension
 colors:
-  bg: "#070502"
-  bg-raised: "#120b04"
+  bg: "#000000"
+  bg-raised: "#100a03"
   fg: "#e8e1cf"
   fg-dim: "#a79c86"
   amber: "#ffb000"
   amber-bright: "#ffd479"
   amber-dim: "#a4790f"
-  amber-faint: "#4a3608"
+  amber-faint: "#57400a"
   alert: "#ff4433"
   green: "oklch(78% 0.17 152)"
   green-dim: "oklch(55% 0.12 152)"
