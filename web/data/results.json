@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-17T00:53:52.000902+00:00",
+  "generated_at": "2026-07-18T20:32:43.768114+00:00",
   "judge": "claude-sonnet-5",
   "judges": [
     "claude-sonnet-5"
@@ -11,8 +11,8 @@
       "id": "claude-haiku-4-5",
       "name": "Claude Haiku 4.5",
       "tier": "cheap",
-      "average": 6.9,
-      "avg_speed_ms": 8275,
+      "average": 6.7,
+      "avg_speed_ms": 8501,
       "avg_stddev": null,
       "runs": 1,
       "challenges": [
@@ -281,6 +281,30 @@
           ]
         },
         {
+          "name": "slots",
+          "description": "Vegas slot machine — reels, pay table, betting, win animations",
+          "correctness": 6,
+          "quality": 4,
+          "documentation": 2,
+          "total": 4,
+          "speed_ms": 11210,
+          "notes": "judge: llama-3.3-70b",
+          "stddev": null,
+          "runs": 1,
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 6,
+              "quality": 4,
+              "documentation": 2,
+              "total": 4,
+              "speed_ms": 11210,
+              "notes": "judge: llama-3.3-70b",
+              "response": ""
+            }
+          ]
+        },
+        {
           "name": "doom",
           "description": "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
           "correctness": 0,
@@ -310,8 +334,8 @@
       "id": "claude-sonnet-4-6",
       "name": "Claude Sonnet 4.6",
       "tier": "paid",
-      "average": 6.6,
-      "avg_speed_ms": 23408,
+      "average": 6.3,
+      "avg_speed_ms": 23886,
       "avg_stddev": null,
       "runs": 1,
       "challenges": [
@@ -576,6 +600,30 @@
               "speed_ms": 27637,
               "notes": "Response is truncated mid-method, missing the post() method entirely and the usage example, so the code doesn't even run as-is despite otherwise clean structure and good docstrings for what exists.",
               "response": "```python\n\"\"\"\nREST API Client wrapper around the requests library.\n\"\"\"\n\nimport requests\nfrom typing import Any, Optional\n\n\nclass APIError(Exception):\n    \"\"\"\n    Custom exception raised when the API returns a non-2xx HTTP response.\n\n    Attributes:\n        status_code (int): The HTTP status code returned by the API.\n        message (str): A descriptive error message from the API response.\n    \"\"\"\n\n    def __init__(self, status_code: int, message: str) -> None:\n        \"\"\"\n        Initialise APIError with a status code and message.\n\n        Args:\n            status_code (int): The HTTP status code returned by the API.\n            message (str): A descriptive error message.\n        \"\"\"\n        self.status_code = status_code\n        self.message = message\n        super().__init__(f\"APIError {status_code}: {message}\")\n\n\nclass APIClient:\n    \"\"\"\n    A reusable HTTP client for interacting with a REST API.\n\n    Wraps the `requests` library to provide a clean interface for\n    making GET and POST requests to a configurable base URL. Handles\n    authentication via an optional API key sent in the request headers,\n    and raises a custom `APIError` for any non-2xx HTTP response.\n\n    Attributes:\n        base_url (str): The root URL of the API (e.g. \"https://api.example.com\").\n        session (requests.Session): The underlying requests session, which\n            persists headers and connection pooling across requests.\n\n    Example:\n        >>> client = APIClient(\"https://jsonplaceholder.typicode.com\")\n        >>> post = client.get(\"/posts/1\")\n        >>> print(post[\"title\"])\n    \"\"\"\n\n    def __init__(self, base_url: str, api_key: Optional[str] = None) -> None:\n        \"\"\"\n        Initialise the APIClient.\n\n        Sets up a `requests.Session` with default headers. If an API key is\n        provided it is included in every request as an `Authorization` bearer\n        token.\n\n        Args:\n            base_url (str): The root URL of the API. Trailing slashes are\n                stripped so paths can always start with \"/\".\n            api_key (Optional[str]): An optional API key. When supplied it is\n                sent as ``Authorization: Bearer <api_key>`` on every request.\n        \"\"\"\n        self.base_url: str = base_url.rstrip(\"/\")\n        self.session: requests.Session = requests.Session()\n\n        # Always send JSON-friendly headers\n        self.session.headers.update(\n            {\n                \"Accept\": \"application/json\",\n                \"Content-Type\": \"application/json\",\n            }\n        )\n\n        if api_key is not None:\n            self.session.headers.update({\"Authorization\": f\"Bearer {api_key}\"})\n\n    # ------------------------------------------------------------------\n    # Private helpers\n    # ------------------------------------------------------------------\n\n    def _build_url(self, path: str) -> str:\n        \"\"\"\n        Construct the full URL from the base URL and a relative path.\n\n        Args:\n            path (str): The API endpoint path (e.g. \"/users/42\").\n\n        Returns:\n            str: The complete URL ready to be used in an HTTP request.\n        \"\"\"\n        return f\"{self.base_url}/{path.lstrip('/')}\"\n\n    def _handle_response(self, response: requests.Response) -> Any:\n        \"\"\"\n        Validate an HTTP response and return its JSON body.\n\n        Checks the HTTP status code. If the response indicates success\n        (2xx) the decoded JSON body is returned. Otherwise an `APIError`\n        is raised containing the status code and the best available error\n        message extracted from the response.\n\n        Args:\n            response (requests.Response): The response object from requests.\n\n        Returns:\n            Any: The parsed JSON body of the response.\n\n        Raises:\n            APIError: If the response status code is not in the 2xx range.\n        \"\"\"\n        if not response.ok:  # response.ok is True for status codes < 400\n            # Try to extract a meaningful message from the response body\n            try:\n                error_body: dict[str, Any] = response.json()\n                message: str = error_body.get(\n                    \"message\",\n                    error_body.get(\"error\", response.text),\n                )\n            except ValueError:\n                # Response body is not valid JSON – fall back to raw text\n                message = response.text or response.reason or \"Unknown error\"\n\n            raise APIError(status_code=response.status_code, message=message)\n\n        return response.json()\n\n    # ------------------------------------------------------------------\n    # Public interface\n    # ------------------------------------------------------------------\n\n    def get(\n        self,\n        path: str,\n        params: Optional[dict[str, Any]] = None,\n    ) -> Any:\n        \"\"\"\n        Send an HTTP GET request to the specified API endpoint.\n\n        Appends optional query parameters to the request URL. The method\n        returns the parsed JSON body of a successful response, or raises\n        `APIError` for any non-2xx status code.\n\n        Args:\n            path (str): The API endpoint path relative to the base URL\n                (e.g. \"/posts\" or \"posts\").\n            params (Optional[dict[str, Any]]): A mapping of query-string\n                parameters to include in the request URL. Defaults to None\n                (no query parameters).\n\n        Returns:\n            Any: The parsed JSON response body (usually a dict or list).\n\n        Raises:\n            APIError: If the server returns a non-2xx HTTP status code.\n            requests.exceptions.RequestException: If a network-level error\n                occurs (e.g. timeout, DNS failure).\n\n        Example:\n            >>> client = APIClient(\"https://jsonplaceholder.typicode.com\")\n            >>> posts = client.get(\"/posts\", params={\"userId\": 1})\n        \"\"\"\n        url: str = self._build_url(path)\n        response: requests.Response = self.session.get(url, params=params)\n        return self._handle_response(response)\n\n    def post(self, path: str, data: dict[str, Any]) -> Any:\n        \"\"\"\n        Send an HTTP POST request to the specified API endpoint.\n\n        Serialises `data` as a JSON request body and sends it to the\n        endpoint. Returns the parsed JSON body of a successful response, or\n        raises `APIError` for any non-2xx status code.\n\n        Args:\n            path (str): The API endpoint path relative to the base URL\n                (e.g. \"/posts\" or \"posts\").\n            data (dict[str, Any]): The payload to send as the JSON request\n                body.\n\n        Returns:\n            Any: The parsed JSON response body (usually a dict).\n\n        Raises:\n            APIError: If the server returns a non-2xx HTTP status code.\n            requests.exceptions.RequestException: If a network-level error\n                occurs (e.g. timeout, DNS failure).\n\n        Example:\n            >>> client = APIClient(\"https://jsonplaceholder.typicode.com\")\n            >>> new_post = client.post(\"/posts\", data={\"title\": \"Hello\"})\n        \"\"\"\n        url: str = self._build_url(path)\n        response: requests.Response = self.session.post(url, json=data)\n        return self._handle_response(response)\n\n\n# ---------------------------------------------------------------------------\n# Usage example\n# ---------------------------------------------------------------------------\n\nif __name__ == \"__main__\":\n    # -----------------------------------------------------------------------\n    # 1. Basic usage – no authentication required\n    # -----------------------------------------------------------------------\n    client = APIClient(\"https://jsonplaceholder.typicode.com\")\n\n    # GET a single post\n    post: dict[str, Any] = client.get(\"/posts/1\")\n    print(\"=== GET /posts/1 ===\")\n    print(f\"  ID    : {post['id']}\")\n    print(f\"  Title : {post['title']}\")\n    print(f\"  Body  : {post['body'][:60]}...\")\n\n    # GET with query parameters\n    print(\"\\n=== GET /posts?userId=1 (first 3 results) ===\")\n    user_posts: list[dict[str, Any]] = client.get(\"/posts\", params={\"userId\": 1})\n    for p in user_posts[:3]:\n        print(f\"  [{p['id']}] {p['title']}\")\n\n    # POST a new resource\n    print(\"\\n=== POST /posts ===\")\n    new_post: dict[str, Any] = client.post(\n        \"/posts\",\n        data={\"title\": \"Hello World\", \"body\": \"My"
+            }
+          ]
+        },
+        {
+          "name": "slots",
+          "description": "Vegas slot machine — reels, pay table, betting, win animations",
+          "correctness": 2,
+          "quality": 4,
+          "documentation": 1,
+          "total": 2.3,
+          "speed_ms": 29629,
+          "notes": "judge: llama-3.3-70b",
+          "stddev": null,
+          "runs": 1,
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 2,
+              "quality": 4,
+              "documentation": 1,
+              "total": 2.3,
+              "speed_ms": 29629,
+              "notes": "judge: llama-3.3-70b",
+              "response": ""
             }
           ]
         },

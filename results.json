@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-17T00:53:52.000902+00:00",
+  "generated_at": "2026-07-18T20:32:43.768114+00:00",
   "judge": "claude-sonnet-5",
   "results": [
     {
@@ -265,6 +265,28 @@
       "speed_ms": 26772,
       "total_score": 0.7,
       "notes": ""
+    },
+    {
+      "model": "claude-haiku-4-5",
+      "challenge": "slots",
+      "response": "",
+      "correctness": 6.0,
+      "quality": 4.0,
+      "documentation": 2.0,
+      "speed_ms": 11210,
+      "total_score": 4.0,
+      "notes": "judge: llama-3.3-70b"
+    },
+    {
+      "model": "claude-sonnet-4-6",
+      "challenge": "slots",
+      "response": "",
+      "correctness": 2.0,
+      "quality": 4.0,
+      "documentation": 1.0,
+      "speed_ms": 29629,
+      "total_score": 2.3,
+      "notes": "judge: llama-3.3-70b"
     }
   ]
 }
