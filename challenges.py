@@ -450,6 +450,78 @@ CHALLENGES: list[Challenge] = [
             ),
         },
     ),
+    Challenge(
+        name="slots",
+        description="Build a Vegas-style slot machine in a single HTML file — reels, pay table, betting, wins",
+        prompt=(
+            "Build a fully playable Vegas-style slot machine in a single self-contained HTML file "
+            "with no external libraries and no external assets.\n\n"
+
+            "## Reels\n"
+            "- 3 reels, each with these 7 symbols (use emoji or Unicode): "
+            "🍒 Cherry, 🍋 Lemon, 🍊 Orange, 🍇 Grape, 🔔 Bell, ⭐ Star, 7️⃣ Seven\n"
+            "- Spin animation: each reel spins independently for a randomized duration "
+            "(reel 1 stops first ~800ms, reel 2 ~1200ms, reel 3 ~1600ms), "
+            "showing symbols scrolling upward at ~12 symbols/sec before snapping to the result\n"
+            "- While spinning, the SPIN button is disabled\n\n"
+
+            "## Pay table (multipliers applied to the current bet)\n"
+            "- 7️⃣ 7️⃣ 7️⃣ → 100×\n"
+            "- ⭐ ⭐ ⭐ → 50×\n"
+            "- 🔔 🔔 🔔 → 20×\n"
+            "- 🍇 🍇 🍇 → 15×\n"
+            "- 🍊 🍊 🍊 → 10×\n"
+            "- 🍋 🍋 🍋 → 5×\n"
+            "- 🍒 🍒 🍒 → 3×\n"
+            "- Any two 🍒 🍒 (in the first two positions) → 2×\n"
+            "- All other outcomes → 0× (loss)\n\n"
+
+            "## Betting & credits\n"
+            "- Player starts with 100 credits\n"
+            "- Bet buttons: 1, 5, 10 credits (highlighted active bet; default: 1)\n"
+            "- Spinning deducts the bet immediately; winning adds bet × multiplier\n"
+            "- If credits reach 0 and player has no bet they can cover: show 'GAME OVER' with a 'Play Again' button that resets to 100 credits\n\n"
+
+            "## Win feedback\n"
+            "- On a win: flash the matching symbols (CSS animation), show '+[amount] credits' in gold text, "
+            "display the winning combination name ('JACKPOT!', 'THREE BELLS', etc.) above the reels\n"
+            "- On a loss: brief shake animation on the reels (CSS transform)\n"
+            "- Credit balance updates after each spin with a count-up animation (increment from old to new value over 400ms)\n\n"
+
+            "## Pay table display\n"
+            "- Render the pay table as a visible panel on the page (not a modal) listing all combinations and their multipliers\n"
+            "- Highlight the winning row in the pay table when that combination hits\n\n"
+
+            "## Code quality\n"
+            "- Single HTML file; all JS in <script>, all CSS in <style>\n"
+            "- Game state in a plain JS object: { credits, bet, spinning, reels, result }\n"
+            "- Named functions: initState(), spin(), checkWin(), animateReels(), updateUI()\n"
+            "- RNG must use Math.random() — no seeding, no external library\n"
+            "- No inline onclick= handlers; use addEventListener throughout\n"
+        ),
+        rubric={
+            "correctness": (
+                "Do all 8 pay table combinations pay the correct multiplier (including the any-two-cherries case)? "
+                "Is the bet deducted before the spin result is known? "
+                "Does the GAME OVER condition trigger correctly at 0 credits? "
+                "Does the reel animation stop in the right order (reel 1 first, reel 3 last)? "
+                "Does the credit count-up animation run from old to new value?"
+            ),
+            "quality": (
+                "Is spinning state tracked so the SPIN button is disabled during animation? "
+                "Is game state a plain JS object (not scattered globals)? "
+                "Are the 5 named functions present and doing what they're named for? "
+                "Does the win feedback (flash, shake, win name) appear correctly? "
+                "Is the pay table panel visible on the page and does it highlight the winning row?"
+            ),
+            "documentation": (
+                "Are the named functions present with clear scope? "
+                "Are pay table multipliers defined as named constants (not magic numbers inline)? "
+                "Is the game state object documented or self-describing? "
+                "Are the reel timing constants named (not bare 800/1200/1600 ms literals)?"
+            ),
+        },
+    ),
 ]
 
 _BY_NAME = {c.name: c for c in CHALLENGES}

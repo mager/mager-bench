@@ -27,6 +27,7 @@ const DESCRIPTIONS = {
   "go-test": "Idiomatic Go table-driven tests + benchmark",
   "elixir-test": "ExUnit describe blocks + assert_raise + unicode handling",
   doom: "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
+  slots: "Vegas slot machine — reels, pay table, betting, win animations",
 };
 
 const DISPLAY_NAMES = {
