@@ -30,7 +30,7 @@ MODELS: list[ModelInfo] = [
     # ── free tier (no card / free quota) ──────────────────────────────────
     ModelInfo("llama-3.3-70b", "groq", "llama-3.3-70b-versatile", "free", "Llama 3.3 70B", "Groq free tier"),
     ModelInfo("llama-3.1-8b", "groq", "llama-3.1-8b-instant", "free", "Llama 3.1 8B", "Groq free tier — fast baseline"),
-    ModelInfo("gemini-2.0-flash", "gemini", "gemini-2.0-flash", "free", "Gemini 2.0 Flash", "Google AI Studio free tier"),
+    # gemini-2.0-flash retired by Google (generateContent 404s as of 2026-07) — 2.5-flash is the free successor
     ModelInfo("gemini-2.5-flash", "gemini", "gemini-2.5-flash", "free", "Gemini 2.5 Flash", "Google AI Studio free tier"),
     # ── cheap (pennies per full bench) ────────────────────────────────────
     ModelInfo("claude-haiku-4-5", "anthropic", "claude-haiku-4-5", "cheap", "Claude Haiku 4.5", "cheap Anthropic default"),
@@ -51,7 +51,6 @@ PAID_MODELS = [m.id for m in MODELS if m.tier == "paid"]
 
 # Judges that work without spending money. Prefer free first.
 FREE_JUDGE_CANDIDATES = [
-    "gemini-2.0-flash",
     "gemini-2.5-flash",
     "llama-3.3-70b",
     "claude-haiku-4-5",
@@ -82,10 +81,18 @@ class AnthropicProvider(Provider):
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )
-        for block in msg.content:
-            if getattr(block, "type", None) == "text":
-                return block.text
-        return msg.content[0].text
+        # Sonnet 5+ think by default and max_tokens caps thinking + text combined,
+        # so a response can contain thinking blocks with no text block at all.
+        text = "".join(
+            block.text for block in msg.content
+            if getattr(block, "type", None) == "text"
+        )
+        if not text:
+            raise RuntimeError(
+                f"{self.model}: no text in response "
+                f"(stop_reason={msg.stop_reason}) — raise max_tokens"
+            )
+        return text
 
 
 class OpenAIProvider(Provider):
@@ -128,13 +135,26 @@ class GeminiProvider(Provider):
         import google.generativeai as genai
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
         self.model_obj = genai.GenerativeModel(model)
+        self.model_name = model
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
-        resp = self.model_obj.generate_content(
-            prompt,
-            generation_config={"max_output_tokens": max_tokens},
-        )
-        return resp.text
+        from instrumentation import get_tracer
+
+        # Manual LLM span — the legacy google-generativeai SDK has no
+        # openinference auto-instrumentor. No-op when tracing is off.
+        with get_tracer().start_as_current_span("gemini.generate_content") as span:
+            span.set_attribute("openinference.span.kind", "LLM")
+            span.set_attribute("llm.model_name", self.model_name)
+            span.set_attribute("input.value", prompt)
+            # Gemini 2.5 models think by default and thoughts count against
+            # max_output_tokens (legacy SDK has no thinking_config), so give
+            # headroom or the visible answer gets truncated to a stub.
+            resp = self.model_obj.generate_content(
+                prompt,
+                generation_config={"max_output_tokens": max_tokens + 8192},
+            )
+            span.set_attribute("output.value", resp.text)
+            return resp.text
 
 
 def model_info(model_id: str) -> ModelInfo | None:
@@ -184,7 +204,7 @@ def pick_default_judge() -> str:
     for m in MODELS:
         if has_key(m.family):
             return m.id
-    return "gemini-2.0-flash"
+    return "gemini-2.5-flash"
 
 
 def get_provider(model_id: str) -> Provider | None:

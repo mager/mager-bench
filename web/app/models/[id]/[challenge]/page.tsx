@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import challengesData from "@/data/challenges.json";
 import resultsData from "@/data/results.json";
+import { arizeTraceUrl } from "@/lib/arize";
 
 type ChallengeDef = {
   name: string;
@@ -32,6 +33,7 @@ type ChallengeResult = {
   notes: string;
   stddev?: number | null;
   runs?: number;
+  trace_id?: string | null;
   run_details?: RunDetail[];
 };
 
@@ -43,7 +45,7 @@ type ModelResult = {
 };
 
 const challenges = challengesData as ChallengeDef[];
-const data = resultsData as { judge: string; models: ModelResult[] };
+const data = resultsData as { judge: string; generated_at: string; models: ModelResult[] };
 
 const DIMENSION_STYLE = {
   correctness: { dot: "bg-green", text: "text-green" },
@@ -117,6 +119,7 @@ export default async function TracePage({
 
   const def = challenges.find((c) => c.name === challengeName);
   const t = tier(result.total);
+  const traceUrl = arizeTraceUrl(result.trace_id, data.generated_at);
   const runs =
     result.run_details && result.run_details.length > 0
       ? result.run_details
@@ -144,6 +147,16 @@ export default async function TracePage({
             <Link href={`/challenges/${result.name}`} className="hover:text-amber-bright">
               challenge spec →
             </Link>
+            {traceUrl && (
+              <a
+                href={traceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cyan hover:text-amber-bright"
+              >
+                trace in arize ↗
+              </a>
+            )}
           </nav>
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h1 className="glow font-display text-3xl tracking-wide text-amber sm:text-4xl">

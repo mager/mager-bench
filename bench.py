@@ -44,6 +44,7 @@ from providers import (
 )
 from judge import score_response_multi, DEFAULT_JUDGE_MODEL
 from challenges import load_challenges
+from instrumentation import setup_tracing, flush_tracing, get_tracer
 
 
 @dataclass
@@ -59,6 +60,8 @@ class Result:
     notes: str
     judge: str = ""
     run: int = 1
+    # Arize trace id for this run's CHAIN span ("" when tracing is off)
+    trace_id: str = ""
     # populated when --runs > 1 after aggregation
     runs: int = 1
     stddev: float | None = None
@@ -78,14 +81,30 @@ def run_model_on_challenge(
     if not provider:
         return None, f"{model_id}: no API key configured, skipping"
 
-    t0 = time.perf_counter()
-    try:
-        response = provider.complete(challenge.prompt)
-    except Exception as e:
-        return None, f"{model_id}: ERROR: {e}"
-    elapsed_ms = int((time.perf_counter() - t0) * 1000)
+    # One CHAIN span per model×challenge run; auto-instrumented LLM calls
+    # (subject + judge) nest under it. No-op when tracing isn't configured.
+    with get_tracer().start_as_current_span(f"bench.{challenge.name}") as span:
+        span.set_attribute("openinference.span.kind", "CHAIN")
+        span.set_attribute("input.value", challenge.prompt)
+        span.set_attribute("metadata.model", model_id)
+        span.set_attribute("metadata.challenge", challenge.name)
+        span.set_attribute("metadata.run", run)
+        span_ctx = span.get_span_context()
+        trace_id = f"{span_ctx.trace_id:032x}" if span_ctx.is_valid else ""
 
-    scores = score_response_multi(challenge, response, model_id, judges)
+        t0 = time.perf_counter()
+        try:
+            response = provider.complete(challenge.prompt)
+        except Exception as e:
+            span.set_attribute("error.message", str(e))
+            return None, f"{model_id}: ERROR: {e}"
+        elapsed_ms = int((time.perf_counter() - t0) * 1000)
+
+        scores = score_response_multi(challenge, response, model_id, judges)
+        span.set_attribute("output.value", response)
+        span.set_attribute("metadata.correctness", scores["correctness"])
+        span.set_attribute("metadata.quality", scores["quality"])
+        span.set_attribute("metadata.documentation", scores["documentation"])
     total = round(
         (scores["correctness"] + scores["quality"] + scores["documentation"]) / 3, 1
     )
@@ -103,6 +122,7 @@ def run_model_on_challenge(
         notes=scores.get("notes", ""),
         judge=judge_label,
         run=run,
+        trace_id=trace_id,
         runs=1,
         scores_per_run=[total],
         run_details=[
@@ -152,6 +172,7 @@ def aggregate_runs(results: list[Result]) -> list[Result]:
                 notes=best.notes,
                 judge=best.judge,
                 run=1,
+                trace_id=best.trace_id,
                 runs=len(group),
                 stddev=std,
                 scores_per_run=totals,
@@ -320,6 +341,7 @@ def main() -> None:
     challenge_names = [args.challenge] if args.challenge else None
 
     print("mager-bench")
+    setup_tracing()
     print(f"  models : {', '.join(models)}")
     print(f"  judges : {', '.join(judges)}")
     print(f"  runs   : {runs}")
@@ -344,6 +366,8 @@ def main() -> None:
         }
         Path(args.output).write_text(json.dumps(payload, indent=2))
         print(f"\nResults saved to {args.output}")
+
+    flush_tracing()  # CLI app: ship buffered spans before exit
 
 
 if __name__ == "__main__":

@@ -2,3 +2,7 @@ anthropic
 openai
 google-generativeai
 python-dotenv
+arize-otel
+openinference-instrumentation-anthropic
+openinference-instrumentation-openai
+wrapt<2

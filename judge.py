@@ -14,7 +14,7 @@ from typing import Iterable
 from challenges import Challenge
 from providers import get_provider, pick_default_judge, display_name
 
-DEFAULT_JUDGE_MODEL = "gemini-2.0-flash"  # free by default; overridden if unconfigured
+DEFAULT_JUDGE_MODEL = "gemini-2.5-flash"  # free by default; overridden if unconfigured
 
 JUDGE_PROMPT = """You are an expert code reviewer judging a model's response to a coding challenge.
 
@@ -112,7 +112,9 @@ def score_response(
         }
 
     try:
-        raw = provider.complete(prompt, max_tokens=1024)
+        # generous cap: judges that think by default (Claude 5-era) spend
+        # part of this budget on thinking before the JSON verdict
+        raw = provider.complete(prompt, max_tokens=8192)
         scores = _normalize(_extract_json(raw))
         scores["judge"] = judge_model
         return scores

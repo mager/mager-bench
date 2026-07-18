@@ -95,6 +95,7 @@ const models = [...byModel.entries()]
           notes: c.notes,
           stddev: c.stddev ?? null,
           runs: c.runs ?? 1,
+          trace_id: c.trace_id || null,
           // per-run paper trail; older results.json files predate run_details,
           // so synthesize a single-run trace from the flat fields
           run_details:
