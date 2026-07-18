@@ -1,7 +1,7 @@
 # mager-bench (web)
 
 The live scorecard/leaderboard for [mager-bench](../README.md), deployed at
-[mager-bench-web.vercel.app](https://mager-bench-web.vercel.app).
+[bench.mager.co](https://bench.mager.co).
 
 ## Routes
 

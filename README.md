@@ -4,9 +4,9 @@ A personal coding model benchmark. Twelve tasks I actually care about — from F
 
 The idea is [Simon Willison's pelican-on-a-bicycle test](https://simonwillison.net/tags/pelican-riding-a-bicycle/), but for code: you don't need a giant eval suite to have opinions about models — you need something small and consistent that you run yourself, every time.
 
-**Live dashboard:** [mager-bench-web.vercel.app](https://mager-bench-web.vercel.app) — Claude Haiku 4.5 (avg **6.9**/10) currently leads Claude Sonnet 4.6 (**6.6**) across all 12 challenges.
-**Fund paid evals:** [mager-bench-web.vercel.app/fund](https://mager-bench-web.vercel.app/fund) · [FUND.md](./FUND.md)
-**JSON API:** [`/api/results`](https://mager-bench-web.vercel.app/api/results)
+**Live dashboard:** [bench.mager.co](https://bench.mager.co) — Claude Haiku 4.5 (avg **6.9**/10) currently leads Claude Sonnet 4.6 (**6.6**) across all 12 challenges.
+**Fund paid evals:** [bench.mager.co/fund](https://bench.mager.co/fund) · [FUND.md](./FUND.md)
+**JSON API:** [`/api/results`](https://bench.mager.co/api/results)
 
 ## Free first
 

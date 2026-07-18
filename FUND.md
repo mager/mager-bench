@@ -18,7 +18,7 @@ Paid model evals are the interesting head-to-heads — and they cost real money 
 
 - [Buy Me a Coffee](https://www.buymeacoffee.com/mager)
 - GitHub Sponsors — coming soon
-- Live drive + wishlist: [mager-bench-web.vercel.app/fund](https://mager-bench-web.vercel.app/fund)
+- Live drive + wishlist: [bench.mager.co/fund](https://bench.mager.co/fund)
 
 ## Tiers
 
