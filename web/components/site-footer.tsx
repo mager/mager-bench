@@ -39,6 +39,14 @@ export function SiteFooter() {
             >
               source →
             </a>
+            <a
+              className="hover:text-amber-bright"
+              href="https://mager.co"
+              target="_blank"
+              rel="noreferrer"
+            >
+              mager.co →
+            </a>
           </nav>
           <Link href="/challenges" className="hover:text-amber-bright">
             think a model can pass all {challengeCount}? →
