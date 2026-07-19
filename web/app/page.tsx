@@ -323,6 +323,24 @@ export default function Home() {
         </section>
 
         <section
+          className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4"
+          style={{ animationDelay: "310ms" }}
+        >
+          <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">
+            methodology, honestly
+          </h2>
+          <p className="text-sm leading-relaxed text-fg">
+            Every score comes from a single LLM judge — currently{" "}
+            <span className="font-semibold text-amber-bright">{data.judge}</span> — pinned across
+            all runs so scores stay comparable. That judge is a Claude model scoring a board that
+            includes Claude models: same-family bias is real, so treat cross-family gaps as
+            directional, not gospel. Thinking and verdict budgets are separate contracts in the
+            harness, and every score links to its raw response and judge notes so you can audit
+            the reasoning instead of trusting the number.
+          </p>
+        </section>
+
+        <section
           id="api"
           className="rise scroll-mt-6 border border-amber-faint bg-bg-raised/40 px-4 py-4 text-xs"
           style={{ animationDelay: "320ms" }}

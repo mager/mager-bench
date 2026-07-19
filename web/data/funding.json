@@ -55,7 +55,7 @@
       "model_id": "claude-opus-4-8",
       "name": "Claude Opus 4.8",
       "tier": "paid",
-      "why": "top-shelf coding model \u2014 expensive per full 12-challenge suite",
+      "why": "top-shelf coding model — expensive per full 12-challenge suite",
       "est_cost_cents": 800,
       "status": "unfunded"
     },
@@ -71,7 +71,7 @@
       "model_id": "gpt-4o",
       "name": "GPT-4o",
       "tier": "paid",
-      "why": "OpenAI flagship \u2014 community keeps asking for a head-to-head",
+      "why": "OpenAI flagship — community keeps asking for a head-to-head",
       "est_cost_cents": 500,
       "status": "unfunded"
     },
@@ -87,23 +87,71 @@
       "model_id": "llama-3.3-70b",
       "name": "Llama 3.3 70B (Groq)",
       "tier": "free",
-      "why": "free via Groq \u2014 just needs someone to press go",
+      "why": "free via Groq — just needs someone to press go",
       "est_cost_cents": 0,
-      "status": "ready"
+      "status": "scored"
     },
     {
-      "model_id": "gemini-2.0-flash",
-      "name": "Gemini 2.0 Flash",
+      "model_id": "gemini-2.5-flash",
+      "name": "Gemini 2.5 Flash",
       "tier": "free",
-      "why": "free AI Studio quota \u2014 free judge + free subject",
+      "why": "free AI Studio quota — replaced retired 2.0 Flash",
       "est_cost_cents": 0,
-      "status": "ready"
+      "status": "scored"
+    },
+    {
+      "model_id": "gpt-5.6",
+      "name": "GPT-5.6",
+      "tier": "paid",
+      "why": "OpenAI's latest flagship — the head-to-head everyone asks for",
+      "est_cost_cents": 600,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "claude-fable-5",
+      "name": "Claude Fable 5",
+      "tier": "paid",
+      "why": "Anthropic's Mythos-class tier above Opus — the ceiling check",
+      "est_cost_cents": 1000,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "claude-opus-4-6",
+      "name": "Claude Opus 4.6",
+      "tier": "paid",
+      "why": "Opus lineage baseline — anchors the 4.x curve",
+      "est_cost_cents": 700,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "claude-opus-4-7",
+      "name": "Claude Opus 4.7",
+      "tier": "paid",
+      "why": "one step up the Opus 4.x curve from 4.6",
+      "est_cost_cents": 750,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "glm-2.5",
+      "name": "GLM 2.5",
+      "tier": "cheap",
+      "why": "Zhipu's open-weight coder — cheap API, big claims",
+      "est_cost_cents": 150,
+      "status": "unfunded"
+    },
+    {
+      "model_id": "kimi-k3",
+      "name": "Kimi K3",
+      "tier": "cheap",
+      "why": "Moonshot's agentic coder — cheap API, strong on long tasks",
+      "est_cost_cents": 200,
+      "status": "unfunded"
     }
   ],
   "principles": [
-    "Free-tier models (Groq Llama, Gemini Flash) always run first \u2014 no card required.",
+    "Free-tier models (Groq Llama, Gemini Flash) always run first — no card required.",
     "Crowdfunded dollars only buy API tokens for published evals, never ads or merch.",
     "Every funded run ships raw responses + rubric scores in results.json. Show the work.",
-    "You can still fork and run paid models yourself \u2014 crowdfunding is optional fuel."
+    "You can still fork and run paid models yourself — crowdfunding is optional fuel."
   ]
 }
