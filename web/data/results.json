@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-18T21:37:57.178662+00:00",
+  "generated_at": "2026-07-19T14:26:21.065817+00:00",
   "judge": "claude-sonnet-5",
   "judges": [
     "claude-sonnet-5"
@@ -7,342 +7,6 @@
   "runs": 1,
   "tier": null,
   "models": [
-    {
-      "id": "claude-haiku-4-5",
-      "name": "Claude Haiku 4.5",
-      "tier": "cheap",
-      "average": 6.7,
-      "avg_speed_ms": 8501,
-      "avg_stddev": null,
-      "runs": 1,
-      "challenges": [
-        {
-          "name": "fizzbuzz",
-          "description": "Baseline correctness + code style",
-          "correctness": 9,
-          "quality": 9,
-          "documentation": 9,
-          "total": 9,
-          "speed_ms": 6149,
-          "notes": "Correct, clean, well-documented solution with extra ValueError handling not required by the spec but reasonable; docstring example formatting (wrapped list) is slightly misleading vs actual doctest output but harmless since not run as doctest.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 9,
-              "quality": 9,
-              "documentation": 9,
-              "total": 9,
-              "speed_ms": 6149,
-              "notes": "Correct, clean, well-documented solution with extra ValueError handling not required by the spec but reasonable; docstring example formatting (wrapped list) is slightly misleading vs actual doctest output but harmless since not run as doctest.",
-              "response": "```python\ndef fizzbuzz(n: int) -> list[str]:\n    \"\"\"\n    Generate a FizzBuzz sequence for numbers 1 through n.\n    \n    For each number from 1 to n (inclusive):\n    - Return 'FizzBuzz' if the number is divisible by both 3 and 5\n    - Return 'Fizz' if the number is divisible by 3\n    - Return 'Buzz' if the number is divisible by 5\n    - Return the number as a string otherwise\n    \n    Args:\n        n: A positive integer specifying the range (1 through n)\n    \n    Returns:\n        A list of strings containing the FizzBuzz sequence\n    \n    Raises:\n        ValueError: If n is less than 1\n    \n    Examples:\n        >>> fizzbuzz(15)\n        ['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', \n         'Buzz', '11', 'Fizz', '13', '14', 'FizzBuzz']\n        \n        >>> fizzbuzz(5)\n        ['1', '2', 'Fizz', '4', 'Buzz']\n        \n        >>> fizzbuzz(1)\n        ['1']\n    \"\"\"\n    if n < 1:\n        raise ValueError(\"n must be at least 1\")\n    \n    result = []\n    for i in range(1, n + 1):\n        if i % 15 == 0:  # Divisible by both 3 and 5\n            result.append('FizzBuzz')\n        elif i % 3 == 0:  # Divisible by 3\n            result.append('Fizz')\n        elif i % 5 == 0:  # Divisible by 5\n            result.append('Buzz')\n        else:  # Not divisible by 3 or 5\n            result.append(str(i))\n    \n    return result\n\n\n# Usage examples\nif __name__ == \"__main__\":\n    # Example 1: FizzBuzz for numbers 1-15\n    print(\"fizzbuzz(15):\")\n    print(fizzbuzz(15))\n    print()\n    \n    # Example 2: FizzBuzz for numbers 1-5\n    print(\"fizzbuzz(5):\")\n    print(fizzbuzz(5))\n    print()\n    \n    # Example 3: FizzBuzz for numbers 1-20\n    print(\"fizzbuzz(20):\")\n    result = fizzbuzz(20)\n    for i, value in enumerate(result, 1):\n        print(f\"{i:2d}: {value}\")\n    print()\n    \n    # Example 4: Error handling\n    try:\n        fizzbuzz(0)\n    except ValueError as e:\n        print(f\"Error: {e}\")\n```\n\n**Output:**\n```\nfizzbuzz(15):\n['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', '11', 'Fizz', '13', '14', 'FizzBuzz']\n\nfizzbuzz(5):\n['1', '2', 'Fizz', '4', 'Buzz']\n\nfizzbuzz(20):\n 1: 1\n 2: 2\n 3: Fizz\n 4: 4\n 5: Buzz\n 6: Fizz\n 7: 7\n 8: 8\n 9: Fizz\n10: Buzz\n11: 11\n12: Fizz\n13: 13\n14: 14\n15: FizzBuzz\n16: 16\n17: 17\n18: Fizz\n19: 19\n20: Buzz\n\nError: n must be at least 1\n```\n\n**Key Features:**\n\n1. **Efficient divisibility check**: Uses `i % 15 == 0` to check for multiples of both 3 and 5 (since 15 = 3 × 5)\n2. **Proper order**: Checks FizzBuzz first to avoid false positives\n3. **Type hints**: Clear input and output types\n4. **Comprehensive docstring**: Includes description, args, returns, raises, and examples\n5. **Error handling**: Validates input with a `ValueError` for invalid inputs\n6. **Multiple examples**: Shows various usage scenarios including edge cases"
-            }
-          ]
-        },
-        {
-          "name": "binary-search",
-          "description": "Algorithm + full docstring (Args/Returns/Raises + examples)",
-          "correctness": 9,
-          "quality": 9,
-          "documentation": 9,
-          "total": 9,
-          "speed_ms": 11549,
-          "notes": "Correct, overflow-safe binary search with clean logic, thorough docstring/comments, and good extra test coverage beyond the required 3 examples, though duplicates aren't explicitly tested.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 9,
-              "quality": 9,
-              "documentation": 9,
-              "total": 9,
-              "speed_ms": 11549,
-              "notes": "Correct, overflow-safe binary search with clean logic, thorough docstring/comments, and good extra test coverage beyond the required 3 examples, though duplicates aren't explicitly tested.",
-              "response": "```python\ndef binary_search(arr: list[int], target: int) -> int:\n    \"\"\"\n    Search for a target value in a sorted list using binary search algorithm.\n    \n    Binary search is an efficient algorithm that works by repeatedly dividing the\n    search space in half. It has a time complexity of O(log n) compared to O(n)\n    for linear search.\n    \n    Args:\n        arr (list[int]): A sorted list of integers to search in.\n        target (int): The integer value to search for.\n    \n    Returns:\n        int: The index of the target value if found, otherwise -1.\n    \n    Raises:\n        TypeError: If arr is not a list or target is not an integer.\n    \n    Examples:\n        >>> binary_search([1, 3, 5, 7, 9, 11], 7)\n        3\n        \n        >>> binary_search([1, 3, 5, 7, 9, 11], 4)\n        -1\n        \n        >>> binary_search([2, 4, 6, 8, 10], 2)\n        0\n    \"\"\"\n    # Input validation\n    if not isinstance(arr, list):\n        raise TypeError(\"arr must be a list\")\n    if not isinstance(target, int):\n        raise TypeError(\"target must be an integer\")\n    \n    # Initialize two pointers: left at the start, right at the end\n    left = 0\n    right = len(arr) - 1\n    \n    # Continue searching while the search space is valid\n    while left <= right:\n        # Calculate the middle index to avoid overflow\n        # (equivalent to (left + right) // 2 but safer for very large numbers)\n        mid = left + (right - left) // 2\n        \n        # Check if target is at the middle position\n        if arr[mid] == target:\n            return mid\n        \n        # If target is smaller than middle element,\n        # it must be in the left half, so move right pointer down\n        elif arr[mid] > target:\n            right = mid - 1\n        \n        # If target is larger than middle element,\n        # it must be in the right half, so move left pointer up\n        else:\n            left = mid + 1\n    \n    # Target was not found in the list\n    return -1\n\n\n# Test cases\nif __name__ == \"__main__\":\n    # Test case 1: Target found in the middle\n    assert binary_search([1, 3, 5, 7, 9, 11], 7) == 3\n    print(\"✓ Test 1 passed: Target found at index 3\")\n    \n    # Test case 2: Target not found\n    assert binary_search([1, 3, 5, 7, 9, 11], 4) == -1\n    print(\"✓ Test 2 passed: Target not found, returned -1\")\n    \n    # Test case 3: Target at the beginning\n    assert binary_search([2, 4, 6, 8, 10], 2) == 0\n    print(\"✓ Test 3 passed: Target found at index 0\")\n    \n    # Additional test cases\n    assert binary_search([1], 1) == 0\n    print(\"✓ Test 4 passed: Single element list\")\n    \n    assert binary_search([], 5) == -1\n    print(\"✓ Test 5 passed: Empty list\")\n    \n    assert binary_search([10, 20, 30, 40, 50], 50) == 4\n    print(\"✓ Test 6 passed: Target at the end\")\n    \n    # Test error handling\n    try:\n        binary_search(\"not a list\", 5)\n        print(\"✗ Error handling test failed\")\n    except TypeError as e:\n        print(f\"✓ Error handling test passed: {e}\")\n    \n    try:\n        binary_search([1, 2, 3], \"not an int\")\n        print(\"✗ Error handling test failed\")\n    except TypeError as e:\n        print(f\"✓ Error handling test passed: {e}\")\n    \n    print(\"\\n✓ All tests passed!\")\n```\n\n**Key Features:**\n\n1. **Docstring**: Includes comprehensive documentation with:\n   - Description of the algorithm\n   - Args section with parameter types\n   - Returns section explaining the output\n   - Raises section documenting exceptions\n   - 3 docstring examples that can be run with doctest\n\n2. **Algorithm Explanation**: Inline comments explain:\n   - Initialization of left and right pointers\n   - The while loop condition\n   - Middle index calculation\n   - Three conditional branches (found, search left, search right)\n\n3. **Input Validation**: Type checking for both parameters\n\n4. **Test Coverage**: Multiple test cases including:\n   - Target in the middle\n   - Target not found\n   - Target at the beginning\n   - Single element list\n   - Empty list\n   - Target at the end\n   - Error handling\n\n**Time Complexity**: O(log n)  \n**Space Complexity**: O(1)"
-            }
-          ]
-        },
-        {
-          "name": "refactor",
-          "description": "Code clarity + whether the model can explain its changes",
-          "correctness": 10,
-          "quality": 9,
-          "documentation": 8,
-          "total": 9,
-          "speed_ms": 4800,
-          "notes": "Correct, idiomatic refactor with meaningful names, type hints, and a clear docstring/example; the explanation is specific but includes an unsubstantiated performance claim (10-15% speedup).",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 10,
-              "quality": 9,
-              "documentation": 8,
-              "total": 9,
-              "speed_ms": 4800,
-              "notes": "Correct, idiomatic refactor with meaningful names, type hints, and a clear docstring/example; the explanation is specific but includes an unsubstantiated performance claim (10-15% speedup).",
-              "response": "# Refactored Function\n\n```python\ndef transform_numbers(numbers: list[int]) -> list[int]:\n    \"\"\"\n    Transform a list of numbers by squaring even numbers and cubing odd numbers.\n    \n    Args:\n        numbers: A list of integers to transform.\n    \n    Returns:\n        A list of transformed integers where even numbers are squared\n        and odd numbers are cubed.\n    \n    Example:\n        >>> transform_numbers([1, 2, 3, 4])\n        [1, 4, 27, 16]\n    \"\"\"\n    return [x * x if x % 2 == 0 else x * x * x for x in numbers]\n```\n\n## Explanation of Changes\n\n| Change | Before | After | Reason |\n|--------|--------|-------|--------|\n| **Function name** | `p()` | `transform_numbers()` | Descriptive names make code self-documenting and easier to maintain |\n| **Parameter name** | `d` | `numbers` | Clarifies that the input is a collection of numeric values |\n| **Variable name** | `r`, `x`, `i` | `(implicit)` | List comprehension eliminates intermediate variables; `x` is clear in context |\n| **List building** | Manual `for` loop with `.append()` | List comprehension | More concise, Pythonic, and performant |\n| **Type hints** | None | `list[int]` → `list[int]` | Enables IDE autocomplete, static type checking, and documents expected types |\n| **Docstring** | None | Full docstring with Args, Returns, Example | Explains purpose, parameters, return value, and usage examples |\n\n## Key Benefits\n\n1. **Readability**: Function name and variable names immediately convey intent\n2. **Pythonic**: List comprehension is the idiomatic way to transform collections\n3. **Type Safety**: Type hints catch errors early and improve IDE support\n4. **Documentation**: Docstring serves as built-in help for other developers\n5. **Performance**: List comprehension is ~10-15% faster than append loops"
-            }
-          ]
-        },
-        {
-          "name": "readme-writer",
-          "description": "Pure documentation ability — no code at all",
-          "correctness": 8,
-          "quality": 9,
-          "documentation": 9,
-          "total": 8.7,
-          "speed_ms": 9906,
-          "notes": "Comprehensive, well-organized README covering all required sections with clear examples, though some invented details (hash/line-count logic, placeholder GitHub URL) go beyond the stated scope.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 8,
-              "quality": 9,
-              "documentation": 9,
-              "total": 8.7,
-              "speed_ms": 9906,
-              "notes": "Comprehensive, well-organized README covering all required sections with clear examples, though some invented details (hash/line-count logic, placeholder GitHub URL) go beyond the stated scope.",
-              "response": "# snapdiff\n\nCompare two directories and report added, removed, and changed files with detailed diff statistics.\n\n## Installation\n\nInstall `snapdiff` using pip:\n\n```bash\npip install snapdiff\n```\n\nFor development installation:\n\n```bash\ngit clone https://github.com/yourusername/snapdiff.git\ncd snapdiff\npip install -e .\n```\n\n## Quick Start\n\n```bash\nsnapdiff /path/to/directory1 /path/to/directory2\n```\n\n## Usage\n\n### Basic Syntax\n\n```bash\nsnapdiff SOURCE_DIR TARGET_DIR [OPTIONS]\n```\n\n### Options\n\n| Flag | Description | Default |\n|------|-------------|---------|\n| `--ignore-hidden` | Exclude hidden files and directories (starting with `.`) | `false` |\n| `--output {json\\|text}` | Output format: JSON for programmatic use, text for human readability | `text` |\n| `--depth N` | Maximum directory depth to traverse (0 = unlimited) | `0` |\n| `--help` | Show help message and exit | — |\n| `--version` | Show version number and exit | — |\n\n### Examples\n\n#### Compare two directories with default settings\n\n```bash\nsnapdiff ~/project-v1 ~/project-v2\n```\n\n#### Ignore hidden files and directories\n\n```bash\nsnapdiff --ignore-hidden ~/backup-old ~/backup-new\n```\n\n#### Limit depth to 2 levels\n\n```bash\nsnapdiff --depth 2 ./src ./src-modified\n```\n\n#### Output as JSON for programmatic use\n\n```bash\nsnapdiff --output json ~/dir1 ~/dir2 > diff.json\n```\n\n#### Combine multiple options\n\n```bash\nsnapdiff --ignore-hidden --depth 3 --output json ~/source ~/target\n```\n\n#### Save results to a file\n\n```bash\nsnapdiff --output text ~/old ~/new > report.txt\n```\n\n## Output Format\n\n### Text Output (Default)\n\n```\n=== SNAPDIFF REPORT ===\nSource: /home/user/project-v1\nTarget: /home/user/project-v2\nGenerated: 2024-01-15 14:23:45\n\n--- SUMMARY ---\nAdded files:     5\nRemoved files:   3\nChanged files:   8\nTotal files:     42\n\n--- ADDED FILES ---\n  + src/components/Header.jsx (2.4 KB)\n  + src/utils/helpers.js (1.8 KB)\n  + config/env.example (0.5 KB)\n  + docs/README.md (5.2 KB)\n  + .gitignore (0.1 KB)\n\n--- REMOVED FILES ---\n  - src/legacy/old.js (4.2 KB)\n  - tests/old-tests.py (3.1 KB)\n  - config/deprecated.json (0.8 KB)\n\n--- CHANGED FILES ---\n  ~ package.json (size: 2.1 KB → 2.3 KB, lines: 45 → 48)\n  ~ src/index.js (size: 8.4 KB → 8.7 KB, lines: 234 → 241)\n  ~ README.md (size: 12.5 KB → 15.3 KB, lines: 289 → 334)\n  ~ src/app.js (size: 5.2 KB → 5.2 KB, lines: 142 → 142, content changed)\n  ...\n```\n\n### JSON Output\n\n```json\n{\n  \"metadata\": {\n    \"source\": \"/home/user/project-v1\",\n    \"target\": \"/home/user/project-v2\",\n    \"generated\": \"2024-01-15T14:23:45\",\n    \"ignore_hidden\": false,\n    \"max_depth\": 0\n  },\n  \"summary\": {\n    \"added\": 5,\n    \"removed\": 3,\n    \"changed\": 8,\n    \"unchanged\": 26,\n    \"total\": 42\n  },\n  \"added\": [\n    {\n      \"path\": \"src/components/Header.jsx\",\n      \"size\": 2457,\n      \"type\": \"file\"\n    },\n    {\n      \"path\": \"src/utils/helpers.js\",\n      \"size\": 1821,\n      \"type\": \"file\"\n    }\n  ],\n  \"removed\": [\n    {\n      \"path\": \"src/legacy/old.js\",\n      \"size\": 4312,\n      \"type\": \"file\"\n    }\n  ],\n  \"changed\": [\n    {\n      \"path\": \"package.json\",\n      \"size_before\": 2150,\n      \"size_after\": 2355,\n      \"lines_before\": 45,\n      \"lines_after\": 48,\n      \"type\": \"file\"\n    }\n  ]\n}\n```\n\n## How It Works\n\n`snapdiff` performs the following steps:\n\n1. **Directory Traversal**: Recursively scans both source and target directories up to the specified depth, optionally excluding hidden files.\n\n2. **File Indexing**: Creates a comprehensive index of all files with metadata:\n   - File path and name\n   - File size\n   - Last modification time\n   - Content hash (for binary files) or line count (for text files)\n\n3. **Comparison**: Compares the two indices to categorize files:\n   - **Added**: Files present in target but not in source\n   - **Removed**: Files present in source but not in target\n   - **Changed**: Files in both directories with different sizes, content, or metadata\n   - **Unchanged**: Files identical in both directories\n\n4. **Reporting**: Generates a human-readable or machine-readable report with summary statistics and detailed file listings.\n\nThe tool uses efficient algorithms to minimize I/O operations and memory usage, making it suitable for comparing large directory structures.\n\n## Requirements\n\n- Python 3.7+\n- No external dependencies (uses only Python standard library)\n\n## Contributing\n\nContributions are welcome! Please submit issues and pull requests on [GitHub](https://github.com/yourusername/snapdiff).\n\n## License\n\nThis project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details."
-            }
-          ]
-        },
-        {
-          "name": "test-writing",
-          "description": "Edge-case thinking + pytest parametrize discipline",
-          "correctness": 8,
-          "quality": 7,
-          "documentation": 8,
-          "total": 7.7,
-          "speed_ms": 11698,
-          "notes": "Comprehensive parametrized happy-path and error coverage with correct arithmetic, but the response cuts off mid-test with an unfinished/no-op assertion, and uses classes despite the 'plain functions' requirement, slightly hurting quality.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 8,
-              "quality": 7,
-              "documentation": 8,
-              "total": 7.7,
-              "speed_ms": 11698,
-              "notes": "Comprehensive parametrized happy-path and error coverage with correct arithmetic, but the response cuts off mid-test with an unfinished/no-op assertion, and uses classes despite the 'plain functions' requirement, slightly hurting quality.",
-              "response": "```python\nimport pytest\nfrom your_module import parse_duration  # Adjust import path as needed\n\n\nclass TestParseDurationHappyPath:\n    \"\"\"Test valid duration strings with expected conversions.\"\"\"\n\n    @pytest.mark.parametrize(\n        \"duration_str,expected_seconds\",\n        [\n            # Single units\n            (\"1h\", 3600),\n            (\"30m\", 1800),\n            (\"45s\", 45),\n            (\"0s\", 0),\n            # Multiple units\n            (\"1h30m\", 5400),\n            (\"2h15m30s\", 8130),\n            (\"1h30m45s\", 5445),\n            # Edge cases with zeros\n            (\"0h\", 0),\n            (\"0m\", 0),\n            (\"0h0m0s\", 0),\n            (\"1h0m0s\", 3600),\n            (\"0h30m0s\", 1800),\n            (\"0h0m45s\", 45),\n            # Larger numbers\n            (\"10h\", 36000),\n            (\"100m\", 6000),\n            (\"3600s\", 3600),\n            (\"23h59m59s\", 86399),\n            # With whitespace\n            (\" 1h\", 3600),\n            (\"30m \", 1800),\n            (\"  45s  \", 45),\n            (\" 1h30m \", 5400),\n        ],\n        ids=[\n            \"1_hour\",\n            \"30_minutes\",\n            \"45_seconds\",\n            \"zero_seconds\",\n            \"1h_30m\",\n            \"2h_15m_30s\",\n            \"1h_30m_45s\",\n            \"zero_hours\",\n            \"zero_minutes\",\n            \"all_zeros\",\n            \"1h_zero_rest\",\n            \"zero_hours_30m\",\n            \"zero_hours_zero_min_45s\",\n            \"10_hours\",\n            \"100_minutes\",\n            \"3600_seconds\",\n            \"max_daily_time\",\n            \"leading_whitespace\",\n            \"trailing_whitespace\",\n            \"both_whitespace\",\n            \"whitespace_multi_unit\",\n        ],\n    )\n    def test_valid_duration_formats(self, duration_str, expected_seconds):\n        \"\"\"Verify that valid duration strings parse to correct seconds.\"\"\"\n        assert parse_duration(duration_str) == expected_seconds\n\n\nclass TestParseDurationErrorCases:\n    \"\"\"Test invalid duration strings that should raise ValueError.\"\"\"\n\n    def test_empty_string_raises_value_error(self):\n        \"\"\"Empty string should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"\")\n\n    def test_only_whitespace_raises_value_error(self):\n        \"\"\"String with only whitespace should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"   \")\n\n    def test_invalid_unit_raises_value_error(self):\n        \"\"\"String with unrecognized unit should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1d\")\n\n    def test_invalid_character_raises_value_error(self):\n        \"\"\"String with invalid characters should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1h30x\")\n\n    def test_wrong_unit_order_raises_value_error(self):\n        \"\"\"Units in wrong order (minutes before hours) should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"30m1h\")\n\n    def test_duplicate_units_raises_value_error(self):\n        \"\"\"Duplicate units should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1h2h\")\n\n    def test_negative_number_raises_value_error(self):\n        \"\"\"Negative numbers should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"-1h\")\n\n    def test_decimal_number_raises_value_error(self):\n        \"\"\"Decimal numbers should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1.5h\")\n\n    def test_no_number_with_unit_raises_value_error(self):\n        \"\"\"Unit without number should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"h\")\n\n    def test_text_without_units_raises_value_error(self):\n        \"\"\"Plain text without units should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"one hour\")\n\n    def test_space_between_number_and_unit_raises_value_error(self):\n        \"\"\"Space between number and unit should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1 h\")\n\n    def test_special_characters_raises_value_error(self):\n        \"\"\"Special characters should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1h@30m\")\n\n\nclass TestParseDurationBoundaryConditions:\n    \"\"\"Test boundary and special numeric conditions.\"\"\"\n\n    @pytest.mark.parametrize(\n        \"duration_str,expected_seconds\",\n        [\n            (\"0h0m0s\", 0),\n            (\"999h59m59s\", 3599999),  # Large but valid\n        ],\n        ids=[\"minimum_valid_value\", \"large_valid_value\"],\n    )\n    def test_numeric_boundaries(self, duration_str, expected_seconds):\n        \"\"\"Test minimum and large valid numeric values.\"\"\"\n        assert parse_duration(duration_str) == expected_seconds\n\n    def test_leading_zeros_in_numbers(self):\n        \"\"\"Numbers with leading zeros should be parsed correctly.\"\"\"\n        assert parse_duration(\"01h02m03s\") == 3723\n\n    def test_large_individual_values(self):\n        \"\"\"Large values for individual units should work.\"\"\"\n        assert parse_duration(\"999h\") == 3596400\n        assert parse_duration(\"9999m\") == 599940\n        assert parse_duration(\"99999s\") == 99999\n\n\nclass TestParseDurationReturnType:\n    \"\"\"Test that the function returns the correct type.\"\"\"\n\n    def test_return_type_is_integer(self):\n        \"\"\"Return value should be an integer.\"\"\"\n        result = parse_duration(\"1h30m45s\")\n        assert isinstance(result, int)\n\n    def test_return_type_is_not_float(self):\n        \"\"\"Return value should not be a float.\"\"\"\n        result = parse_duration(\"30m\")\n        assert not isinstance(result, float)\n\n\nclass TestParseDurationCommonUseCases:\n    \"\"\"Test common real-world use cases.\"\"\"\n\n    @pytest.mark.parametrize(\n        \"duration_str,expected_seconds\",\n        [\n            (\"5m\", 300),  # Short timeout\n            (\"30m\", 1800),  # Cache expiration\n            (\"1h\", 3600),  # Meeting duration\n            (\"8h\", 28800),  # Workday\n            (\"24h\", 86400),  # Full day\n            (\"1h30m\", 5400),  # Common task duration\n            (\"2h30m45s\", 9045),  # Detailed duration\n        ],\n        ids=[\n            \"short_timeout\",\n            \"cache_expiration\",\n            \"meeting\",\n            \"workday\",\n            \"full_day\",\n            \"task_duration\",\n            \"detailed_log\",\n        ],\n    )\n    def test_common_use_cases(self, duration_str, expected_seconds):\n        \"\"\"Test parsing of commonly used durations.\"\"\"\n        assert parse_duration(duration_str) == expected_seconds\n```\n\nThis comprehensive test suite covers:\n\n1. **Happy Path Tests** (23 cases with `@pytest.mark.parametrize`):\n   - Single units (hours, minutes, seconds)\n   - Combined units in correct order\n   - Edge cases with zeros\n   - Large numbers\n   - Whitespace handling\n\n2. **Error Cases** (12 tests with `pytest.raises`):\n   - Empty/whitespace strings\n   - Invalid units\n   - Wrong unit order\n   - Duplicate units\n   - Negative/decimal numbers\n   - Missing numbers or units\n   - Spaces between numbers and units\n\n3. **Boundary Conditions**:\n   - Minimum/"
-            }
-          ]
-        },
-        {
-          "name": "go-test",
-          "description": "Idiomatic Go table-driven tests + benchmark",
-          "correctness": 8,
-          "quality": 9,
-          "documentation": 6,
-          "total": 7.7,
-          "speed_ms": 7056,
-          "notes": "Comprehensive table-driven tests with correct map comparison via maps.Equal and a proper benchmark loop, but lacks a doc comment on TestWordCount and makes some debatable assumptions about punctuation/apostrophe handling.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 8,
-              "quality": 9,
-              "documentation": 6,
-              "total": 7.7,
-              "speed_ms": 7056,
-              "notes": "Comprehensive table-driven tests with correct map comparison via maps.Equal and a proper benchmark loop, but lacks a doc comment on TestWordCount and makes some debatable assumptions about punctuation/apostrophe handling.",
-              "response": "```go\npackage wordcount\n\nimport (\n\t\"maps\"\n\t\"testing\"\n)\n\nfunc TestWordCount(t *testing.T) {\n\ttests := []struct {\n\t\tname  string\n\t\tinput string\n\t\twant  map[string]int\n\t}{\n\t\t{\n\t\t\tname:  \"empty string\",\n\t\t\tinput: \"\",\n\t\t\twant:  map[string]int{},\n\t\t},\n\t\t{\n\t\t\tname:  \"single word\",\n\t\t\tinput: \"hello\",\n\t\t\twant:  map[string]int{\"hello\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"mixed case\",\n\t\t\tinput: \"Hello HELLO hello\",\n\t\t\twant:  map[string]int{\"hello\": 3},\n\t\t},\n\t\t{\n\t\t\tname:  \"punctuation\",\n\t\t\tinput: \"hello, world! how's it?\",\n\t\t\twant:  map[string]int{\"hello\": 1, \"world\": 1, \"how's\": 1, \"it\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"repeated words\",\n\t\t\tinput: \"the quick brown fox jumps over the lazy dog\",\n\t\t\twant: map[string]int{\n\t\t\t\t\"the\": 2, \"quick\": 1, \"brown\": 1, \"fox\": 1,\n\t\t\t\t\"jumps\": 1, \"over\": 1, \"lazy\": 1, \"dog\": 1,\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tname:  \"multi-word sentence with various punctuation\",\n\t\t\tinput: \"Don't worry, it's fine! Don't worry.\",\n\t\t\twant: map[string]int{\n\t\t\t\t\"don't\": 2, \"worry\": 2, \"it's\": 1, \"fine\": 1,\n\t\t\t},\n\t\t},\n\t\t{\n\t\t\tname:  \"multiple spaces and tabs\",\n\t\t\tinput: \"hello   world\\t\\tgo\",\n\t\t\twant:  map[string]int{\"hello\": 1, \"world\": 1, \"go\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"only punctuation\",\n\t\t\tinput: \"... !!! ???\",\n\t\t\twant:  map[string]int{},\n\t\t},\n\t\t{\n\t\t\tname:  \"words with numbers\",\n\t\t\tinput: \"test123 Test123 TEST123\",\n\t\t\twant:  map[string]int{\"test123\": 3},\n\t\t},\n\t\t{\n\t\t\tname:  \"single character words\",\n\t\t\tinput: \"a B c A b C\",\n\t\t\twant:  map[string]int{\"a\": 2, \"b\": 2, \"c\": 2},\n\t\t},\n\t}\n\n\tfor _, tc := range tests {\n\t\tt.Run(tc.name, func(t *testing.T) {\n\t\t\tgot := WordCount(tc.input)\n\n\t\t\tif !maps.Equal(got, tc.want) {\n\t\t\t\tt.Errorf(\"WordCount(%q) = %v, want %v\", tc.input, got, tc.want)\n\t\t\t}\n\t\t})\n\t}\n}\n\nfunc BenchmarkWordCount(b *testing.B) {\n\tsentence := \"The quick brown fox jumps over the lazy dog. \" +\n\t\t\"Pack my box with five dozen liquor jugs. \" +\n\t\t\"How vexingly quick daft zebras jump! \" +\n\t\t\"The five boxing wizards jump quickly. \" +\n\t\t\"Waltz, bad nymph, for quick jigs vex.\"\n\n\tb.ResetTimer()\n\tfor i := 0; i < b.N; i++ {\n\t\tWordCount(sentence)\n\t}\n}\n```\n\n**Key Features:**\n\n1. **Table-driven tests**: Uses a slice of anonymous structs with `name`, `input`, and `want` fields\n2. **Subtests**: Each test case is run with `t.Run()` for better error identification\n3. **Map comparison**: Uses `maps.Equal()` from Go's standard library (Go 1.21+) to compare maps\n4. **6+ test cases covering**:\n   - Empty string\n   - Single word\n   - Mixed case handling\n   - Punctuation stripping\n   - Repeated words\n   - Multi-word sentences\n   - Additional cases: multiple whitespace, only punctuation, numbers, single characters\n\n5. **Benchmark**: `BenchmarkWordCount` tests performance on a realistic multi-sentence input with common pangrams\n\n**Note:** If using Go < 1.21, replace `maps.Equal()` with `reflect.DeepEqual()`:\n```go\nif !reflect.DeepEqual(got, tc.want) {\n```"
-            }
-          ]
-        },
-        {
-          "name": "async-fetch",
-          "description": "Async concurrency patterns + retry/timeout handling",
-          "correctness": 7,
-          "quality": 7,
-          "documentation": 8,
-          "total": 7.3,
-          "speed_ms": 9035,
-          "notes": "Solid overall (proper session reuse, per-request ClientTimeout, asyncio.gather, error containment) but backoff is linear (0.5*(n+1)) rather than truly exponential, and persistent 5xx failures after retries exhaust silently return status with error=None; retry logic is also duplicated across multiple except blocks instead of being unified.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 7,
-              "quality": 7,
-              "documentation": 8,
-              "total": 7.3,
-              "speed_ms": 9035,
-              "notes": "Solid overall (proper session reuse, per-request ClientTimeout, asyncio.gather, error containment) but backoff is linear (0.5*(n+1)) rather than truly exponential, and persistent 5xx failures after retries exhaust silently return status with error=None; retry logic is also duplicated across multiple except blocks instead of being unified.",
-              "response": "```python\n\"\"\"\nConcurrent URL fetcher with retry logic and comprehensive error handling.\n\"\"\"\n\nimport asyncio\nimport aiohttp\nfrom typing import Optional\n\n\nasync def fetch_all(\n    urls: list[str], timeout: float = 5.0, retries: int = 2\n) -> list[dict]:\n    \"\"\"\n    Fetch multiple URLs concurrently with retry logic and error handling.\n\n    Args:\n        urls: List of URLs to fetch\n        timeout: Request timeout in seconds (per-request, not total)\n        retries: Number of retries on network errors or 5xx responses\n\n    Returns:\n        List of result dicts with keys:\n        - url (str): Original URL\n        - status (int | None): HTTP status code or None on error\n        - body (str | None): Response text or None on error\n        - error (str | None): Error message or None on success\n\n    Note:\n        - All requests are made concurrently\n        - Errors are never raised; they're captured in result dicts\n        - Retries use exponential backoff (0.5s, 1s, 1.5s, ...)\n        - Retries occur on network errors or 5xx status codes\n    \"\"\"\n    results: list[dict] = []\n\n    async def fetch_single(\n        session: aiohttp.ClientSession, url: str\n    ) -> dict:\n        \"\"\"Fetch a single URL with retry logic.\"\"\"\n        for attempt in range(retries + 1):\n            try:\n                async with session.get(\n                    url, timeout=aiohttp.ClientTimeout(total=timeout)\n                ) as response:\n                    body = await response.text()\n                    status = response.status\n\n                    # Retry on 5xx errors\n                    if 500 <= status < 600 and attempt < retries:\n                        wait_time = 0.5 * (attempt + 1)\n                        await asyncio.sleep(wait_time)\n                        continue\n\n                    return {\n                        \"url\": url,\n                        \"status\": status,\n                        \"body\": body,\n                        \"error\": None,\n                    }\n\n            except asyncio.TimeoutError:\n                if attempt < retries:\n                    wait_time = 0.5 * (attempt + 1)\n                    await asyncio.sleep(wait_time)\n                    continue\n                return {\n                    \"url\": url,\n                    \"status\": None,\n                    \"body\": None,\n                    \"error\": f\"Timeout after {timeout}s\",\n                }\n\n            except aiohttp.ClientConnectorError as e:\n                if attempt < retries:\n                    wait_time = 0.5 * (attempt + 1)\n                    await asyncio.sleep(wait_time)\n                    continue\n                return {\n                    \"url\": url,\n                    \"status\": None,\n                    \"body\": None,\n                    \"error\": f\"Connection error: {str(e)}\",\n                }\n\n            except aiohttp.ClientSSLError as e:\n                # Don't retry SSL errors\n                return {\n                    \"url\": url,\n                    \"status\": None,\n                    \"body\": None,\n                    \"error\": f\"SSL error: {str(e)}\",\n                }\n\n            except aiohttp.ClientError as e:\n                if attempt < retries:\n                    wait_time = 0.5 * (attempt + 1)\n                    await asyncio.sleep(wait_time)\n                    continue\n                return {\n                    \"url\": url,\n                    \"status\": None,\n                    \"body\": None,\n                    \"error\": f\"Request error: {str(e)}\",\n                }\n\n            except Exception as e:\n                return {\n                    \"url\": url,\n                    \"status\": None,\n                    \"body\": None,\n                    \"error\": f\"Unexpected error: {str(e)}\",\n                }\n\n        # Should not reach here, but fallback\n        return {\n            \"url\": url,\n            \"status\": None,\n            \"body\": None,\n            \"error\": \"Failed after all retries\",\n        }\n\n    # Create session and fetch all URLs concurrently\n    connector = aiohttp.TCPConnector(limit=10)\n    timeout_config = aiohttp.ClientTimeout(total=None)  # Per-request timeout only\n\n    async with aiohttp.ClientSession(\n        connector=connector, timeout=timeout_config\n    ) as session:\n        tasks = [fetch_single(session, url) for url in urls]\n        results = await asyncio.gather(*tasks)\n\n    return results\n\n\nasync def main() -> None:\n    \"\"\"Example usage: fetch 3 URLs and print results.\"\"\"\n    urls = [\n        \"https://httpbin.org/delay/1\",\n        \"https://httpbin.org/status/500\",\n        \"https://invalid-domain-that-does-not-exist-12345.com\",\n    ]\n\n    print(\"Fetching URLs concurrently...\\n\")\n    results = await fetch_all(urls, timeout=10.0, retries=2)\n\n    for result in results:\n        print(f\"URL: {result['url']}\")\n        print(f\"  Status: {result['status']}\")\n        print(f\"  Error: {result['error']}\")\n        if result['body']:\n            body_preview = result['body'][:100].replace('\\n', ' ')\n            print(f\"  Body: {body_preview}...\")\n        print()\n\n\nif __name__ == \"__main__\":\n    asyncio.run(main())\n```\n\n**Key Features:**\n\n1. **Concurrent Execution**: Uses `asyncio.gather()` to fetch all URLs simultaneously\n2. **Per-Request Timeout**: `aiohttp.ClientTimeout(total=timeout)` enforces timeout per request\n3. **Exponential Backoff**: Retry delays are `0.5 * (attempt + 1)` seconds\n4. **Smart Retries**: Retries on network errors and 5xx responses, but not SSL errors\n5. **No Exceptions**: All errors are captured in result dicts\n6. **Type Hints**: Fully annotated with return types\n7. **Connection Pooling**: Uses `TCPConnector(limit=10)` for efficient resource management\n\n**Result Format:**\n```python\n{\n    \"url\": \"https://example.com\",\n    \"status\": 200,           # None on error\n    \"body\": \"...\",           # None on error\n    \"error\": None            # None on success\n}\n```"
-            }
-          ]
-        },
-        {
-          "name": "sql",
-          "description": "CTE + window function fluency on a real schema",
-          "correctness": 5,
-          "quality": 7,
-          "documentation": 9,
-          "total": 7,
-          "speed_ms": 4904,
-          "notes": "Logic for revenue, avg, and top_customer (via DISTINCT ON) is correct, but revenue_pct is computed with a CROSS JOIN CTE rather than an actual window function (SUM(...) OVER()), directly violating an explicit requirement despite the model's rationalization; comments and explanations are clear and well-organized otherwise.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 5,
-              "quality": 7,
-              "documentation": 9,
-              "total": 7,
-              "speed_ms": 4904,
-              "notes": "Logic for revenue, avg, and top_customer (via DISTINCT ON) is correct, but revenue_pct is computed with a CROSS JOIN CTE rather than an actual window function (SUM(...) OVER()), directly violating an explicit requirement despite the model's rationalization; comments and explanations are clear and well-organized otherwise.",
-              "response": "```sql\n-- Compute revenue metrics aggregated by country\nWITH country_metrics AS (\n  SELECT\n    c.country,\n    SUM(o.amount) AS total_revenue,\n    COUNT(o.id) AS order_count,\n    ROUND(AVG(o.amount)::numeric, 2) AS avg_order_value\n  FROM customers c\n  LEFT JOIN orders o ON c.id = o.customer_id\n  GROUP BY c.country\n),\n-- Identify the top spending customer per country (earliest by name if tied)\ntop_customers_per_country AS (\n  SELECT DISTINCT ON (c.country)\n    c.country,\n    c.name AS top_customer\n  FROM customers c\n  LEFT JOIN orders o ON c.id = o.customer_id\n  GROUP BY c.id, c.country, c.name\n  ORDER BY c.country, SUM(o.amount) DESC NULLS LAST, c.name ASC\n),\n-- Calculate global total revenue for percentage computation\nglobal_revenue AS (\n  SELECT SUM(amount) AS total FROM orders\n)\nSELECT\n  cm.country,\n  cm.total_revenue,\n  cm.order_count,\n  cm.avg_order_value,\n  tc.top_customer,\n  ROUND(\n    (cm.total_revenue / NULLIF(gr.total, 0) * 100)::numeric,\n    1\n  ) AS revenue_pct\nFROM country_metrics cm\nLEFT JOIN top_customers_per_country tc ON cm.country = tc.country\nCROSS JOIN global_revenue gr\nORDER BY cm.total_revenue DESC;\n```\n\n**Explanation:**\n\n1. **`country_metrics` CTE**: Aggregates orders by country to compute total revenue, order count, and average order value.\n\n2. **`top_customers_per_country` CTE**: Uses `DISTINCT ON` to find the customer with the highest total spend per country, breaking ties by customer name in ascending order.\n\n3. **`global_revenue` CTE**: Calculates the sum of all order amounts across the entire dataset for use in percentage calculations.\n\n4. **Window function alternative (via `CROSS JOIN`)**: The `gr.total` value is applied across all rows, effectively creating a window function behavior to compute each country's percentage share of global revenue.\n\n5. The final `SELECT` joins all CTEs and computes `revenue_pct` using the global total, with `NULLIF` protecting against division by zero.\n\n6. Results are ordered by `total_revenue` in descending order."
-            }
-          ]
-        },
-        {
-          "name": "elixir-test",
-          "description": "ExUnit describe blocks + assert_raise + unicode handling",
-          "correctness": 5,
-          "quality": 7,
-          "documentation": 6,
-          "total": 6,
-          "speed_ms": 6951,
-          "notes": "patched after judge fix",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 5,
-              "quality": 7,
-              "documentation": 6,
-              "total": 6,
-              "speed_ms": 6951,
-              "notes": "patched after judge fix",
-              "response": "```elixir\ndefmodule StringUtilsTest do\n  use ExUnit.Case\n  doctest StringUtils\n\n  @moduledoc \"\"\"\n  Test suite for StringUtils.truncate/3\n\n  ## Examples\n\n      iex> StringUtils.truncate(\"Hello World\", 5)\n      \"He...\"\n\n      iex> StringUtils.truncate(\"Hi\", 10)\n      \"Hi\"\n\n      iex> StringUtils.truncate(\"Hello\", 5, \"\")\n      \"Hello\"\n\n      iex> StringUtils.truncate(\"Hello World\", 8, \">>\")\n      \"Hello>>\"\n  \"\"\"\n\n  describe \"happy path - strings within or needing truncation\" do\n    test \"returns original string when shorter than max_len\" do\n      result = StringUtils.truncate(\"Hi\", 10)\n      assert result == \"Hi\"\n    end\n\n    test \"returns original string when exactly at max_len\" do\n      result = StringUtils.truncate(\"Hello\", 5)\n      assert result == \"Hello\"\n    end\n\n    test \"truncates and appends default suffix when string exceeds max_len\" do\n      result = StringUtils.truncate(\"Hello World\", 8)\n      assert result == \"Hello...\"\n    end\n\n    test \"truncates and appends custom suffix when provided\" do\n      result = StringUtils.truncate(\"Hello World\", 8, \">>\")\n      assert result == \"Hello>>\"\n    end\n\n    test \"handles empty string\" do\n      result = StringUtils.truncate(\"\", 10)\n      assert result == \"\"\n    end\n\n    test \"handles unicode characters correctly\" do\n      result = StringUtils.truncate(\"こんにちは世界\", 6)\n      assert result == \"こんに...\"\n    end\n\n    test \"uses empty string as custom suffix\" do\n      result = StringUtils.truncate(\"Hello World\", 5, \"\")\n      assert result == \"Hello\"\n    end\n  end\n\n  describe \"edge cases and error handling\" do\n    test \"truncates to 0 length with default suffix\" do\n      result = StringUtils.truncate(\"Hello\", 0)\n      assert result == \"...\"\n    end\n\n    test \"raises ArgumentError when max_len is negative\" do\n      assert_raise ArgumentError, fn ->\n        StringUtils.truncate(\"Hello\", -1)\n      end\n    end\n\n    test \"handles max_len smaller than suffix length\" do\n      result = StringUtils.truncate(\"Hello World\", 2, \">>>\")\n      assert result == \">>>\"\n    end\n\n    test \"preserves whitespace when truncating\" do\n      result = StringUtils.truncate(\"Hello  World\", 7)\n      assert result == \"Hello ...\"\n    end\n  end\nend\n```\n\nThis test module provides comprehensive coverage with:\n\n1. **Two describe blocks**:\n   - `happy path - strings within or needing truncation`: Tests normal usage scenarios\n   - `edge cases and error handling`: Tests boundary conditions and error cases\n\n2. **8+ test cases covering**:\n   - ✅ String shorter than limit\n   - ✅ Exact length match\n   - ✅ Longer string with default suffix\n   - ✅ Custom suffix\n   - ✅ Empty string\n   - ✅ Unicode strings\n   - ✅ max_len of 0\n   - ✅ Negative max_len with `assert_raise`\n   - ✅ Edge case: suffix longer than max_len\n   - ✅ Whitespace preservation\n\n3. **Testing techniques**:\n   - `assert` for equality checks\n   - `assert_raise` for error handling\n   - Pattern matching in function arguments\n   - Module docstring with usage examples\n\nThe tests are well-organized, readable, and cover both typical usage and edge cases that would likely appear in production code."
-            }
-          ]
-        },
-        {
-          "name": "debug",
-          "description": "Careful reading + correctness reasoning over broken code",
-          "correctness": 5,
-          "quality": 6,
-          "documentation": 6,
-          "total": 5.7,
-          "speed_ms": 6280,
-          "notes": "Correctly identifies the count>1 filter and empty-string bugs and passes all test cases, but 'Bug 3' is not a distinct third defect—it's the same buggy line and fix as Bug 1 restated, so the model effectively only found 2 genuine bugs despite the task requiring 3.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 5,
-              "quality": 6,
-              "documentation": 6,
-              "total": 5.7,
-              "speed_ms": 6280,
-              "notes": "Correctly identifies the count>1 filter and empty-string bugs and passes all test cases, but 'Bug 3' is not a distinct third defect—it's the same buggy line and fix as Bug 1 restated, so the model effectively only found 2 genuine bugs despite the task requiring 3.",
-              "response": "# Bug Analysis\n\n## Bug 1: The `if count > 1` filter removes valid results\n\n**Buggy line:**\n```python\nreturn [word for word, count in ranked[:n] if count > 1]\n```\n\n**What it does wrong:**\nThe condition `if count > 1` filters out words that appear only once. This breaks the third test case where both 'hello' and 'world' appear once—they should both be included in the top-2, but this filter removes them. It also breaks the first test case where 'cat' and 'mat' appear once each.\n\n**Fix:**\nRemove the `if count > 1` condition entirely:\n```python\nreturn [word for word, count in ranked[:n]]\n```\n\n---\n\n## Bug 2: Empty strings remain after stripping punctuation\n\n**Buggy line:**\n```python\nwords = [w.strip('.,!?;:\\'\"') for w in words]\n```\n\n**What it does wrong:**\nIf a word consists entirely of punctuation (e.g., `\"...\"`), `strip()` leaves an empty string `\"\"` in the list. These empty strings get counted in the `Counter` and can appear in results. The Counter will include `''` as a word.\n\n**Fix:**\nFilter out empty strings after stripping:\n```python\nwords = [w.strip('.,!?;:\\'\"') for w in words if w.strip('.,!?;:\\'\"')]\n```\n\nOr more concisely:\n```python\nwords = [w.strip('.,!?;:\\'\"') for w in words]\nwords = [w for w in words if w]\n```\n\n---\n\n## Bug 3: Slice happens before filtering, returning wrong count\n\n**Buggy line:**\n```python\nreturn [word for word, count in ranked[:n] if count > 1]\n```\n\n**What it does wrong:**\nThe slice `ranked[:n]` takes the top-N items *before* applying the filter. If many top items have `count == 1`, they get filtered out, leaving fewer than N results (or possibly none). For example, in test case 1, `ranked[:3]` might include items with count=1 that get filtered, returning only 1 word instead of 3.\n\n**Fix:**\nRemove the filter condition (Bug 1) so that the slice correctly returns the top-N:\n```python\nreturn [word for word, count in ranked[:n]]\n```\n\n---\n\n## Corrected Function\n\n```python\nfrom collections import Counter\n\ndef top_words(text: str, n: int = 10) -> list[str]:\n    words = text.lower().split()\n    words = [w.strip('.,!?;:\\'\"') for w in words]\n    words = [w for w in words if w]  # Remove empty strings\n    counts = Counter(words)\n    ranked = sorted(counts.items(), key=lambda x: (-x[1], x[0]))\n    return [word for word, count in ranked[:n]]\n```\n\n**Verification:**\n- `top_words('the cat sat on the mat the', 3)` → `['the', 'cat', 'mat']` ✓\n- `top_words('a a b b c', 2)` → `['a', 'b']` ✓\n- `top_words('hello world', 5)` → `['hello', 'world']` ✓"
-            }
-          ]
-        },
-        {
-          "name": "api-client",
-          "description": "Class design + error handling + type hints + docs",
-          "correctness": 4,
-          "quality": 6,
-          "documentation": 5,
-          "total": 5,
-          "speed_ms": 10540,
-          "notes": "Well-structured and thoroughly documented up to the point of truncation, but the response cuts off mid-docstring in the post method, omitting its body and the required usage example entirely, and it never uses a requests.Session for connection reuse.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 4,
-              "quality": 6,
-              "documentation": 5,
-              "total": 5,
-              "speed_ms": 10540,
-              "notes": "Well-structured and thoroughly documented up to the point of truncation, but the response cuts off mid-docstring in the post method, omitting its body and the required usage example entirely, and it never uses a requests.Session for connection reuse.",
-              "response": "```python\n\"\"\"\nREST API Client module with error handling and type hints.\n\"\"\"\n\nfrom typing import Any, Optional, Dict\nimport requests\nfrom requests.exceptions import RequestException\n\n\nclass APIError(Exception):\n    \"\"\"\n    Custom exception raised when an API request returns a non-2xx status code.\n    \n    Attributes:\n        status_code (int): HTTP status code returned by the API.\n        message (str): Error message from the API response or default message.\n    \"\"\"\n    \n    def __init__(self, status_code: int, message: str) -> None:\n        \"\"\"\n        Initialize APIError.\n        \n        Args:\n            status_code: The HTTP status code of the failed request.\n            message: The error message describing what went wrong.\n        \"\"\"\n        self.status_code = status_code\n        self.message = message\n        super().__init__(f\"API Error {status_code}: {message}\")\n\n\nclass APIClient:\n    \"\"\"\n    A wrapper around the requests library for making REST API calls.\n    \n    This client handles common REST operations (GET, POST) with built-in error\n    handling, automatic header management, and optional API key authentication.\n    \n    Attributes:\n        base_url (str): The base URL for all API requests.\n        api_key (Optional[str]): Optional API key for authentication.\n    \n    Example:\n        >>> client = APIClient(\"https://api.example.com\", api_key=\"secret123\")\n        >>> response = client.get(\"/users\", params={\"page\": 1})\n        >>> new_user = client.post(\"/users\", data={\"name\": \"John\", \"email\": \"john@example.com\"})\n    \"\"\"\n    \n    def __init__(self, base_url: str, api_key: Optional[str] = None) -> None:\n        \"\"\"\n        Initialize the APIClient.\n        \n        Args:\n            base_url: The base URL for all API requests (e.g., \"https://api.example.com\").\n            api_key: Optional API key for authentication. If provided, it will be\n                    included in the Authorization header as a Bearer token.\n        \n        Raises:\n            ValueError: If base_url is empty or None.\n        \"\"\"\n        if not base_url:\n            raise ValueError(\"base_url cannot be empty\")\n        \n        self.base_url = base_url.rstrip(\"/\")\n        self.api_key = api_key\n    \n    def _get_headers(self) -> Dict[str, str]:\n        \"\"\"\n        Build the request headers.\n        \n        Returns:\n            A dictionary of HTTP headers including Content-Type and optional\n            Authorization header if api_key is set.\n        \"\"\"\n        headers: Dict[str, str] = {\n            \"Content-Type\": \"application/json\",\n        }\n        \n        if self.api_key:\n            headers[\"Authorization\"] = f\"Bearer {self.api_key}\"\n        \n        return headers\n    \n    def _make_request(\n        self,\n        method: str,\n        path: str,\n        **kwargs: Any\n    ) -> Dict[str, Any]:\n        \"\"\"\n        Make an HTTP request and handle errors.\n        \n        Args:\n            method: The HTTP method (GET, POST, etc.).\n            path: The endpoint path (e.g., \"/users\" or \"/users/123\").\n            **kwargs: Additional arguments to pass to requests (params, json, etc.).\n        \n        Returns:\n            The parsed JSON response as a dictionary.\n        \n        Raises:\n            APIError: If the response status code is not 2xx.\n            RequestException: If there's a network error.\n        \"\"\"\n        url = f\"{self.base_url}{path}\"\n        headers = self._get_headers()\n        \n        try:\n            response = requests.request(\n                method,\n                url,\n                headers=headers,\n                timeout=10,\n                **kwargs\n            )\n            response.raise_for_status()\n        except requests.exceptions.HTTPError as e:\n            # Extract error message from response if available\n            try:\n                error_data = response.json()\n                message = error_data.get(\"message\") or error_data.get(\"error\") or response.text\n            except (ValueError, AttributeError):\n                message = response.text or str(e)\n            \n            raise APIError(response.status_code, message)\n        except RequestException as e:\n            raise APIError(0, f\"Request failed: {str(e)}\")\n        \n        # Handle empty responses (e.g., 204 No Content)\n        if response.status_code == 204:\n            return {}\n        \n        try:\n            return response.json()\n        except ValueError:\n            raise APIError(response.status_code, \"Invalid JSON response\")\n    \n    def get(\n        self,\n        path: str,\n        params: Optional[Dict[str, Any]] = None\n    ) -> Dict[str, Any]:\n        \"\"\"\n        Make a GET request to the API.\n        \n        Args:\n            path: The endpoint path (e.g., \"/users\" or \"/users/123\").\n            params: Optional dictionary of query parameters.\n        \n        Returns:\n            The parsed JSON response as a dictionary.\n        \n        Raises:\n            APIError: If the response status code is not 2xx.\n            RequestException: If there's a network error.\n        \n        Example:\n            >>> client = APIClient(\"https://api.example.com\")\n            >>> users = client.get(\"/users\", params={\"page\": 1, \"limit\": 10})\n        \"\"\"\n        return self._make_request(\"GET\", path, params=params)\n    \n    def post(\n        self,\n        path: str,\n        data: Dict[str, Any]\n    ) -> Dict[str, Any]:\n        \"\"\"\n        Make a POST request to the API.\n        \n        Args:\n            path: The endpoint path (e.g., \"/users\" or \"/posts\").\n            data: Dictionary of data to send in the request body as JSON.\n        \n        Returns:\n            The parsed JSON response as a dictionary.\n        \n        Raises:\n            APIError: If the response status code is not 2xx.\n            RequestException: If there's a network error.\n        \n        Example:\n            >>> client = APIClient(\"https://api.example.com\")\n            >>> new_user = client.post(\"/users\", data={\"name\": \"John\", \"email\": \"john@example.com\"})\n        \"\"\"\n        return self._make_request(\"POST\", path, json=data)\n\n\n# ============================================================================\n# USAGE EXAMPLE\n# ============================================================================\n\nif __name__ == \"__main__\":\n    # Example 1: Using JSONPlaceholder API (no authentication needed)\n    print(\"=\" * 60)\n    print(\"Example 1: Fetching posts from JSONPlaceholder\")\n    print(\"=\" * 60)\n    \n    client = APIClient(\"https://jsonplaceholder.typicode.com\")\n    \n    # GET request with parameters\n    try:\n        posts = client.get(\"/posts\", params={\"userId\": 1, \"_limit\": 3})\n        print(f\"\\nFetched {len(posts)} posts:\")\n        for post in posts:\n            print(f\"  - {post['title']}\")\n    except APIError as e:\n        print(f\"Error: {e}\")\n    \n    # Example 2: POST request\n    print(\"\\n\" + \"=\" * 60)\n    print(\"Example 2: Creating a new post\")\n    print(\"=\" * 60)\n    \n    try:\n        new_post = client.post(\n            \"/posts\",\n            data={\n                \"title\": \"My New Post\",\n                \"body\": \"This is the content of my post.\",\n                \"userId\": 1\n            }\n        )\n        print(f\"\\nNew post created with ID: {new_post.get('id')}\")\n        print(f\"Title: {new_post.get('title')}\")\n    except APIError as e:\n        print(f\"Error: {e}\")\n    \n    # Example 3: Error handling\n    print(\"\\n\" + \"=\" * 60)\n    print(\"Example 3: Error handling (404 Not Found)\")\n    print(\"=\" * 60)\n    \n    try:\n        non_existent = client.get(\"/posts/99999\")\n    except APIError as e:\n        print(f\"Caught error: {e}\")\n        print(f\"Status code: {e.status_code}\")\n    \n    # Example 4: With API Key authentication\n    print(\"\\n\" + \"=\""
-            }
-          ]
-        },
-        {
-          "name": "slots",
-          "description": "Vegas slot machine — reels, pay table, betting, win animations",
-          "correctness": 6,
-          "quality": 4,
-          "documentation": 2,
-          "total": 4,
-          "speed_ms": 11210,
-          "notes": "judge: llama-3.3-70b",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 6,
-              "quality": 4,
-              "documentation": 2,
-              "total": 4,
-              "speed_ms": 11210,
-              "notes": "judge: llama-3.3-70b",
-              "response": ""
-            }
-          ]
-        },
-        {
-          "name": "doom",
-          "description": "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
-          "correctness": 0,
-          "quality": 1,
-          "documentation": 1,
-          "total": 0.7,
-          "speed_ms": 10435,
-          "notes": "Response is severely truncated mid-function, leaving out nearly all rendering, player, HUD, and code logic — completely unusable and unscoreable as a working implementation.",
-          "stddev": null,
-          "runs": 1,
-          "trace_id": null,
-          "run_details": [
-            {
-              "run": 1,
-              "correctness": 0,
-              "quality": 1,
-              "documentation": 1,
-              "total": 0.7,
-              "speed_ms": 10435,
-              "notes": "Response is severely truncated mid-function, leaving out nearly all rendering, player, HUD, and code logic — completely unusable and unscoreable as a working implementation.",
-              "response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>3D Raycasting Engine</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        \n        body {\n            width: 100vw;\n            height: 100vh;\n            overflow: hidden;\n            background: #000;\n            font-family: 'Courier New', monospace;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        }\n        \n        canvas {\n            display: block;\n            cursor: pointer;\n            background: #000;\n        }\n        \n        #gameContainer {\n            width: 100%;\n            height: 100%;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        }\n    </style>\n</head>\n<body>\n    <div id=\"gameContainer\">\n        <canvas id=\"gameCanvas\"></canvas>\n    </div>\n\n    <script>\n        // ============================================================================\n        // CONSTANTS AND CONFIGURATION\n        // ============================================================================\n        \n        const INTERNAL_WIDTH = 640;\n        const INTERNAL_HEIGHT = 480;\n        const MOVE_SPEED = 3.0; // cells per second\n        const ROT_SPEED = 2.0; // radians per second\n        const PLAYER_RADIUS = 0.2; // cells\n        const FOV = (66 * Math.PI) / 180; // radians\n        const DOOR_RANGE = 1.5; // cells\n        const MAX_DISTANCE = 32; // cells\n        \n        // Wall types\n        const WALL_EMPTY = 0;\n        const WALL_BRICK = 1;\n        const WALL_STONE = 2;\n        const WALL_METAL = 3;\n        const WALL_DOOR = 4;\n        const WALL_EXIT = 5;\n        \n        // Texture patterns\n        const TEXTURE_CHECKERBOARD = 0;\n        const TEXTURE_BRICK = 1;\n        const TEXTURE_STRIPE = 2;\n        \n        // ============================================================================\n        // GAME STATE OBJECT\n        // ============================================================================\n        \n        const gameState = {\n            map: null,\n            player: {\n                x: 0,\n                y: 0,\n                angle: 0,\n                vx: 0,\n                vy: 0,\n                vr: 0\n            },\n            keys: {},\n            pointerLocked: false,\n            zBuffer: new Float32Array(INTERNAL_WIDTH),\n            doorStates: {},\n            levelStartTime: Date.now(),\n            levelComplete: false,\n            frameCount: 0,\n            frameTimes: [],\n            currentFPS: 0,\n            mouseX: 0,\n            mouseY: 0\n        };\n        \n        // ============================================================================\n        // MAP INITIALIZATION\n        // ============================================================================\n        \n        function initMap() {\n            // 20x20 map with multiple rooms, corridors, secret area, and exit\n            // 0=empty, 1=brick, 2=stone, 3=metal, 4=door, 5=exit\n            gameState.map = [\n                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,2,2,2,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,4,0,0,2,0,2,0,0,0,3,3,3,0,0,1],\n                [1,0,0,0,0,1,0,0,2,2,2,0,0,0,3,0,3,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,3,3,3,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,2,2,2,2,0,0,0,0,0,1],\n                [1,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,3,3,0,1],\n                [1,0,0,0,0,1,0,0,0,0,2,0,0,2,0,0,3,3,0,1],\n                [1,0,0,0,0,1,0,0,0,0,2,2,2,2,0,0,0,0,0,1],\n                [1,0,0,0,0,1,4,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,5,0,1],\n                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\n                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]\n            ];\n            \n            // Initialize door states (all closed initially)\n            gameState.doorStates = {};\n            for (let y = 0; y < gameState.map.length; y++) {\n                for (let x = 0; x < gameState.map[y].length; x++) {\n                    if (gameState.map[y][x] === WALL_DOOR) {\n                        gameState.doorStates[`${x},${y}`] = false; // false = closed\n                    }\n                }\n            }\n            \n            // Player spawn: starting room facing corridor\n            gameState.player.x = 2.5;\n            gameState.player.y = 2.5;\n            gameState.player.angle = 0; // facing right\n            gameState.levelStartTime = Date.now();\n            gameState.levelComplete = false;\n        }\n        \n        // ============================================================================\n        // PROCEDURAL TEXTURE GENERATION\n        // ============================================================================\n        \n        function generateCheckerboardTexture(canvas, size, scale) {\n            const ctx = canvas.getContext('2d');\n            ctx.fillStyle = '#888888';\n            ctx.fillRect(0, 0, size, size);\n            \n            const squareSize = Math.floor(size / scale);\n            ctx.fillStyle = '#444444';\n            \n            for (let y = 0; y < scale; y++) {\n                for (let x"
-            }
-          ]
-        }
-      ]
-    },
     {
       "id": "claude-sonnet-4-6",
       "name": "Claude Sonnet 4.6",
@@ -674,6 +338,342 @@
               "speed_ms": 26772,
               "notes": "",
               "response": "(response saved separately)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "claude-haiku-4-5",
+      "name": "Claude Haiku 4.5",
+      "tier": "cheap",
+      "average": 6.2,
+      "avg_speed_ms": 8184,
+      "avg_stddev": null,
+      "runs": 1,
+      "challenges": [
+        {
+          "name": "fizzbuzz",
+          "description": "Baseline correctness + code style",
+          "correctness": 10,
+          "quality": 9,
+          "documentation": 10,
+          "total": 9.7,
+          "speed_ms": 6422,
+          "notes": "Correct, clean, idiomatic implementation with clear docstring, doctest-style example, and extra usage demonstrations, though the docstring output formatting isn't a valid doctest due to line wrapping.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "8333792b14eabd58c180550131e79ae7",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 10,
+              "quality": 9,
+              "documentation": 10,
+              "total": 9.7,
+              "speed_ms": 6422,
+              "notes": "Correct, clean, idiomatic implementation with clear docstring, doctest-style example, and extra usage demonstrations, though the docstring output formatting isn't a valid doctest due to line wrapping.",
+              "response": "# FizzBuzz Function\n\n```python\ndef fizzbuzz(n: int) -> list[str]:\n    \"\"\"\n    Generate a FizzBuzz sequence from 1 to n (inclusive).\n    \n    For each number from 1 to n:\n    - Return 'FizzBuzz' if the number is divisible by both 3 and 5\n    - Return 'Fizz' if the number is divisible by 3\n    - Return 'Buzz' if the number is divisible by 5\n    - Return the number as a string otherwise\n    \n    Args:\n        n: A positive integer representing the upper limit (inclusive)\n    \n    Returns:\n        A list of strings containing the FizzBuzz sequence\n    \n    Raises:\n        ValueError: If n is less than 1\n    \n    Example:\n        >>> fizzbuzz(15)\n        ['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', \n         '11', 'Fizz', '13', '14', 'FizzBuzz']\n    \"\"\"\n    if n < 1:\n        raise ValueError(\"n must be at least 1\")\n    \n    result = []\n    for i in range(1, n + 1):\n        if i % 15 == 0:  # Divisible by both 3 and 5\n            result.append('FizzBuzz')\n        elif i % 3 == 0:  # Divisible by 3\n            result.append('Fizz')\n        elif i % 5 == 0:  # Divisible by 5\n            result.append('Buzz')\n        else:\n            result.append(str(i))\n    \n    return result\n\n\n# Usage Examples\nif __name__ == \"__main__\":\n    # Example 1: Basic usage with n=15\n    print(\"FizzBuzz(15):\")\n    result = fizzbuzz(15)\n    print(result)\n    print()\n    \n    # Example 2: Smaller range\n    print(\"FizzBuzz(10):\")\n    print(fizzbuzz(10))\n    print()\n    \n    # Example 3: Larger range (first 30)\n    print(\"FizzBuzz(30):\")\n    print(fizzbuzz(30))\n    print()\n    \n    # Example 4: Print formatted output\n    print(\"Formatted FizzBuzz(20):\")\n    for item in fizzbuzz(20):\n        print(item, end=\" \")\n    print()\n    print()\n    \n    # Example 5: Error handling\n    try:\n        fizzbuzz(0)\n    except ValueError as e:\n        print(f\"Error: {e}\")\n```\n\n**Output:**\n```\nFizzBuzz(15):\n['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', '11', 'Fizz', '13', '14', 'FizzBuzz']\n\nFizzBuzz(10):\n['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz']\n\nFizzBuzz(30):\n['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', '11', 'Fizz', '13', '14', 'FizzBuzz', '16', '17', 'Fizz', '19', 'Buzz', 'Fizz', '22', '23', 'Fizz', 'Buzz', '26', 'Fizz', '28', '29', 'FizzBuzz']\n\nFormatted FizzBuzz(20):\n1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz 16 17 Fizz 19 Buzz \n\nError: n must be at least 1\n```\n\n## Key Features:\n\n✅ **Correct logic**: Checks for divisibility by 15 first (for 'FizzBuzz')  \n✅ **Type hints**: Includes parameter and return type annotations  \n✅ **Comprehensive docstring**: Documents purpose, args, returns, and exceptions  \n✅ **Error handling**: Validates input with meaningful error message  \n✅ **Multiple examples**: Shows various use cases and formatting options"
+            }
+          ]
+        },
+        {
+          "name": "refactor",
+          "description": "Code clarity + whether the model can explain its changes",
+          "correctness": 10,
+          "quality": 8,
+          "documentation": 9,
+          "total": 9,
+          "speed_ms": 4281,
+          "notes": "Correct, idiomatic refactor with meaningful names, type hints, and docstring; explanation is specific and itemized, though the loop variable 'x' could have been renamed further for full clarity.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "4911a8f3c3706f5ee5d0eaef29073b02",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 10,
+              "quality": 8,
+              "documentation": 9,
+              "total": 9,
+              "speed_ms": 4281,
+              "notes": "Correct, idiomatic refactor with meaningful names, type hints, and docstring; explanation is specific and itemized, though the loop variable 'x' could have been renamed further for full clarity.",
+              "response": "# Refactored Code\n\n```python\ndef transform_numbers(data: list[int]) -> list[int]:\n    \"\"\"\n    Transform a list of numbers by squaring even numbers and cubing odd numbers.\n    \n    Args:\n        data: A list of integers to transform.\n        \n    Returns:\n        A new list where even numbers are squared and odd numbers are cubed.\n    \"\"\"\n    return [x * x if x % 2 == 0 else x * x * x for x in data]\n```\n\n# Explanation of Changes\n\n## 1. **Renamed Function: `p` → `transform_numbers`**\n   - **Why:** Single-letter function names are cryptic and unmaintainable. The new name clearly describes what the function does.\n\n## 2. **Renamed Variables:**\n   - `d` → `data`: More descriptive parameter name\n   - `r` → Removed: Eliminated the unnecessary intermediate list variable\n   - `i` → Removed: No longer needed with list comprehension\n   - `x` → `x`: Kept as-is (represents individual elements, which is idiomatic)\n\n## 3. **Added Type Hints: `list[int] → list[int]`**\n   - **Why:** Type hints improve code clarity, enable IDE autocompletion, and catch type-related bugs early.\n\n## 4. **Converted to List Comprehension**\n   - **Why:** More Pythonic, concise, and typically faster than manual loop building\n   - Eliminates the need to track index with `range(len(d))` and explicitly `.append()`\n\n## 5. **Added Docstring**\n   - **Why:** Documents the function's purpose, parameters, and return value for future maintainers and IDE tooltips.\n\n## 6. **Used Conditional Expression in Comprehension**\n   - **Why:** Cleaner than the nested if/else block while remaining readable\n\n**Result:** The refactored code is 1 line instead of 6, more maintainable, and self-documenting."
+            }
+          ]
+        },
+        {
+          "name": "readme-writer",
+          "description": "Pure documentation ability — no code at all",
+          "correctness": 8,
+          "quality": 9,
+          "documentation": 9,
+          "total": 8.7,
+          "speed_ms": 9373,
+          "notes": "Thorough, well-formatted README covering all required sections with clear examples, though depth flag semantics (-1 for unlimited vs default unlimited) are slightly confusing and some details are fabricated/unverifiable.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "6fd45322c43bc805b63410ea31d6c712",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 8,
+              "quality": 9,
+              "documentation": 9,
+              "total": 8.7,
+              "speed_ms": 9373,
+              "notes": "Thorough, well-formatted README covering all required sections with clear examples, though depth flag semantics (-1 for unlimited vs default unlimited) are slightly confusing and some details are fabricated/unverifiable.",
+              "response": "# snapdiff\n\nA command-line tool that compares two directories and reports added, removed, and changed files with detailed difference analysis.\n\n## Installation\n\nInstall `snapdiff` using pip:\n\n```bash\npip install snapdiff\n```\n\nFor development installation:\n\n```bash\ngit clone https://github.com/yourusername/snapdiff.git\ncd snapdiff\npip install -e .\n```\n\n## Quick Start\n\nCompare two directories:\n\n```bash\nsnapdiff /path/to/dir1 /path/to/dir2\n```\n\n## Usage\n\n```bash\nsnapdiff [OPTIONS] DIRECTORY1 DIRECTORY2\n```\n\n### Arguments\n\n- `DIRECTORY1`: Path to the first directory (baseline)\n- `DIRECTORY2`: Path to the second directory (comparison)\n\n### Options\n\n- `-i, --ignore-hidden`: Exclude hidden files and directories (starting with `.`)\n- `-o, --output {json,text}`: Output format (default: `text`)\n- `-d, --depth N`: Maximum directory depth to scan (default: unlimited, use `-1` for unlimited)\n- `-h, --help`: Show help message and exit\n- `-v, --version`: Show version information\n\n## Examples\n\n### Basic comparison\n\n```bash\nsnapdiff ./backup ./current\n```\n\n**Output:**\n```\nComparing: ./backup → ./current\n\nAdded (2 files):\n  + src/new_feature.py\n  + README.md\n\nRemoved (1 file):\n  - src/legacy.py\n\nChanged (3 files):\n  ~ config.yaml (size: 1024 → 2048 bytes, modified: 2024-01-15 → 2024-01-20)\n  ~ src/main.py (size: 5120 → 5312 bytes, modified: 2024-01-18 → 2024-01-21)\n  ~ .env (size: 256 → 280 bytes, modified: 2024-01-19 → 2024-01-21)\n\nSummary:\n  Total files compared: 42\n  Added: 2 | Removed: 1 | Changed: 3 | Unchanged: 36\n```\n\n### Ignore hidden files\n\n```bash\nsnapdiff ./backup ./current --ignore-hidden\n```\n\nThis excludes `.git/`, `.env`, `.gitignore`, and other hidden files from the comparison.\n\n### Limit directory depth\n\n```bash\nsnapdiff ./backup ./current --depth 2\n```\n\nScans only up to 2 directory levels deep.\n\n### JSON output\n\n```bash\nsnapdiff ./backup ./current --output json\n```\n\n**Output:**\n```json\n{\n  \"comparison\": {\n    \"dir1\": \"./backup\",\n    \"dir2\": \"./current\"\n  },\n  \"summary\": {\n    \"total\": 42,\n    \"added\": 2,\n    \"removed\": 1,\n    \"changed\": 3,\n    \"unchanged\": 36\n  },\n  \"files\": {\n    \"added\": [\n      \"src/new_feature.py\",\n      \"README.md\"\n    ],\n    \"removed\": [\n      \"src/legacy.py\"\n    ],\n    \"changed\": [\n      {\n        \"path\": \"config.yaml\",\n        \"dir1\": {\n          \"size\": 1024,\n          \"modified\": \"2024-01-15T10:30:00Z\"\n        },\n        \"dir2\": {\n          \"size\": 2048,\n          \"modified\": \"2024-01-20T14:45:00Z\"\n        }\n      }\n    ]\n  }\n}\n```\n\n### Combine options\n\n```bash\nsnapdiff ./project_v1 ./project_v2 \\\n  --ignore-hidden \\\n  --depth 3 \\\n  --output json > diff_report.json\n```\n\n## Output Format\n\n### Text Format\n\nThe default text output provides a human-readable summary:\n\n- **Added**: Files present in `DIRECTORY2` but not in `DIRECTORY1`\n- **Removed**: Files present in `DIRECTORY1` but not in `DIRECTORY2`\n- **Changed**: Files with different sizes or modification times\n- **Summary**: Statistics on total, added, removed, changed, and unchanged files\n\n### JSON Format\n\nThe JSON format provides structured output suitable for programmatic parsing and integration:\n\n- `comparison`: Paths of the compared directories\n- `summary`: Aggregate statistics\n- `files`: Detailed lists with file metadata (size, modification time)\n\n## How It Works\n\n1. **Directory Traversal**: Recursively scans both directories up to the specified depth, respecting the `--ignore-hidden` flag\n2. **File Indexing**: Creates a manifest of all files with metadata:\n   - File path (relative to directory root)\n   - File size (in bytes)\n   - Last modified timestamp\n3. **Comparison**: Compares manifests by filename:\n   - **Added**: Files in `DIRECTORY2` index but not in `DIRECTORY1`\n   - **Removed**: Files in `DIRECTORY1` index but not in `DIRECTORY2`\n   - **Changed**: Files in both with different size or modification time\n   - **Unchanged**: Files with identical size and timestamp\n4. **Reporting**: Formats and outputs results in the specified format (text or JSON)\n\n**Note**: `snapdiff` compares file metadata (size, timestamp) rather than content. For content-level diffing, consider using specialized diff tools like `diff` or `git diff`.\n\n## Requirements\n\n- Python 3.8+\n\n## Contributing\n\nContributions are welcome! Please open an issue or submit a pull request on GitHub.\n\n## License\n\nMIT License - see LICENSE file for details"
+            }
+          ]
+        },
+        {
+          "name": "sql",
+          "description": "CTE + window function fluency on a real schema",
+          "correctness": 9,
+          "quality": 8,
+          "documentation": 9,
+          "total": 8.7,
+          "speed_ms": 3378,
+          "notes": "Correct results with proper GROUP BY, DISTINCT-via-ROW_NUMBER for top_customer, and window-function-derived revenue_pct, though the extra grouping by window-computed columns and duplicate orders-customers joins add unnecessary complexity.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "2e2b5805ac001521ce9272bea4090a0b",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 9,
+              "quality": 8,
+              "documentation": 9,
+              "total": 8.7,
+              "speed_ms": 3378,
+              "notes": "Correct results with proper GROUP BY, DISTINCT-via-ROW_NUMBER for top_customer, and window-function-derived revenue_pct, though the extra grouping by window-computed columns and duplicate orders-customers joins add unnecessary complexity.",
+              "response": "```sql\n-- CTE 1: Aggregate order data by country with customer details\nWITH country_orders AS (\n  SELECT\n    c.country,\n    c.id AS customer_id,\n    c.name AS customer_name,\n    o.amount,\n    SUM(o.amount) OVER (PARTITION BY c.country) AS country_total,\n    SUM(o.amount) OVER () AS global_total\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.id\n),\n\n-- CTE 2: Calculate summary statistics per country\ncountry_summary AS (\n  SELECT\n    country,\n    SUM(amount) AS total_revenue,\n    COUNT(*) AS order_count,\n    ROUND(AVG(amount)::NUMERIC, 2) AS avg_order_value,\n    country_total,\n    global_total\n  FROM country_orders\n  GROUP BY country, country_total, global_total\n),\n\n-- CTE 3: Identify the top customer per country (highest spend, ties broken by name)\ntop_customers AS (\n  SELECT\n    c.country,\n    c.name,\n    SUM(o.amount) AS customer_total,\n    ROW_NUMBER() OVER (PARTITION BY c.country ORDER BY SUM(o.amount) DESC, c.name ASC) AS rn\n  FROM orders o\n  JOIN customers c ON o.customer_id = c.id\n  GROUP BY c.country, c.name\n)\n\nSELECT\n  cs.country,\n  cs.total_revenue,\n  cs.order_count,\n  cs.avg_order_value,\n  tc.name AS top_customer,\n  ROUND((cs.total_revenue / cs.global_total * 100)::NUMERIC, 1) AS revenue_pct\nFROM country_summary cs\nJOIN top_customers tc ON cs.country = tc.country AND tc.rn = 1\nORDER BY cs.total_revenue DESC;\n```"
+            }
+          ]
+        },
+        {
+          "name": "elixir-test",
+          "description": "ExUnit describe blocks + assert_raise + unicode handling",
+          "correctness": 8,
+          "quality": 9,
+          "documentation": 9,
+          "total": 8.7,
+          "speed_ms": 6332,
+          "notes": "Comprehensive, well-organized tests with correct unicode/String.length usage and proper assert_raise, though the exact behavior for max_len=0/suffix-longer-than-max_len cases is somewhat assumption-based since no implementation was given, and the added `doctest StringUtils` call is likely a no-op since the actual module lacks doc examples.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "71949851436964ecb1cc239e481ec5ee",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 8,
+              "quality": 9,
+              "documentation": 9,
+              "total": 8.7,
+              "speed_ms": 6332,
+              "notes": "Comprehensive, well-organized tests with correct unicode/String.length usage and proper assert_raise, though the exact behavior for max_len=0/suffix-longer-than-max_len cases is somewhat assumption-based since no implementation was given, and the added `doctest StringUtils` call is likely a no-op since the actual module lacks doc examples.",
+              "response": "```elixir\ndefmodule StringUtilsTest do\n  use ExUnit.Case\n  doctest StringUtils\n\n  @moduledoc \"\"\"\n  Test suite for StringUtils.truncate/3\n\n  ## Examples\n\n      iex> StringUtils.truncate(\"Hello World\", 5)\n      \"He...\"\n\n      iex> StringUtils.truncate(\"Hi\", 10)\n      \"Hi\"\n\n      iex> StringUtils.truncate(\"Hello\", 5, \"\")\n      \"Hello\"\n\n      iex> StringUtils.truncate(\"Hello World\", 8, \"→\")\n      \"Hello W→\"\n  \"\"\"\n\n  describe \"happy path - successful truncation\" do\n    test \"returns original string when length is less than max_len\" do\n      result = StringUtils.truncate(\"Hello\", 10)\n      assert result == \"Hello\"\n    end\n\n    test \"returns original string when length equals max_len\" do\n      result = StringUtils.truncate(\"Hello\", 5)\n      assert result == \"Hello\"\n    end\n\n    test \"truncates string and appends default suffix when exceeding max_len\" do\n      result = StringUtils.truncate(\"Hello World\", 8)\n      assert result == \"Hello...\"\n      assert String.length(result) == 8\n    end\n\n    test \"truncates string with custom suffix\" do\n      result = StringUtils.truncate(\"Hello World\", 8, \"→\")\n      assert result == \"Hello W→\"\n      assert String.length(result) == 8\n    end\n\n    test \"handles empty string gracefully\" do\n      result = StringUtils.truncate(\"\", 10)\n      assert result == \"\"\n    end\n\n    test \"handles unicode characters correctly\" do\n      result = StringUtils.truncate(\"こんにちは世界\", 6)\n      assert result == \"こんに...\"\n    end\n\n    test \"truncates with empty string suffix\" do\n      result = StringUtils.truncate(\"Hello World\", 5, \"\")\n      assert result == \"Hello\"\n    end\n  end\n\n  describe \"edge cases and error handling\" do\n    test \"truncates when max_len is 0 with default suffix\" do\n      result = StringUtils.truncate(\"Hello\", 0)\n      assert result == \"\"\n    end\n\n    test \"raises ArgumentError when max_len is negative\" do\n      assert_raise ArgumentError, fn ->\n        StringUtils.truncate(\"Hello\", -1)\n      end\n    end\n\n    test \"handles max_len smaller than suffix length\" do\n      # When max_len (2) is smaller than suffix length (3),\n      # the function should still attempt truncation\n      result = StringUtils.truncate(\"Hello World\", 2)\n      assert String.length(result) == 2\n    end\n\n    test \"handles very long strings efficiently\" do\n      long_string = String.duplicate(\"a\", 10000)\n      result = StringUtils.truncate(long_string, 100)\n      assert String.length(result) == 100\n      assert String.ends_with?(result, \"...\")\n    end\n  end\nend\n```\n\nThis test module includes:\n\n✅ **Structure**: Uses `ExUnit.Case` with module-level `@moduledoc` containing usage examples\n\n✅ **Grouping**: Two `describe` blocks:\n- \"happy path - successful truncation\" (6 tests)\n- \"edge cases and error handling\" (4 tests)\n\n✅ **All 8+ test cases**:\n1. String shorter than limit\n2. String exactly at limit\n3. String longer (with suffix appended)\n4. Empty string\n5. Custom suffix\n6. max_len of 0\n7. Negative max_len (raises)\n8. Unicode strings\n9. Suffix shorter than max_len edge case\n10. Very long string handling\n\n✅ **Assertions**: Uses `assert`, `assert_raise`, and pattern matching appropriately\n\n✅ **Module documentation**: Includes `## Examples` in `@moduledoc` showing realistic usage"
+            }
+          ]
+        },
+        {
+          "name": "binary-search",
+          "description": "Algorithm + full docstring (Args/Returns/Raises + examples)",
+          "correctness": 9,
+          "quality": 7,
+          "documentation": 9,
+          "total": 8.3,
+          "speed_ms": 9962,
+          "notes": "Algorithm is correct with proper mid calculation and edge case handling, but the added sortedness validation (O(n log n) sorted() check) is an unrequested, questionable design choice that adds overhead and complexity not asked for in the task.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "bdb40fe2051a0ab97ac6e4c9e726f074",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 9,
+              "quality": 7,
+              "documentation": 9,
+              "total": 8.3,
+              "speed_ms": 9962,
+              "notes": "Algorithm is correct with proper mid calculation and edge case handling, but the added sortedness validation (O(n log n) sorted() check) is an unrequested, questionable design choice that adds overhead and complexity not asked for in the task.",
+              "response": "```python\ndef binary_search(arr: list[int], target: int) -> int:\n    \"\"\"\n    Search for a target value in a sorted list using binary search algorithm.\n    \n    Binary search works by repeatedly dividing the search interval in half.\n    It compares the target with the middle element and eliminates half of the\n    remaining elements with each comparison, achieving O(log n) time complexity.\n    \n    Args:\n        arr: A sorted list of integers in ascending order.\n        target: The integer value to search for.\n    \n    Returns:\n        The index (0-based) of the target if found in the list.\n        Returns -1 if the target is not present in the list.\n    \n    Raises:\n        TypeError: If arr is not a list or target is not an integer.\n        ValueError: If the input list is not sorted in ascending order.\n    \n    Examples:\n        >>> binary_search([1, 3, 5, 7, 9, 11], 7)\n        3\n        \n        >>> binary_search([1, 3, 5, 7, 9, 11], 4)\n        -1\n        \n        >>> binary_search([2, 4, 6, 8, 10], 2)\n        0\n    \"\"\"\n    # Input validation\n    if not isinstance(arr, list):\n        raise TypeError(\"arr must be a list\")\n    if not isinstance(target, int):\n        raise TypeError(\"target must be an integer\")\n    \n    # Check if the list is sorted (basic validation for small lists)\n    if len(arr) > 1 and arr != sorted(arr):\n        raise ValueError(\"arr must be sorted in ascending order\")\n    \n    # Initialize left and right pointers\n    left = 0\n    right = len(arr) - 1\n    \n    # Continue searching while the search space is valid\n    while left <= right:\n        # Calculate middle index (avoids potential overflow in other languages)\n        mid = left + (right - left) // 2\n        \n        # Compare target with middle element\n        if arr[mid] == target:\n            # Target found, return the index\n            return mid\n        elif arr[mid] < target:\n            # Target is in the right half, move left pointer up\n            left = mid + 1\n        else:\n            # Target is in the left half, move right pointer down\n            right = mid - 1\n    \n    # Target not found in the list\n    return -1\n\n\n# Test cases demonstrating the function\nif __name__ == \"__main__\":\n    # Test case 1: Target found in the middle\n    arr1 = [1, 3, 5, 7, 9, 11]\n    result1 = binary_search(arr1, 7)\n    print(f\"Test 1 - Search for 7 in {arr1}: Index = {result1}\")\n    assert result1 == 3, \"Expected index 3\"\n    \n    # Test case 2: Target not found\n    arr2 = [1, 3, 5, 7, 9, 11]\n    result2 = binary_search(arr2, 4)\n    print(f\"Test 2 - Search for 4 in {arr2}: Index = {result2}\")\n    assert result2 == -1, \"Expected -1\"\n    \n    # Test case 3: Target at the beginning\n    arr3 = [2, 4, 6, 8, 10]\n    result3 = binary_search(arr3, 2)\n    print(f\"Test 3 - Search for 2 in {arr3}: Index = {result3}\")\n    assert result3 == 0, \"Expected index 0\"\n    \n    # Additional test cases\n    # Test case 4: Target at the end\n    arr4 = [2, 4, 6, 8, 10]\n    result4 = binary_search(arr4, 10)\n    print(f\"Test 4 - Search for 10 in {arr4}: Index = {result4}\")\n    assert result4 == 4, \"Expected index 4\"\n    \n    # Test case 5: Single element list - found\n    arr5 = [5]\n    result5 = binary_search(arr5, 5)\n    print(f\"Test 5 - Search for 5 in {arr5}: Index = {result5}\")\n    assert result5 == 0, \"Expected index 0\"\n    \n    # Test case 6: Single element list - not found\n    arr6 = [5]\n    result6 = binary_search(arr6, 3)\n    print(f\"Test 6 - Search for 3 in {arr6}: Index = {result6}\")\n    assert result6 == -1, \"Expected -1\"\n    \n    # Test case 7: Empty list\n    arr7 = []\n    result7 = binary_search(arr7, 5)\n    print(f\"Test 7 - Search for 5 in {arr7}: Index = {result7}\")\n    assert result7 == -1, \"Expected -1\"\n    \n    print(\"\\nAll tests passed! ✓\")\n    \n    # Error handling examples\n    print(\"\\nTesting error handling:\")\n    try:\n        binary_search(\"not a list\", 5)\n    except TypeError as e:\n        print(f\"✓ TypeError caught: {e}\")\n    \n    try:\n        binary_search([1, 2, 3], \"five\")\n    except TypeError as e:\n        print(f\"✓ TypeError caught: {e}\")\n    \n    try:\n        binary_search([3, 1, 2], 2)\n    except ValueError as e:\n        print(f\"✓ ValueError caught: {e}\")\n```\n\n**Key Features:**\n\n1. **Comprehensive Docstring**: Includes detailed description, Args, Returns, Raises, and Examples sections\n\n2. **Algorithm Explanation**: \n   - Uses two pointers (left, right) to track the search interval\n   - Calculates middle index safely\n   - Eliminates half the remaining elements each iteration\n   - Time complexity: O(log n)\n\n3. **Input Validation**:\n   - Type checking for both parameters\n   - Ensures the list is sorted\n\n4. **Inline Comments**: Explains each step of the algorithm logic\n\n5. **Comprehensive Testing**: \n   - 7 test cases covering various scenarios\n   - Error handling demonstrations\n   - All assertions included\n\n**Output:**\n```\nTest 1 - Search for 7 in [1, 3, 5, 7, 9, 11]: Index = 3\nTest 2 - Search for 4 in [1, 3, 5, 7, 9, 11]: Index = -1\nTest 3 - Search for 2 in [2, 4, 6, 8, 10]: Index = 0\nTest 4 - Search for 10 in [2, 4, 6, 8, 10]: Index = 4\nTest 5 - Search for 5 in [5]: Index = 0\nTest 6 - Search for 3 in [5]: Index = -1\nTest 7 - Search for 5 in []: Index = -1\n\nAll tests passed! ✓\n\nTesting error handling:\n✓ TypeError caught: arr must be a list\n✓ TypeError caught: target must be an integer\n✓ ValueError caught: arr must be sorted in ascending order\n```"
+            }
+          ]
+        },
+        {
+          "name": "async-fetch",
+          "description": "Async concurrency patterns + retry/timeout handling",
+          "correctness": 9,
+          "quality": 8,
+          "documentation": 8,
+          "total": 8.3,
+          "speed_ms": 8387,
+          "notes": "Correctly implements per-request timeout via session-level ClientTimeout, real concurrency via asyncio.gather, retries with exponential backoff on 5xx/timeouts/ClientError, and never raises; minor style nit is repeated backoff/continue blocks across exception branches and the backoff behavior isn't mentioned in the top-level docstring.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "5b6c89689ea025c69182b523dd0dfb22",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 9,
+              "quality": 8,
+              "documentation": 8,
+              "total": 8.3,
+              "speed_ms": 8387,
+              "notes": "Correctly implements per-request timeout via session-level ClientTimeout, real concurrency via asyncio.gather, retries with exponential backoff on 5xx/timeouts/ClientError, and never raises; minor style nit is repeated backoff/continue blocks across exception branches and the backoff behavior isn't mentioned in the top-level docstring.",
+              "response": "```python\nimport asyncio\nimport aiohttp\nfrom typing import Optional\nimport time\n\n\nasync def fetch_all(\n    urls: list[str], timeout: float = 5.0, retries: int = 2\n) -> list[dict]:\n    \"\"\"\n    Fetch all URLs concurrently using aiohttp.\n\n    Args:\n        urls: List of URLs to fetch\n        timeout: Timeout per request in seconds (default: 5.0)\n        retries: Number of retries on network errors or 5xx responses (default: 2)\n\n    Returns:\n        List of result dicts, each containing:\n            - url: original URL string\n            - status: HTTP status code (int) or None on error\n            - body: response text (str) or None on error\n            - error: error message string or None on success\n    \"\"\"\n    results: list[dict] = []\n    connector = aiohttp.TCPConnector(limit_per_host=5)\n    timeout_obj = aiohttp.ClientTimeout(total=timeout)\n\n    async with aiohttp.ClientSession(\n        connector=connector, timeout=timeout_obj\n    ) as session:\n        tasks = [\n            _fetch_with_retry(session, url, retries) for url in urls\n        ]\n        results = await asyncio.gather(*tasks)\n\n    return results\n\n\nasync def _fetch_with_retry(\n    session: aiohttp.ClientSession, url: str, retries: int\n) -> dict:\n    \"\"\"\n    Fetch a single URL with retry logic and exponential backoff.\n\n    Args:\n        session: aiohttp ClientSession\n        url: URL to fetch\n        retries: Number of retries remaining\n\n    Returns:\n        Result dict with url, status, body, and error fields\n    \"\"\"\n    attempt = 0\n    max_attempts = retries + 1\n\n    while attempt < max_attempts:\n        try:\n            async with session.get(url) as response:\n                body = await response.text()\n\n                # Retry on 5xx errors (but not on last attempt)\n                if 500 <= response.status < 600 and attempt < max_attempts - 1:\n                    await _backoff(attempt)\n                    attempt += 1\n                    continue\n\n                return {\n                    \"url\": url,\n                    \"status\": response.status,\n                    \"body\": body,\n                    \"error\": None,\n                }\n\n        except asyncio.TimeoutError:\n            if attempt < max_attempts - 1:\n                await _backoff(attempt)\n                attempt += 1\n                continue\n            return {\n                \"url\": url,\n                \"status\": None,\n                \"body\": None,\n                \"error\": f\"Request timeout after {max_attempts} attempt(s)\",\n            }\n\n        except aiohttp.ClientError as e:\n            if attempt < max_attempts - 1:\n                await _backoff(attempt)\n                attempt += 1\n                continue\n            return {\n                \"url\": url,\n                \"status\": None,\n                \"body\": None,\n                \"error\": f\"Network error: {type(e).__name__}: {str(e)}\",\n            }\n\n        except Exception as e:\n            return {\n                \"url\": url,\n                \"status\": None,\n                \"body\": None,\n                \"error\": f\"Unexpected error: {type(e).__name__}: {str(e)}\",\n            }\n\n    # Should not reach here, but just in case\n    return {\n        \"url\": url,\n        \"status\": None,\n        \"body\": None,\n        \"error\": \"Max retries exceeded\",\n    }\n\n\nasync def _backoff(attempt: int) -> None:\n    \"\"\"\n    Exponential backoff: 0.5s, 1s, 2s, ...\n\n    Args:\n        attempt: Current attempt number (0-indexed)\n    \"\"\"\n    delay = 0.5 * (2 ** attempt)\n    await asyncio.sleep(delay)\n\n\nasync def main() -> None:\n    \"\"\"Fetch 3 sample URLs and print results.\"\"\"\n    urls = [\n        \"https://httpbin.org/delay/1\",\n        \"https://httpbin.org/status/200\",\n        \"https://httpbin.org/status/500\",\n    ]\n\n    print(\"Fetching URLs concurrently...\")\n    start = time.time()\n    results = await fetch_all(urls, timeout=10.0, retries=2)\n    elapsed = time.time() - start\n\n    print(f\"\\nCompleted in {elapsed:.2f}s\\n\")\n\n    for result in results:\n        print(f\"URL: {result['url']}\")\n        print(f\"  Status: {result['status']}\")\n        print(f\"  Error: {result['error']}\")\n        if result[\"body\"]:\n            body_preview = result[\"body\"][:100].replace(\"\\n\", \" \")\n            print(f\"  Body: {body_preview}...\")\n        print()\n\n\nif __name__ == \"__main__\":\n    asyncio.run(main())\n```\n\n**Key Features:**\n\n1. **Concurrent Execution**: All URLs fetched simultaneously via `asyncio.gather()`\n2. **Per-Request Timeout**: Each request has its own `aiohttp.ClientTimeout`\n3. **Retry Logic with Exponential Backoff**: \n   - Retries on network errors (`aiohttp.ClientError`)\n   - Retries on 5xx status codes\n   - Backoff delays: 0.5s, 1s, 2s, etc.\n4. **No Exceptions Raised**: All errors captured in result dicts\n5. **Full Type Hints**: All arguments and returns typed\n6. **Comprehensive Docstrings**: Functions documented with Args/Returns\n\n**Output Example:**\n```\nFetching URLs concurrently...\n\nCompleted in 3.15s\n\nURL: https://httpbin.org/delay/1\n  Status: 200\n  Error: None\n  Body: {\n    \"args\": {},\n    \"headers\": {\n      \"Host\": \"httpbin.org\",\n      ...\n\nURL: https://httpbin.org/status/200\n  Status: 200\n  Error: None\n  Body: ...\n\nURL: https://httpbin.org/status/500\n  Status: 500\n  Error: None\n  Body: ...\n```"
+            }
+          ]
+        },
+        {
+          "name": "go-test",
+          "description": "Idiomatic Go table-driven tests + benchmark",
+          "correctness": 8,
+          "quality": 9,
+          "documentation": 6,
+          "total": 7.7,
+          "speed_ms": 6437,
+          "notes": "Solid table-driven tests with correct maps.Equal comparison and proper benchmark, but extra cases (contractions, apostrophes) rely on unverified assumptions about punctuation handling, and code lacks explanatory comments on the test/benchmark functions themselves.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "18d2b8df32d3d878be1f765275e473c6",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 8,
+              "quality": 9,
+              "documentation": 6,
+              "total": 7.7,
+              "speed_ms": 6437,
+              "notes": "Solid table-driven tests with correct maps.Equal comparison and proper benchmark, but extra cases (contractions, apostrophes) rely on unverified assumptions about punctuation handling, and code lacks explanatory comments on the test/benchmark functions themselves.",
+              "response": "```go\npackage wordcount\n\nimport (\n\t\"maps\"\n\t\"testing\"\n)\n\nfunc TestWordCount(t *testing.T) {\n\ttests := []struct {\n\t\tname  string\n\t\tinput string\n\t\twant  map[string]int\n\t}{\n\t\t{\n\t\t\tname:  \"empty string\",\n\t\t\tinput: \"\",\n\t\t\twant:  map[string]int{},\n\t\t},\n\t\t{\n\t\t\tname:  \"single word\",\n\t\t\tinput: \"hello\",\n\t\t\twant:  map[string]int{\"hello\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"mixed case\",\n\t\t\tinput: \"Hello HELLO hello\",\n\t\t\twant:  map[string]int{\"hello\": 3},\n\t\t},\n\t\t{\n\t\t\tname:  \"punctuation\",\n\t\t\tinput: \"hello, world! how are you?\",\n\t\t\twant:  map[string]int{\"hello\": 1, \"world\": 1, \"how\": 1, \"are\": 1, \"you\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"repeated words\",\n\t\t\tinput: \"the quick brown fox jumps over the lazy dog the\",\n\t\t\twant:  map[string]int{\"the\": 3, \"quick\": 1, \"brown\": 1, \"fox\": 1, \"jumps\": 1, \"over\": 1, \"lazy\": 1, \"dog\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"multi-word sentence with mixed case and punctuation\",\n\t\t\tinput: \"The Quick, BROWN fox! The lazy dog's tail.\",\n\t\t\twant:  map[string]int{\"the\": 2, \"quick\": 1, \"brown\": 1, \"fox\": 1, \"lazy\": 1, \"dog's\": 1, \"tail\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"whitespace only\",\n\t\t\tinput: \"   \\t\\n  \",\n\t\t\twant:  map[string]int{},\n\t\t},\n\t\t{\n\t\t\tname:  \"multiple spaces between words\",\n\t\t\tinput: \"hello    world   foo\",\n\t\t\twant:  map[string]int{\"hello\": 1, \"world\": 1, \"foo\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"punctuation at various positions\",\n\t\t\tinput: \"it's can't won't shouldn't\",\n\t\t\twant:  map[string]int{\"it's\": 1, \"can't\": 1, \"won't\": 1, \"shouldn't\": 1},\n\t\t},\n\t\t{\n\t\t\tname:  \"numbers mixed with words\",\n\t\t\tinput: \"abc123 123abc 123\",\n\t\t\twant:  map[string]int{\"abc123\": 1, \"123abc\": 1, \"123\": 1},\n\t\t},\n\t}\n\n\tfor _, tc := range tests {\n\t\tt.Run(tc.name, func(t *testing.T) {\n\t\t\tgot := WordCount(tc.input)\n\t\t\tif !maps.Equal(got, tc.want) {\n\t\t\t\tt.Errorf(\"WordCount(%q) = %v, want %v\", tc.input, got, tc.want)\n\t\t\t}\n\t\t})\n\t}\n}\n\nfunc BenchmarkWordCount(b *testing.B) {\n\ttext := \"The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. \" +\n\t\t\"The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. \" +\n\t\t\"The quick brown fox jumps over the lazy dog.\"\n\n\tb.ResetTimer()\n\tfor i := 0; i < b.N; i++ {\n\t\tWordCount(text)\n\t}\n}\n```\n\nThis test file includes:\n\n1. **Table-driven tests** using a slice of anonymous structs with `name`, `input`, and `want` fields\n2. **6+ test cases** covering:\n   - Empty string\n   - Single word\n   - Mixed case (case-insensitivity)\n   - Punctuation stripping\n   - Repeated words\n   - Multi-word sentence with mixed case and punctuation\n   - Additional edge cases (whitespace, contractions, numbers)\n\n3. **Subtests** using `t.Run()` for clear failure identification\n4. **Map comparison** using `maps.Equal()` from the standard library (Go 1.21+, or use `reflect.DeepEqual()` for earlier versions)\n5. **Benchmark** (`BenchmarkWordCount`) testing with a realistic, repeated sentence\n\nTo run the tests:\n```bash\ngo test ./wordcount\ngo test -v ./wordcount          # verbose output\ngo test -bench=. ./wordcount    # run benchmarks\n```"
+            }
+          ]
+        },
+        {
+          "name": "test-writing",
+          "description": "Edge-case thinking + pytest parametrize discipline",
+          "correctness": 4,
+          "quality": 5,
+          "documentation": 6,
+          "total": 5,
+          "speed_ms": 11766,
+          "notes": "Good format coverage and error cases, but the response is cut off mid-docstring leaving an unterminated string/incomplete class, making the file a syntax error and thus non-runnable, and it also disregards the 'plain functions, no classes' requirement by wrapping everything in three TestX classes.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "b10a4493f524c6153427dd1d52b4ca74",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 4,
+              "quality": 5,
+              "documentation": 6,
+              "total": 5,
+              "speed_ms": 11766,
+              "notes": "Good format coverage and error cases, but the response is cut off mid-docstring leaving an unterminated string/incomplete class, making the file a syntax error and thus non-runnable, and it also disregards the 'plain functions, no classes' requirement by wrapping everything in three TestX classes.",
+              "response": "```python\nimport pytest\nfrom your_module import parse_duration  # adjust import path as needed\n\n\nclass TestParseDurationHappyPath:\n    \"\"\"Tests for valid duration strings.\"\"\"\n\n    @pytest.mark.parametrize(\n        \"duration_string,expected_seconds\",\n        [\n            # Single units\n            (\"1h\", 3600),\n            (\"30m\", 1800),\n            (\"45s\", 45),\n            (\"0s\", 0),\n            (\"1s\", 1),\n            # Combined units\n            (\"1h30m\", 5400),\n            (\"1h45s\", 3645),\n            (\"30m45s\", 1845),\n            (\"1h30m45s\", 5445),\n            # Multi-digit values\n            (\"10h\", 36000),\n            (\"59m\", 3540),\n            (\"59s\", 59),\n            (\"12h34m56s\", 45296),\n            # Whitespace handling\n            (\"  1h  \", 3600),\n            (\"\\t30m\\n\", 1800),\n            (\"  1h30m45s  \", 5445),\n            # Zero values in combinations\n            (\"0h0m0s\", 0),\n            (\"0h30m\", 1800),\n            (\"1h0m0s\", 3600),\n            # Edge case: large numbers\n            (\"100h\", 360000),\n            (\"999m\", 59940),\n            (\"9999s\", 9999),\n        ],\n        ids=[\n            \"single_hour\",\n            \"single_minute\",\n            \"single_second\",\n            \"zero_seconds\",\n            \"one_second\",\n            \"hour_and_minute\",\n            \"hour_and_second\",\n            \"minute_and_second\",\n            \"all_three_units\",\n            \"ten_hours\",\n            \"fifty_nine_minutes\",\n            \"fifty_nine_seconds\",\n            \"complex_duration\",\n            \"hour_with_leading_spaces\",\n            \"minute_with_tabs_and_newlines\",\n            \"all_units_with_spaces\",\n            \"all_zeros\",\n            \"zero_hours_with_minutes\",\n            \"zero_minutes_and_seconds\",\n            \"large_hour_value\",\n            \"large_minute_value\",\n            \"large_second_value\",\n        ],\n    )\n    def test_parse_valid_duration_strings(self, duration_string, expected_seconds):\n        \"\"\"Test that valid duration strings are parsed correctly.\"\"\"\n        assert parse_duration(duration_string) == expected_seconds\n\n\nclass TestParseDurationEdgeCases:\n    \"\"\"Tests for edge cases and boundary conditions.\"\"\"\n\n    def test_parse_empty_string_raises_value_error(self):\n        \"\"\"Empty string should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"\")\n\n    def test_parse_whitespace_only_string_raises_value_error(self):\n        \"\"\"Whitespace-only string should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"   \")\n\n    def test_parse_string_with_only_tabs_raises_value_error(self):\n        \"\"\"String with only tabs should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"\\t\\t\\t\")\n\n    def test_parse_invalid_format_with_unknown_unit_raises_value_error(self):\n        \"\"\"String with unknown time unit should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1d\")\n\n    def test_parse_invalid_format_with_letters_only_raises_value_error(self):\n        \"\"\"String with only letters should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"hours\")\n\n    def test_parse_invalid_format_with_numbers_only_raises_value_error(self):\n        \"\"\"String with only numbers (no units) should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"123\")\n\n    def test_parse_invalid_format_wrong_unit_order_raises_value_error(self):\n        \"\"\"Units in wrong order (m before h) should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"30m1h\")\n\n    def test_parse_invalid_format_with_duplicate_units_raises_value_error(self):\n        \"\"\"Duplicate units should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1h2h\")\n\n    def test_parse_invalid_format_with_special_characters_raises_value_error(self):\n        \"\"\"Special characters should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1h@30m\")\n\n    def test_parse_invalid_format_with_negative_numbers_raises_value_error(self):\n        \"\"\"Negative numbers should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"-1h\")\n\n    def test_parse_invalid_format_with_decimal_numbers_raises_value_error(self):\n        \"\"\"Decimal numbers should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1.5h\")\n\n    def test_parse_invalid_format_with_trailing_characters_raises_value_error(self):\n        \"\"\"Trailing non-whitespace characters should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"1h30m45sextra\")\n\n    def test_parse_invalid_format_with_leading_characters_raises_value_error(self):\n        \"\"\"Leading non-whitespace characters should raise ValueError.\"\"\"\n        with pytest.raises(ValueError, match=\"Invalid duration\"):\n            parse_duration(\"prefix1h30m\")\n\n\nclass TestParseDurationMathematicalCorrectness:\n    \"\"\"Tests verifying mathematical conversion accuracy.\"\"\"\n\n    def test_one_hour_equals_3600_seconds(self):\n        \"\"\"Verify 1 hour = 3600 seconds.\"\"\"\n        assert parse_duration(\"1h\") == 3600\n\n    def test_one_minute_equals_60_seconds(self):\n        \"\"\"Verify 1 minute = 60 seconds.\"\"\"\n        assert parse_duration(\"1m\") == 60\n\n    def test_combined_units_sum_correctly(self):\n        \"\"\"Verify combined units are summed correctly.\"\"\"\n        # 2h (7200) + 15m (900) + 30s (30) = 8130\n        assert parse_duration(\"2h15m30s\") == 8130\n\n    def test_hour_minute_second_conversion_chain(self):\n        \"\"\"Verify conversion chain: hours → minutes → seconds.\"\"\"\n        # 1h = 60m = 3600s\n        assert parse_duration(\"1h\") == parse_duration(\"60m\")\n        assert parse_duration(\"60m\") == parse_duration(\"3600s\")\n\n\nclass TestParseDurationReturnType:\n    \"\"\"Tests verifying return type correctness.\"\"\"\n\n    def test_parse_duration_returns_integer(self):\n        \"\"\"Result should always be an integer.\"\"\"\n        result = parse_duration(\"1h30m45s\")\n        assert isinstance(result, int)\n\n    def test_parse_duration_returns_non_negative_integer(self):\n        \"\"\"Result should always be non-negative.\"\"\"\n        result = parse_duration(\"0s\")\n        assert result >= 0\n        assert isinstance(result, int)\n```\n\nThis comprehensive test suite includes:\n\n1. **Happy Path Tests** (22 parametrized cases):\n   - Single units (h, m, s)\n   - Combined units\n   - Multi-digit values\n   - Whitespace handling variations\n   - Zero values in combinations\n   - Large numbers\n\n2. **Error Cases** (12 dedicated tests with `pytest.raises`):\n   - Empty strings\n   - Whitespace-only strings\n   - Invalid formats (unknown units, wrong order, duplicates)\n   - Special characters, negative numbers, decimals\n   - Trailing/leading characters\n\n3. **Mathematical Correctness** (4 tests):\n   - Verifies conversion formulas\n   - Tests summing of combined units\n\n4. **Return Type Validation** (2 tests):\n   - Ensures return type is always `int`\n   - Verifies non-negative results\n\nThe tests are **descriptive**, **maintainable**, and test the function as a **black box**"
+            }
+          ]
+        },
+        {
+          "name": "debug",
+          "description": "Careful reading + correctness reasoning over broken code",
+          "correctness": 5,
+          "quality": 5,
+          "documentation": 4,
+          "total": 4.7,
+          "speed_ms": 7262,
+          "notes": "Correctly finds the count>1 filter bug and the empty-string bug, but 'Bug 2' is not a genuine separate defect—it's the same line and same fix as Bug 1, and the explanation even contradicts itself by admitting the fix collapses back to Bug 1's fix; a real third bug (e.g., n<=0 edge case) was never found, so the function passes tests but the bug analysis is padded and confusing rather than truly three distinct defects.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "eac7e95bdbc76ef036807af7888684d9",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 5,
+              "quality": 5,
+              "documentation": 4,
+              "total": 4.7,
+              "speed_ms": 7262,
+              "notes": "Correctly finds the count>1 filter bug and the empty-string bug, but 'Bug 2' is not a genuine separate defect—it's the same line and same fix as Bug 1, and the explanation even contradicts itself by admitting the fix collapses back to Bug 1's fix; a real third bug (e.g., n<=0 edge case) was never found, so the function passes tests but the bug analysis is padded and confusing rather than truly three distinct defects.",
+              "response": "# Three Bugs Found and Fixed\n\n## Bug 1: The `if count > 1` filter removes valid results\n\n**Buggy line:**\n```python\nreturn [word for word, count in ranked[:n] if count > 1]\n```\n\n**What it does wrong:**\nThe filter `if count > 1` excludes any word that appears only once. This means words appearing 1 time are filtered out, even though they should be included in the top-N results. Test case `top_words('hello world', 5)` would return `[]` instead of `['hello', 'world']`.\n\n**Fix:**\nRemove the condition entirely—we want the top-N words regardless of frequency:\n```python\nreturn [word for word, count in ranked[:n]]\n```\n\n---\n\n## Bug 2: Slicing happens before filtering, limiting to wrong items\n\n**Buggy line:**\n```python\nreturn [word for word, count in ranked[:n] if count > 1]\n```\n\n**What it does wrong:**\nEven after fixing Bug 1, this line slices the ranked list to N items *before* the list comprehension processes them. If a word in the top-N happens to have count == 1 and we're filtering it out, we don't get N results back. More critically (with Bug 1 fixed), we correctly get the top-N, but the logic is backwards if we ever need to filter. The order of operations should be: get all items, apply the filter, then take the top-N.\n\n**Fix:**\nApply the filter first, then slice:\n```python\nreturn [word for word, count in ranked if count > 1][:n]\n```\n\n**However**, with Bug 1 fixed (removing the count filter entirely), this becomes:\n```python\nreturn [word for word, count in ranked[:n]]\n```\n\n---\n\n## Bug 3: Empty strings in the words list aren't filtered out\n\n**Buggy line:**\n```python\nwords = [w.strip('.,!?;:\\'\"') for w in words]\n```\n\n**What it does wrong:**\nWhen `strip()` removes all punctuation from a word like `'...'` or `'!!!'`, it returns an empty string `''`. These empty strings are added to the counter and treated as valid words, potentially affecting frequency counts and appearing in results. Test case `top_words('the cat. sat on the mat the', 3)` would count the empty string from `'cat.'` → `'cat'` correctly, but pure punctuation tokens would create spurious empty-string entries.\n\n**Fix:**\nFilter out empty strings after stripping:\n```python\nwords = [w.strip('.,!?;:\\'\"') for w in words if w.strip('.,!?;:\\'\"')]\n```\n\nOr more efficiently:\n```python\nwords = [w.strip('.,!?;:\\'\"') for w in words]\nwords = [w for w in words if w]  # Remove empty strings\n```\n\n---\n\n# Corrected Function\n\n```python\nfrom collections import Counter\n\ndef top_words(text: str, n: int = 10) -> list[str]:\n    words = text.lower().split()\n    words = [w.strip('.,!?;:\\'\"') for w in words]\n    words = [w for w in words if w]  # Bug 3 fix: Remove empty strings\n    counts = Counter(words)\n    ranked = sorted(counts.items(), key=lambda x: (-x[1], x[0]))\n    return [word for word, count in ranked[:n]]  # Bug 1 fix: Remove count > 1\n```\n\n**Test results:**\n- `top_words('the cat sat on the mat the', 3)` → `['the', 'cat', 'mat']` ✓\n- `top_words('a a b b c', 2)` → `['a', 'b']` ✓\n- `top_words('hello world', 5)` → `['hello', 'world']` ✓"
+            }
+          ]
+        },
+        {
+          "name": "api-client",
+          "description": "Class design + error handling + type hints + docs",
+          "correctness": 0,
+          "quality": 2,
+          "documentation": 3,
+          "total": 1.7,
+          "speed_ms": 10799,
+          "notes": "The response is truncated mid-code (post method incomplete, code cuts off at 'headers = s'), leaving the class non-functional and lacking the usage example entirely.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "eee9381a5e34306ea44009f13ed72285",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 0,
+              "quality": 2,
+              "documentation": 3,
+              "total": 1.7,
+              "speed_ms": 10799,
+              "notes": "The response is truncated mid-code (post method incomplete, code cuts off at 'headers = s'), leaving the class non-functional and lacking the usage example entirely.",
+              "response": "```python\n\"\"\"\nA simple REST API client wrapper around the requests library.\n\"\"\"\n\nimport requests\nfrom typing import Any, Optional, Dict\nfrom requests.exceptions import RequestException\n\n\nclass APIError(Exception):\n    \"\"\"\n    Custom exception raised when an API request fails.\n    \n    Attributes:\n        status_code (int): The HTTP status code of the failed response.\n        message (str): The error message from the API response.\n    \"\"\"\n    \n    def __init__(self, status_code: int, message: str) -> None:\n        \"\"\"\n        Initialize the APIError.\n        \n        Args:\n            status_code: The HTTP status code.\n            message: The error message.\n        \"\"\"\n        self.status_code = status_code\n        self.message = message\n        super().__init__(f\"API Error {status_code}: {message}\")\n\n\nclass APIClient:\n    \"\"\"\n    A wrapper around the requests library for making REST API calls.\n    \n    This client provides a simple interface for making GET and POST requests\n    to a REST API with optional authentication via API key. It automatically\n    handles error responses by raising an APIError exception.\n    \n    Attributes:\n        base_url (str): The base URL for all API requests.\n        api_key (Optional[str]): Optional API key for authentication.\n    \"\"\"\n    \n    def __init__(self, base_url: str, api_key: Optional[str] = None) -> None:\n        \"\"\"\n        Initialize the APIClient.\n        \n        Args:\n            base_url: The base URL for the API (e.g., \"https://api.example.com/v1\").\n            api_key: Optional API key for authentication. If provided, it will be\n                     included in the Authorization header as a Bearer token.\n        \n        Raises:\n            ValueError: If base_url is empty.\n        \"\"\"\n        if not base_url:\n            raise ValueError(\"base_url cannot be empty\")\n        \n        self.base_url = base_url.rstrip(\"/\")\n        self.api_key = api_key\n    \n    def _get_headers(self) -> Dict[str, str]:\n        \"\"\"\n        Get headers for API requests.\n        \n        Returns:\n            A dictionary of headers including the Authorization header if\n            an API key is configured.\n        \"\"\"\n        headers: Dict[str, str] = {\n            \"Content-Type\": \"application/json\",\n        }\n        \n        if self.api_key:\n            headers[\"Authorization\"] = f\"Bearer {self.api_key}\"\n        \n        return headers\n    \n    def _build_url(self, path: str) -> str:\n        \"\"\"\n        Build the full URL from base_url and path.\n        \n        Args:\n            path: The API endpoint path (e.g., \"/users\" or \"users/123\").\n        \n        Returns:\n            The full URL.\n        \"\"\"\n        # Remove leading slash from path to avoid double slashes\n        path = path.lstrip(\"/\")\n        return f\"{self.base_url}/{path}\"\n    \n    def _handle_response(self, response: requests.Response) -> Dict[str, Any]:\n        \"\"\"\n        Handle the API response and raise APIError on non-2xx status codes.\n        \n        Args:\n            response: The requests Response object.\n        \n        Returns:\n            The JSON-decoded response body.\n        \n        Raises:\n            APIError: If the response status code is not in the 2xx range.\n        \"\"\"\n        if not response.ok:\n            # Try to extract error message from JSON response\n            try:\n                error_data = response.json()\n                message = error_data.get(\"message\") or error_data.get(\"error\") or response.text\n            except (ValueError, KeyError):\n                message = response.text or f\"HTTP {response.status_code}\"\n            \n            raise APIError(response.status_code, message)\n        \n        # Try to parse JSON, return empty dict if no content\n        if response.content:\n            try:\n                return response.json()\n            except ValueError:\n                return {\"raw_response\": response.text}\n        \n        return {}\n    \n    def get(\n        self,\n        path: str,\n        params: Optional[Dict[str, Any]] = None\n    ) -> Dict[str, Any]:\n        \"\"\"\n        Make a GET request to the API.\n        \n        Args:\n            path: The API endpoint path (e.g., \"/users\" or \"users/123\").\n            params: Optional query parameters as a dictionary.\n        \n        Returns:\n            The JSON-decoded response body as a dictionary.\n        \n        Raises:\n            APIError: If the response status code is not in the 2xx range.\n            RequestException: If the request fails due to network issues.\n        \n        Example:\n            >>> client = APIClient(\"https://api.example.com/v1\", api_key=\"secret\")\n            >>> response = client.get(\"/users\", params={\"page\": 1, \"limit\": 10})\n        \"\"\"\n        url = self._build_url(path)\n        headers = self._get_headers()\n        \n        try:\n            response = requests.get(url, params=params, headers=headers)\n            return self._handle_response(response)\n        except RequestException as e:\n            raise APIError(0, f\"Network request failed: {str(e)}\")\n    \n    def post(\n        self,\n        path: str,\n        data: Dict[str, Any]\n    ) -> Dict[str, Any]:\n        \"\"\"\n        Make a POST request to the API.\n        \n        Args:\n            path: The API endpoint path (e.g., \"/users\").\n            data: The request body data as a dictionary. This will be\n                  JSON-encoded and sent with the appropriate Content-Type header.\n        \n        Returns:\n            The JSON-decoded response body as a dictionary.\n        \n        Raises:\n            APIError: If the response status code is not in the 2xx range.\n            RequestException: If the request fails due to network issues.\n        \n        Example:\n            >>> client = APIClient(\"https://api.example.com/v1\", api_key=\"secret\")\n            >>> response = client.post(\"/users\", data={\"name\": \"John\", \"email\": \"john@example.com\"})\n        \"\"\"\n        url = self._build_url(path)\n        headers = self._get_headers()\n        \n        try:\n            response = requests.post(url, json=data, headers=headers)\n            return self._handle_response(response)\n        except RequestException as e:\n            raise APIError(0, f\"Network request failed: {str(e)}\")\n\n\n# ============================================================================\n# USAGE EXAMPLE\n# ============================================================================\n\nif __name__ == \"__main__\":\n    # Example 1: Create a client without authentication\n    client = APIClient(\"https://jsonplaceholder.typicode.com\")\n    \n    try:\n        # GET request example\n        print(\"=== GET Request Example ===\")\n        posts = client.get(\"/posts\", params={\"userId\": 1, \"_limit\": 2})\n        print(f\"Retrieved {len(posts)} posts:\")\n        for post in posts:\n            print(f\"  - {post.get('title')}\")\n        \n        # POST request example\n        print(\"\\n=== POST Request Example ===\")\n        new_post = client.post(\"/posts\", data={\n            \"title\": \"My New Post\",\n            \"body\": \"This is the content of my post\",\n            \"userId\": 1\n        })\n        print(f\"Created post with ID: {new_post.get('id')}\")\n        print(f\"Title: {new_post.get('title')}\")\n    \n    except APIError as e:\n        print(f\"API Error: {e}\")\n    except Exception as e:\n        print(f\"Unexpected error: {e}\")\n    \n    # Example 2: Demonstrating error handling\n    print(\"\\n=== Error Handling Example ===\")\n    try:\n        # This will fail because the endpoint doesn't exist\n        response = client.get(\"/nonexistent-endpoint\")\n    except APIError as e:\n        print(f\"Caught APIError: Status {e.status_code}\")\n        print(f\"Message: {e.message}\")\n    \n    # Example 3: Client with API key (though not actually used in this example)\n    print(\"\\n=== Client with API Key ===\")\n    secure_client = APIClient(\n        base_url=\"https://api.example.com/v1\",\n        api_key=\"your-secret-api-key"
+            }
+          ]
+        },
+        {
+          "name": "doom",
+          "description": "DDA raycaster + textures + door + minimap + Z-buffer — the signature challenge",
+          "correctness": 0,
+          "quality": 1,
+          "documentation": 1,
+          "total": 0.7,
+          "speed_ms": 10329,
+          "notes": "Response is cut off almost immediately after texture generation code, with no raycasting (castRay), rendering, player movement, collision, HUD, minimap, or game loop implemented at all — the vast majority of required functionality is completely absent.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "51fb312e946e599cbf211897cbf9636e",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 0,
+              "quality": 1,
+              "documentation": 1,
+              "total": 0.7,
+              "speed_ms": 10329,
+              "notes": "Response is cut off almost immediately after texture generation code, with no raycasting (castRay), rendering, player movement, collision, HUD, minimap, or game loop implemented at all — the vast majority of required functionality is completely absent.",
+              "response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>3D Raycasting Engine</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n        body {\n            width: 100vw;\n            height: 100vh;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            background: #000;\n            font-family: monospace;\n            overflow: hidden;\n        }\n        canvas {\n            display: block;\n            cursor: crosshair;\n        }\n        #info {\n            position: absolute;\n            top: 10px;\n            right: 10px;\n            color: #0f0;\n            font-size: 14px;\n            z-index: 10;\n        }\n        #hintText {\n            position: absolute;\n            bottom: 40px;\n            left: 50%;\n            transform: translateX(-50%);\n            color: #ff0;\n            font-size: 16px;\n            text-align: center;\n            pointer-events: none;\n            z-index: 10;\n        }\n        #levelComplete {\n            position: absolute;\n            top: 50%;\n            left: 50%;\n            transform: translate(-50%, -50%);\n            background: rgba(0, 0, 0, 0.9);\n            color: #0f0;\n            padding: 40px;\n            border: 3px solid #0f0;\n            font-size: 32px;\n            text-align: center;\n            pointer-events: none;\n            z-index: 20;\n            display: none;\n        }\n    </style>\n</head>\n<body>\n    <canvas id=\"gameCanvas\"></canvas>\n    <div id=\"info\">FPS: <span id=\"fpsCounter\">0</span></div>\n    <div id=\"hintText\"></div>\n    <div id=\"levelComplete\"></div>\n\n    <script>\n        // ============================================================================\n        // CONSTANTS & CONFIGURATION\n        // ============================================================================\n        const CONFIG = {\n            INTERNAL_WIDTH: 640,\n            INTERNAL_HEIGHT: 480,\n            FOV: (66 * Math.PI) / 180,\n            MOVE_SPEED: 3.0,           // cells per second\n            ROT_SPEED: 2.0,            // radians per second\n            PLAYER_RADIUS: 0.2,        // collision radius\n            DOOR_DISTANCE: 1.5,        // distance to interact with door\n            MINIMAP_SCALE: 6,          // pixels per cell\n            MINIMAP_X: 10,\n            MINIMAP_Y: 10,\n        };\n\n        // ============================================================================\n        // TEXTURE GENERATION\n        // ============================================================================\n        function generateCheckerboardTexture(canvas, ctx, size = 64) {\n            ctx.fillStyle = '#aaa';\n            ctx.fillRect(0, 0, size, size);\n            const tileSize = size / 8;\n            ctx.fillStyle = '#333';\n            for (let y = 0; y < 8; y++) {\n                for (let x = 0; x < 8; x++) {\n                    if ((x + y) % 2 === 0) {\n                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);\n                    }\n                }\n            }\n        }\n\n        function generateBrickTexture(canvas, ctx, size = 64) {\n            ctx.fillStyle = '#8B4513';\n            ctx.fillRect(0, 0, size, size);\n            ctx.strokeStyle = '#333';\n            ctx.lineWidth = 1;\n            const brickW = size / 4;\n            const brickH = size / 8;\n            for (let y = 0; y < 8; y++) {\n                for (let x = 0; x < 4; x++) {\n                    const offsetX = y % 2 === 0 ? 0 : brickW / 2;\n                    ctx.strokeRect(x * brickW + offsetX, y * brickH, brickW, brickH);\n                }\n            }\n        }\n\n        function generateStripeTexture(canvas, ctx, size = 64) {\n            ctx.fillStyle = '#444';\n            ctx.fillRect(0, 0, size, size);\n            ctx.fillStyle = '#999';\n            const stripeW = size / 8;\n            for (let x = 0; x < 8; x += 2) {\n                ctx.fillRect(x * stripeW, 0, stripeW, size);\n            }\n        }\n\n        function createTextures() {\n            const textures = {};\n            const size = 64;\n\n            // Texture 1: Checkerboard (wall type 1)\n            const canvas1 = document.createElement('canvas');\n            canvas1.width = canvas1.height = size;\n            const ctx1 = canvas1.getContext('2d');\n            generateCheckerboardTexture(canvas1, ctx1, size);\n            textures[1] = canvas1;\n\n            // Texture 2: Brick (wall type 2)\n            const canvas2 = document.createElement('canvas');\n            canvas2.width = canvas2.height = size;\n            const ctx2 = canvas2.getContext('2d');\n            generateBrickTexture(canvas2, ctx2, size);\n            textures[2] = canvas2;\n\n            // Texture 3: Stripe (wall type 3)\n            const canvas3 = document.createElement('canvas');\n            canvas3.width = canvas3.height = size;\n            const ctx3 = canvas3.getContext('2d');\n            generateStripeTexture(canvas3, ctx3, size);\n            textures[3] = canvas3;\n\n            // Texture 4: Door (open archway - simple dark rectangle)\n            const canvas4 = document.createElement('canvas');\n            canvas4.width = canvas4.height = size;\n            const ctx4 = canvas4.getContext('2d');\n            ctx4.fillStyle = '#1a1a1a';\n            ctx4.fillRect(0, 0, size, size);\n            ctx4.fillStyle = '#333';\n            ctx4.fillRect(size * 0.2, size * 0.1, size * 0.6, size * 0.8);\n            textures[4] = canvas4;\n\n            return textures;\n        }\n\n        // ============================================================================\n        // MAP INITIALIZATION\n        // ============================================================================\n        function initMap() {\n            // 20x20 map with multiple rooms, corridors, a secret, and a door\n            // 0 = empty, 1 = wall (checkerboard), 2 = wall (brick), 3 = wall (stripe)\n            // 4 = door (closed), 5 = exit\n            const mapData = [\n                [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],\n                [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],\n                [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],\n                [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],\n                [1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0"
+            }
+          ]
+        },
+        {
+          "name": "slots",
+          "description": "Vegas slot machine — reels, pay table, betting, win animations",
+          "correctness": 0,
+          "quality": 0,
+          "documentation": 0,
+          "total": 0,
+          "speed_ms": 11667,
+          "notes": "Response is truncated mid-CSS with no JavaScript at all, making it a completely non-functional, incomplete submission.",
+          "stddev": null,
+          "runs": 1,
+          "trace_id": "e08ffa88b62bf682d8912bc16a3e9b4a",
+          "run_details": [
+            {
+              "run": 1,
+              "correctness": 0,
+              "quality": 0,
+              "documentation": 0,
+              "total": 0,
+              "speed_ms": 11667,
+              "notes": "Response is truncated mid-CSS with no JavaScript at all, making it a completely non-functional, incomplete submission.",
+              "response": "```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Vegas Slot Machine</title>\n    <style>\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: 'Arial Black', sans-serif;\n            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);\n            min-height: 100vh;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            padding: 20px;\n        }\n\n        .container {\n            display: grid;\n            grid-template-columns: 1fr 300px;\n            gap: 30px;\n            max-width: 1200px;\n            width: 100%;\n        }\n\n        .machine {\n            background: linear-gradient(to bottom, #2d1b4e, #1a0f2e);\n            border: 8px solid #ffd700;\n            border-radius: 20px;\n            padding: 30px;\n            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.5);\n        }\n\n        .header {\n            text-align: center;\n            margin-bottom: 30px;\n            color: #ffd700;\n            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);\n        }\n\n        .header h1 {\n            font-size: 2.5em;\n            margin-bottom: 10px;\n            letter-spacing: 2px;\n        }\n\n        .credits-display {\n            background: rgba(0, 0, 0, 0.5);\n            border: 3px solid #ffd700;\n            border-radius: 10px;\n            padding: 15px 30px;\n            color: #ffd700;\n            font-size: 1.5em;\n            margin-bottom: 20px;\n            text-align: center;\n            font-weight: bold;\n            box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);\n        }\n\n        .credits-display span {\n            font-size: 1.8em;\n            display: inline-block;\n            min-width: 100px;\n        }\n\n        .reels-container {\n            display: flex;\n            gap: 15px;\n            margin-bottom: 30px;\n            justify-content: center;\n        }\n\n        .reel {\n            width: 120px;\n            height: 180px;\n            background: linear-gradient(to bottom, #000, #1a0f2e);\n            border: 4px solid #ffd700;\n            border-radius: 10px;\n            overflow: hidden;\n            position: relative;\n            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3);\n        }\n\n        .reel-symbols {\n            display: flex;\n            flex-direction: column;\n            height: 100%;\n            font-size: 3em;\n            justify-content: center;\n            align-items: center;\n            transition: none;\n            position: relative;\n        }\n\n        .reel-symbol {\n            width: 100%;\n            height: 60px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        }\n\n        .reel.spinning .reel-symbols {\n            animation: spin 0.8s linear;\n        }\n\n        @keyframes spin {\n            0% {\n                transform: translateY(0);\n            }\n            100% {\n                transform: translateY(-420px);\n            }\n        }\n\n        .reel.shake {\n            animation: shake 0.4s ease-in-out;\n        }\n\n        @keyframes shake {\n            0%, 100% { transform: translateX(0); }\n            25% { transform: translateX(-10px); }\n            75% { transform: translateX(10px); }\n        }\n\n        .reel.flash-win .reel-symbol.highlight {\n            animation: flashWin 0.6s ease-in-out 3;\n        }\n\n        @keyframes flashWin {\n            0%, 100% { \n                text-shadow: 0 0 0 rgba(255, 215, 0, 0);\n                transform: scale(1);\n            }\n            50% { \n                text-shadow: 0 0 20px rgba(255, 215, 0, 1);\n                transform: scale(1.1);\n            }\n        }\n\n        .win-display {\n            text-align: center;\n            margin-bottom: 20px;\n            min-height: 60px;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n            align-items: center;\n        }\n\n        .win-name {\n            color: #ffd700;\n            font-size: 1.8em;\n            font-weight: bold;\n            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);\n            margin-bottom: 10px;\n            min-height: 30px;\n        }\n\n        .win-amount {\n            color: #00ff00;\n            font-size: 1.5em;\n            font-weight: bold;\n            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);\n            animation: slideUp 0.6s ease-out;\n        }\n\n        @keyframes slideUp {\n            from {\n                opacity: 0;\n                transform: translateY(20px);\n            }\n            to {\n                opacity: 1;\n                transform: translateY(0);\n            }\n        }\n\n        .controls {\n            display: flex;\n            flex-direction: column;\n            gap: 20px;\n        }\n\n        .bet-buttons {\n            display: grid;\n            grid-template-columns: repeat(3, 1fr);\n            gap: 10px;\n        }\n\n        .btn {\n            padding: 12px 20px;\n            font-size: 1em;\n            font-weight: bold;\n            border: 2px solid #ffd700;\n            border-radius: 8px;\n            cursor: pointer;\n            transition: all 0.3s;\n            color: #ffd700;\n            background: rgba(0, 0, 0, 0.3);\n            text-transform: uppercase;\n            letter-spacing: 1px;\n        }\n\n        .btn:hover:not(:disabled) {\n            background: #ffd700;\n            color: #1a0f2e;\n            transform: scale(1.05);\n            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);\n        }\n\n        .btn:disabled {\n            opacity: 0.5;\n            cursor: not-allowed;\n        }\n\n        .btn.active {\n            background: #ffd700;\n            color: #1a0f2e;\n            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);\n        }\n\n        .spin-btn {\n            padding: 18px 40px;\n            font-size: 1.3em;\n            background: linear-gradient(to bottom, #ff6b00, #cc5500);\n            border: 3px solid #ffd700;\n            color: #fff;\n            border-radius: 10px;\n            cursor: pointer;\n            font-weight: bold;\n            transition: all 0.3s;\n            text-transform: uppercase;\n            letter-spacing: 2px;\n            box-shadow: 0 5px 15px rgba(0, 0, 0, 0"
             }
           ]
         }
@@ -1446,12 +1446,60 @@
         "status": "scored"
       },
       {
-        "model_id": "gemini-2.0-flash",
-        "name": "Gemini 2.0 Flash",
+        "model_id": "gemini-2.5-flash",
+        "name": "Gemini 2.5 Flash",
         "tier": "free",
-        "why": "free AI Studio quota — free judge + free subject",
+        "why": "free AI Studio quota — replaced retired 2.0 Flash",
         "est_cost_cents": 0,
-        "status": "ready"
+        "status": "scored"
+      },
+      {
+        "model_id": "gpt-5.6",
+        "name": "GPT-5.6",
+        "tier": "paid",
+        "why": "OpenAI's latest flagship — the head-to-head everyone asks for",
+        "est_cost_cents": 600,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "claude-fable-5",
+        "name": "Claude Fable 5",
+        "tier": "paid",
+        "why": "Anthropic's Mythos-class tier above Opus — the ceiling check",
+        "est_cost_cents": 1000,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "claude-opus-4-6",
+        "name": "Claude Opus 4.6",
+        "tier": "paid",
+        "why": "Opus lineage baseline — anchors the 4.x curve",
+        "est_cost_cents": 700,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "claude-opus-4-7",
+        "name": "Claude Opus 4.7",
+        "tier": "paid",
+        "why": "one step up the Opus 4.x curve from 4.6",
+        "est_cost_cents": 750,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "glm-2.5",
+        "name": "GLM 2.5",
+        "tier": "cheap",
+        "why": "Zhipu's open-weight coder — cheap API, big claims",
+        "est_cost_cents": 150,
+        "status": "unfunded"
+      },
+      {
+        "model_id": "kimi-k3",
+        "name": "Kimi K3",
+        "tier": "cheap",
+        "why": "Moonshot's agentic coder — cheap API, strong on long tasks",
+        "est_cost_cents": 200,
+        "status": "unfunded"
       }
     ],
     "principles": [
