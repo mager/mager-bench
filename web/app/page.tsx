@@ -1,6 +1,7 @@
 import Link from "next/link";
 import resultsData from "@/data/results.json";
 import fundingData from "@/data/funding.json";
+import challengesData from "@/data/challenges.json";
 
 type Challenge = {
   name: string;
@@ -26,6 +27,11 @@ type ModelResult = {
   challenges: Challenge[];
 };
 
+type ChallengeDef = {
+  name: string;
+  description: string;
+};
+
 const data = resultsData as {
   generated_at: string;
   judge: string;
@@ -33,6 +39,8 @@ const data = resultsData as {
   runs?: number;
   models: ModelResult[];
 };
+
+const challengeDefs = challengesData as ChallengeDef[];
 
 const funding = fundingData as {
   goal_cents: number;
@@ -52,23 +60,11 @@ function scoreTier(score: number): Tier {
   return "red";
 }
 
-const TIER_LABEL: Record<Tier, string> = {
-  green: "TOP SCORE",
-  yellow: "SOLID",
-  red: "LOW SCORE",
-};
-
 const TIER_STYLE: Record<Tier, { dot: string; text: string; glow: string }> = {
   green: { dot: "bg-green", text: "text-green", glow: "glow-green" },
   yellow: { dot: "bg-amber", text: "text-amber", glow: "glow" },
   red: { dot: "bg-alert", text: "text-alert", glow: "glow-alert" },
 };
-
-const DIMENSION_STYLE = {
-  correctness: { dot: "bg-green", text: "text-green" },
-  quality: { dot: "bg-magenta", text: "text-magenta" },
-  documentation: { dot: "bg-cyan", text: "text-cyan" },
-} as const;
 
 const COST_TIER_STYLE: Record<string, string> = {
   free: "text-green",
@@ -84,13 +80,24 @@ function money(cents: number) {
 export default function Home() {
   const models = data.models;
   const top = models[0];
-  const challengeCount = top?.challenges.length ?? 0;
+  const challengeCount = challengeDefs.length;
   const fundPct = Math.min(
     100,
     Math.round((funding.raised_cents / Math.max(1, funding.goal_cents)) * 100)
   );
   const unfunded = funding.wishlist.filter((w) => w.status === "unfunded").length;
   const scoredIds = new Set(models.map((m) => m.id));
+
+  const boardAvg = (name: string) => {
+    const scores = models
+      .map((m) => m.challenges.find((c) => c.name === name)?.total)
+      .filter((s): s is number => s != null);
+    if (scores.length === 0) return null;
+    return {
+      avg: scores.reduce((a, b) => a + b, 0) / scores.length,
+      n: scores.length,
+    };
+  };
 
   return (
     <div className="px-4 py-10 sm:px-8 md:py-16">
@@ -180,10 +187,14 @@ export default function Home() {
                     >
                       <td className="px-4 py-3 text-fg-dim">{String(i + 1).padStart(2, "0")}</td>
                       <td className="px-4 py-3 font-medium">
-                        <a href={`#model-${m.id}`} className="inline-flex items-center gap-2 hover:text-amber-bright">
+                        <Link
+                          href={`/models/${m.id}`}
+                          className="inline-flex items-center gap-2 hover:text-amber-bright"
+                        >
                           <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
                           {m.name}
-                        </a>
+                          <span className="text-xs text-amber-dim">→</span>
+                        </Link>
                       </td>
                       <td className={`px-4 py-3 text-xs uppercase tracking-wider ${COST_TIER_STYLE[cost] ?? COST_TIER_STYLE.unknown}`}>
                         {cost}
@@ -203,17 +214,67 @@ export default function Home() {
             </table>
           </div>
           <p className="mt-2 text-xs text-fg-dim">
-            free + cheap run by default. paid models land when{" "}
+            click a model for its full challenge breakdown, raw responses, and judge notes.
+            free + cheap run by default; paid models land when{" "}
             <Link href="/fund" className="text-amber hover:text-amber-bright">
               crowdfunded
-            </Link>{" "}
-            or when you run them yourself.
+            </Link>
+            .
+          </p>
+        </section>
+
+        <section id="challenges" className="rise scroll-mt-6" style={{ animationDelay: "200ms" }}>
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
+              the {challengeCount} challenges
+            </h2>
+            <Link
+              href="/challenges"
+              className="text-xs text-amber hover:text-amber-bright"
+            >
+              full specs + rubrics →
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {challengeDefs.map((c) => {
+              const board = boardAvg(c.name);
+              const style = board ? TIER_STYLE[scoreTier(board.avg)] : null;
+              return (
+                <Link
+                  key={c.name}
+                  href={`/challenges/${c.name}`}
+                  className="lift group flex flex-col gap-1.5 border border-amber-faint bg-bg-raised/40 px-4 py-3"
+                >
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-mono text-sm font-semibold tracking-wide text-amber-bright group-hover:text-amber">
+                      {c.name}
+                      <span className="ml-1.5 inline-block text-amber-dim transition-transform group-hover:translate-x-0.5">
+                        →
+                      </span>
+                    </span>
+                    {board && style && (
+                      <span
+                        className={`font-display text-xl ${style.text}`}
+                        title={`board average across ${board.n} model${board.n === 1 ? "" : "s"}`}
+                      >
+                        {board.avg.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm leading-relaxed text-fg">{c.description}</p>
+                </Link>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-fg-dim">
+            score shown is the board average across all {models.length} scored models — a rough
+            difficulty read. every model attempts every challenge.
           </p>
         </section>
 
         <section
           className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4"
-          style={{ animationDelay: "180ms" }}
+          style={{ animationDelay: "260ms" }}
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -237,107 +298,6 @@ export default function Home() {
             {money(funding.raised_cents)} / {money(funding.goal_cents)} season goal · {fundPct}%
           </p>
         </section>
-
-        {models.map((model, mi) => (
-          <section
-            key={model.id}
-            id={`model-${model.id}`}
-            className="rise flex scroll-mt-6 flex-col gap-4"
-            style={{ animationDelay: `${200 + mi * 40}ms` }}
-          >
-            <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-amber-faint pb-2">
-              <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
-                <span className="text-amber-bright">{model.name}</span>
-                {" — "}challenge breakdown
-                {" · "}
-                <Link
-                  href={`/models/${model.id}`}
-                  className="normal-case tracking-normal text-amber hover:text-amber-bright"
-                >
-                  inspect traces →
-                </Link>
-              </h2>
-              <div className="flex items-center gap-3 text-xs text-fg-dim">
-                <span className={`uppercase tracking-wider ${COST_TIER_STYLE[model.tier ?? "unknown"]}`}>
-                  {model.tier ?? "unknown"}
-                </span>
-                <span className={`font-display text-2xl ${TIER_STYLE[scoreTier(model.average)].text}`}>
-                  {model.average.toFixed(1)}
-                </span>
-              </div>
-            </div>
-            {model.challenges.map((c) => {
-              const t = scoreTier(c.total);
-              const style = TIER_STYLE[t];
-              return (
-                <article
-                  key={`${model.id}-${c.name}`}
-                  className="lift border border-amber-faint bg-bg-raised/40 px-4 py-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/challenges/${c.name}`}
-                      className="group whitespace-nowrap font-mono text-base font-semibold tracking-wide text-amber-bright hover:text-amber"
-                    >
-                      {c.name}
-                      <span className="ml-1.5 inline-block text-amber-dim transition-transform group-hover:translate-x-0.5">
-                        →
-                      </span>
-                    </Link>
-                    <div
-                      className="h-px flex-1"
-                      style={{
-                        backgroundImage:
-                          "repeating-linear-gradient(to right, var(--amber-dim) 0, var(--amber-dim) 4px, transparent 4px, transparent 8px)",
-                      }}
-                    />
-                    <span className={`font-display text-2xl ${style.text} ${style.glow}`}>
-                      {c.total.toFixed(1)}
-                    </span>
-                  </div>
-                  <p className="mt-1.5 text-sm leading-relaxed text-fg">{c.description}</p>
-
-                  <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-fg-dim">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.correctness.dot}`} />
-                      correctness{" "}
-                      <b className={`font-semibold ${DIMENSION_STYLE.correctness.text}`}>
-                        {c.correctness.toFixed(1)}
-                      </b>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.quality.dot}`} />
-                      quality{" "}
-                      <b className={`font-semibold ${DIMENSION_STYLE.quality.text}`}>
-                        {c.quality.toFixed(1)}
-                      </b>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.documentation.dot}`}
-                      />
-                      documentation{" "}
-                      <b className={`font-semibold ${DIMENSION_STYLE.documentation.text}`}>
-                        {c.documentation.toFixed(1)}
-                      </b>
-                    </span>
-                    <span>{c.speed_ms}ms</span>
-                    {t !== "yellow" && (
-                      <span className={`${style.text} ${style.glow}`}>
-                        {t === "green" ? "▲" : "⚠"} {TIER_LABEL[t]}
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="mt-3 bg-bg/50 px-3 py-2 text-sm leading-relaxed text-fg">
-                    <span className="text-amber-dim"># </span>
-                    {c.notes}
-                  </p>
-                </article>
-              );
-            })}
-          </section>
-        ))}
 
         <section
           className="rise border border-amber-faint px-4 py-4"
