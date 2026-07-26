@@ -24,7 +24,7 @@ coding tasks Mager actually cares about, run against any model, scored by
 an LLM judge on correctness, code quality, and documentation.
 
 **Free first.** Default subjects and judges are free-tier models (Groq Llama,
-Gemini Flash). Cheap models (Haiku, GPT-4o mini) are optional pennies.
+GPT-OSS, Gemini Flash). Cheap models (Haiku, GPT-4o mini) are optional pennies.
 Paid models (Opus, GPT-4o, Sonnet flagships) sit on a public wishlist and
 get unlocked via crowdfunding or BYO keys.
 

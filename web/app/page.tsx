@@ -21,6 +21,9 @@ type ModelResult = {
   name: string;
   tier?: string;
   average: number;
+  avg_correctness?: number;
+  avg_quality?: number;
+  avg_documentation?: number;
   avg_speed_ms: number;
   avg_stddev?: number | null;
   runs?: number;
@@ -165,12 +168,22 @@ export default function Home() {
         <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
           <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-fg-dim">leaderboard</h2>
           <div className="overflow-x-auto border border-amber-faint">
-            <table className="w-full min-w-[560px] border-collapse text-sm">
+            <table className="w-full min-w-[720px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-amber-faint text-left text-xs uppercase tracking-wider text-fg-dim">
                   <th className="px-4 py-3 font-normal">#</th>
                   <th className="px-4 py-3 font-normal">model</th>
                   <th className="px-4 py-3 font-normal">cost</th>
+                  <th
+                    className="px-4 py-3 text-right font-normal"
+                    title="average correctness · quality · documentation"
+                  >
+                    <span className="text-green">crct</span>{" "}
+                    <span className="text-fg-dim">·</span>{" "}
+                    <span className="text-magenta">qual</span>{" "}
+                    <span className="text-fg-dim">·</span>{" "}
+                    <span className="text-cyan">docs</span>
+                  </th>
                   <th className="px-4 py-3 text-right font-normal">avg score</th>
                   <th className="px-4 py-3 text-right font-normal">avg latency</th>
                   <th className="px-4 py-3 text-right font-normal">n</th>
@@ -199,6 +212,19 @@ export default function Home() {
                       <td className={`px-4 py-3 text-xs uppercase tracking-wider ${COST_TIER_STYLE[cost] ?? COST_TIER_STYLE.unknown}`}>
                         {cost}
                       </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">
+                        {m.avg_correctness != null ? (
+                          <>
+                            <span className="text-green">{m.avg_correctness.toFixed(1)}</span>
+                            <span className="text-fg-dim"> · </span>
+                            <span className="text-magenta">{m.avg_quality?.toFixed(1)}</span>
+                            <span className="text-fg-dim"> · </span>
+                            <span className="text-cyan">{m.avg_documentation?.toFixed(1)}</span>
+                          </>
+                        ) : (
+                          <span className="text-fg-dim">—</span>
+                        )}
+                      </td>
                       <td className={`px-4 py-3 text-right ${style.text} ${style.glow}`}>
                         {m.average.toFixed(1)}
                         {m.avg_stddev != null && m.avg_stddev > 0 && (
@@ -213,6 +239,12 @@ export default function Home() {
               </tbody>
             </table>
           </div>
+          <p className="mt-2 text-xs text-fg-dim">
+            <span className="text-green">crct</span> · <span className="text-magenta">qual</span> ·{" "}
+            <span className="text-cyan">docs</span> are the rubric dimensions averaged across all{" "}
+            {challengeCount} challenges — the headline average hides whether a model is
+            correct-but-undocumented or well-written-but-wrong.
+          </p>
           <p className="mt-2 text-xs text-fg-dim">
             click a model for its full challenge breakdown, raw responses, and judge notes.
             free + cheap run by default; paid models land when{" "}

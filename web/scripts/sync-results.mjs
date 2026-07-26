@@ -42,11 +42,13 @@ const DISPLAY_NAMES = {
   "gemini-2.5-pro": "Gemini 2.5 Pro",
   "llama-3.3-70b": "Llama 3.3 70B",
   "llama-3.1-8b": "Llama 3.1 8B",
+  "gpt-oss-120b": "GPT-OSS 120B",
 };
 
 const TIERS = {
   "llama-3.3-70b": "free",
   "llama-3.1-8b": "free",
+  "gpt-oss-120b": "free",
   "gemini-2.0-flash": "free",
   "gemini-2.5-flash": "free",
   "claude-haiku-4-5": "cheap",
@@ -73,11 +75,18 @@ const models = [...byModel.entries()]
     const stds = challenges.map((c) => c.stddev).filter((x) => typeof x === "number");
     const avgStd =
       stds.length > 0 ? Math.round((stds.reduce((a, b) => a + b, 0) / stds.length) * 100) / 100 : null;
+    // Per-dimension averages: the headline number hides whether a model is
+    // correct-but-undocumented or well-written-but-wrong.
+    const dimAvg = (key) =>
+      Math.round((challenges.reduce((sum, c) => sum + c[key], 0) / challenges.length) * 10) / 10;
     return {
       id,
       name: DISPLAY_NAMES[id] ?? id,
       tier: TIERS[id] ?? "unknown",
       average: Math.round(average * 10) / 10,
+      avg_correctness: dimAvg("correctness"),
+      avg_quality: dimAvg("quality"),
+      avg_documentation: dimAvg("documentation"),
       avg_speed_ms: avgSpeedMs,
       avg_stddev: avgStd,
       runs: challenges[0]?.runs ?? raw.runs ?? 1,

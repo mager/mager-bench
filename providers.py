@@ -23,6 +23,10 @@ class ModelInfo:
     tier: Tier
     display_name: str
     notes: str = ""
+    # Reasoning models spend tokens thinking before they answer, and most APIs
+    # count those against the same budget as the answer. Flagged models get
+    # extra headroom so their *visible* answer budget matches everyone else's.
+    reasoning: bool = False
 
 
 # Canonical catalogue. Order is the default run order (free first).
@@ -30,6 +34,8 @@ MODELS: list[ModelInfo] = [
     # ── free tier (no card / free quota) ──────────────────────────────────
     ModelInfo("llama-3.3-70b", "groq", "llama-3.3-70b-versatile", "free", "Llama 3.3 70B", "Groq free tier"),
     ModelInfo("llama-3.1-8b", "groq", "llama-3.1-8b-instant", "free", "Llama 3.1 8B", "Groq free tier — fast baseline"),
+    ModelInfo("gpt-oss-120b", "groq", "openai/gpt-oss-120b", "free", "GPT-OSS 120B",
+              "OpenAI open-weights, served on Groq free tier", reasoning=True),
     # gemini-2.0-flash retired by Google (generateContent 404s as of 2026-07) — 2.5-flash is the free successor
     ModelInfo("gemini-2.5-flash", "gemini", "gemini-2.5-flash", "free", "Gemini 2.5 Flash", "Google AI Studio free tier"),
     # ── cheap (pennies per full bench) ────────────────────────────────────
@@ -113,21 +119,46 @@ class OpenAIProvider(Provider):
 class GroqProvider(Provider):
     """Groq exposes an OpenAI-compatible API, so reuse the OpenAI SDK."""
 
-    def __init__(self, model: str) -> None:
+    def __init__(self, model: str, reasoning: bool = False) -> None:
         from openai import OpenAI
         self.client = OpenAI(
             api_key=os.environ["GROQ_API_KEY"],
             base_url="https://api.groq.com/openai/v1",
+            # Free tier is tokens-per-minute limited; let the SDK sit out the
+            # 429s (it honours retry-after) instead of failing the challenge.
+            max_retries=6,
         )
         self.model = model
+        self.reasoning = reasoning
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
+        kwargs = {}
+        if self.reasoning:
+            # Groq bills reasoning tokens against max_tokens, so without headroom
+            # a thinking model's answer gets truncated mid-implementation.
+            # "parsed" keeps the chain-of-thought out of message.content — it's a
+            # Groq-only param, so it rides in extra_body (the OpenAI SDK rejects
+            # unknown top-level kwargs).
+            #
+            # Headroom is 2048, not more: Groq reserves the full max_tokens
+            # against a free-tier ceiling of 8000 tokens/minute, so a bigger
+            # budget gets the request rejected outright (413) rather than
+            # merely throttled. Answer budget stays at the board-wide 2048.
+            max_tokens += 2048
+            kwargs["extra_body"] = {"reasoning_format": "parsed"}
         resp = self.client.chat.completions.create(
             model=self.model,
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
+            **kwargs,
         )
-        return resp.choices[0].message.content or ""
+        text = resp.choices[0].message.content or ""
+        if not text:
+            raise RuntimeError(
+                f"{self.model}: empty response "
+                f"(finish_reason={resp.choices[0].finish_reason}) — raise max_tokens"
+            )
+        return text
 
 
 class GeminiProvider(Provider):
@@ -219,7 +250,7 @@ def get_provider(model_id: str) -> Provider | None:
     if info.family == "openai":
         return OpenAIProvider(info.api_model)
     if info.family == "groq":
-        return GroqProvider(info.api_model)
+        return GroqProvider(info.api_model, reasoning=info.reasoning)
     if info.family == "gemini":
         return GeminiProvider(info.api_model)
     return None

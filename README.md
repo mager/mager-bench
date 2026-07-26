@@ -14,7 +14,7 @@ Default runs use **free + cheap** models so a full leaderboard doesn't torch you
 
 | Tier | Models | Cost |
 |------|--------|------|
-| free | `llama-3.3-70b`, `llama-3.1-8b` (Groq), `gemini-2.0-flash`, `gemini-2.5-flash` | $0 free quotas |
+| free | `llama-3.3-70b`, `llama-3.1-8b`, `gpt-oss-120b` (Groq), `gemini-2.5-flash` | $0 free quotas |
 | cheap | `claude-haiku-4-5`, `gpt-4o-mini` | pennies / suite |
 | paid | `claude-sonnet-*`, `claude-opus-4-8`, `gpt-4o`, `gemini-2.5-pro` | crowdfund or BYO |
 
@@ -58,8 +58,8 @@ python bench.py --tier free --judge gemini-2.0-flash
 python bench.py --tier free --runs 3 --output results.json
 
 # multi-judge panel (averages scores — reduces single-model bias)
-python bench.py --models llama-3.3-70b,gemini-2.0-flash \
-  --judges gemini-2.0-flash,llama-3.3-70b --runs 2
+python bench.py --models llama-3.3-70b,gemini-2.5-flash \
+  --judges gemini-2.5-flash,llama-3.3-70b --runs 2
 
 # one challenge / serial latency
 python bench.py --challenge doom --serial
