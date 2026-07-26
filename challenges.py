@@ -12,6 +12,13 @@ class Challenge:
     prompt: str
     # rubric hints passed to the judge
     rubric: dict
+    # Answer budget. Most tasks finish well inside the 2048 default; the
+    # "build a whole app in one file" challenges cannot, and at 2048 every
+    # model truncates mid-function and scores ~0 — which measures the budget,
+    # not the model. Ceiling is set by the tightest free tier on the board
+    # (Groq gpt-oss: 8000 tokens/min covering prompt + max_tokens), so big
+    # builds get 7000 rather than an arbitrary larger number.
+    max_tokens: int = 2048
 
 
 CHALLENGES: list[Challenge] = [
@@ -62,6 +69,7 @@ CHALLENGES: list[Challenge] = [
             "quality": "Is the code clean and well-structured? Is APIError a proper Exception subclass? Are session/connection concerns handled?",
             "documentation": "Does the class have a docstring? Do all public methods have docstrings? Is the usage example runnable?",
         },
+        max_tokens=4096,
     ),
     Challenge(
         name="readme-writer",
@@ -449,6 +457,7 @@ CHALLENGES: list[Challenge] = [
                 "Are the three texture types distinguishable in code (not just wall type 1/2/3 with no explanation)?"
             ),
         },
+        max_tokens=7000,
     ),
     Challenge(
         name="slots",
@@ -521,6 +530,7 @@ CHALLENGES: list[Challenge] = [
                 "Are the reel timing constants named (not bare 800/1200/1600 ms literals)?"
             ),
         },
+        max_tokens=7000,
     ),
 ]
 

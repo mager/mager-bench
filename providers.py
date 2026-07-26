@@ -27,15 +27,22 @@ class ModelInfo:
     # count those against the same budget as the answer. Flagged models get
     # extra headroom so their *visible* answer budget matches everyone else's.
     reasoning: bool = False
+    # Free-tier tokens-per-minute ceiling, where the provider reserves
+    # prompt + max_tokens against it up front (Groq does). Requests over the
+    # ceiling are rejected outright (413), not throttled, so the harness has
+    # to clamp rather than retry. None = no meaningful ceiling.
+    tpm_ceiling: int | None = None
 
 
 # Canonical catalogue. Order is the default run order (free first).
 MODELS: list[ModelInfo] = [
     # ── free tier (no card / free quota) ──────────────────────────────────
-    ModelInfo("llama-3.3-70b", "groq", "llama-3.3-70b-versatile", "free", "Llama 3.3 70B", "Groq free tier"),
-    ModelInfo("llama-3.1-8b", "groq", "llama-3.1-8b-instant", "free", "Llama 3.1 8B", "Groq free tier — fast baseline"),
+    ModelInfo("llama-3.3-70b", "groq", "llama-3.3-70b-versatile", "free", "Llama 3.3 70B", "Groq free tier",
+              tpm_ceiling=12000),
+    ModelInfo("llama-3.1-8b", "groq", "llama-3.1-8b-instant", "free", "Llama 3.1 8B", "Groq free tier — fast baseline",
+              tpm_ceiling=6000),
     ModelInfo("gpt-oss-120b", "groq", "openai/gpt-oss-120b", "free", "GPT-OSS 120B",
-              "OpenAI open-weights, served on Groq free tier", reasoning=True),
+              "OpenAI open-weights, served on Groq free tier", reasoning=True, tpm_ceiling=8000),
     # gemini-2.0-flash retired by Google (generateContent 404s as of 2026-07) — 2.5-flash is the free successor
     ModelInfo("gemini-2.5-flash", "gemini", "gemini-2.5-flash", "free", "Gemini 2.5 Flash", "Google AI Studio free tier"),
     # ── cheap (pennies per full bench) ────────────────────────────────────
@@ -119,7 +126,7 @@ class OpenAIProvider(Provider):
 class GroqProvider(Provider):
     """Groq exposes an OpenAI-compatible API, so reuse the OpenAI SDK."""
 
-    def __init__(self, model: str, reasoning: bool = False) -> None:
+    def __init__(self, model: str, reasoning: bool = False, tpm_ceiling: int | None = None) -> None:
         from openai import OpenAI
         self.client = OpenAI(
             api_key=os.environ["GROQ_API_KEY"],
@@ -130,6 +137,7 @@ class GroqProvider(Provider):
         )
         self.model = model
         self.reasoning = reasoning
+        self.tpm_ceiling = tpm_ceiling
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
         kwargs = {}
@@ -139,13 +147,14 @@ class GroqProvider(Provider):
             # "parsed" keeps the chain-of-thought out of message.content — it's a
             # Groq-only param, so it rides in extra_body (the OpenAI SDK rejects
             # unknown top-level kwargs).
-            #
-            # Headroom is 2048, not more: Groq reserves the full max_tokens
-            # against a free-tier ceiling of 8000 tokens/minute, so a bigger
-            # budget gets the request rejected outright (413) rather than
-            # merely throttled. Answer budget stays at the board-wide 2048.
             max_tokens += 2048
             kwargs["extra_body"] = {"reasoning_format": "parsed"}
+        if self.tpm_ceiling:
+            # Groq reserves prompt + max_tokens against the per-minute ceiling
+            # and rejects (413) rather than throttles, so clamp to what fits.
+            # ~4 chars/token, plus a margin for the tokenizer estimate.
+            budget = self.tpm_ceiling - (len(prompt) // 4) - 256
+            max_tokens = max(256, min(max_tokens, budget))
         resp = self.client.chat.completions.create(
             model=self.model,
             max_tokens=max_tokens,
@@ -250,7 +259,7 @@ def get_provider(model_id: str) -> Provider | None:
     if info.family == "openai":
         return OpenAIProvider(info.api_model)
     if info.family == "groq":
-        return GroqProvider(info.api_model, reasoning=info.reasoning)
+        return GroqProvider(info.api_model, reasoning=info.reasoning, tpm_ceiling=info.tpm_ceiling)
     if info.family == "gemini":
         return GeminiProvider(info.api_model)
     return None

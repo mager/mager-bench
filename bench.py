@@ -94,7 +94,7 @@ def run_model_on_challenge(
 
         t0 = time.perf_counter()
         try:
-            response = provider.complete(challenge.prompt)
+            response = provider.complete(challenge.prompt, max_tokens=challenge.max_tokens)
         except Exception as e:
             span.set_attribute("error.message", str(e))
             return None, f"{model_id}: ERROR: {e}"
@@ -303,7 +303,11 @@ def main() -> None:
         default="cheap",
         help="model tier when --models not set (default: cheap = free+haiku+mini)",
     )
-    parser.add_argument("--challenge", default=None, help="run a single challenge by name")
+    parser.add_argument(
+        "--challenge",
+        default=None,
+        help="comma-separated challenge names (default: all)",
+    )
     parser.add_argument(
         "--judge",
         default=None,
@@ -338,7 +342,11 @@ def main() -> None:
     models = resolve_models(args)
     judges = resolve_judges(args)
     runs = max(1, args.runs)
-    challenge_names = [args.challenge] if args.challenge else None
+    challenge_names = (
+        [c.strip() for c in args.challenge.split(",") if c.strip()]
+        if args.challenge
+        else None
+    )
 
     print("mager-bench")
     setup_tracing()
