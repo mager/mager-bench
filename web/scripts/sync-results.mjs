@@ -14,6 +14,31 @@ if (!existsSync(rawPath)) {
 
 const raw = JSON.parse(readFileSync(rawPath, "utf8"));
 
+// Integrity gate. Two kinds of bad row have made it onto the published board
+// before: a 0-character response that still earned points, and a stale row
+// scored by a different judge than the one the board is pinned to (which
+// makes its score incomparable). Both are silent in the averages, so fail
+// the publish rather than serve them.
+{
+  const problems = [];
+  for (const r of raw.results) {
+    const label = `${r.model}/${r.challenge}`;
+    if (!(r.response ?? "").trim()) {
+      problems.push(`${label}: empty response scored ${r.total_score}`);
+    }
+    const judged = /^judge:\s*(\S+)/.exec(r.notes ?? "");
+    if (judged && judged[1] !== raw.judge) {
+      problems.push(`${label}: scored by ${judged[1]}, board judge is ${raw.judge}`);
+    }
+  }
+  if (problems.length > 0) {
+    console.error("results.json failed integrity check — refusing to publish:");
+    for (const p of problems) console.error(`  - ${p}`);
+    console.error("re-run the affected model/challenge pairs before syncing.");
+    process.exit(1);
+  }
+}
+
 const DESCRIPTIONS = {
   fizzbuzz: "Baseline correctness + code style",
   "binary-search": "Algorithm + full docstring (Args/Returns/Raises + examples)",
