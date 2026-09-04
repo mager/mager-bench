@@ -352,13 +352,21 @@ class GatewayProvider(Provider):
                 **kwargs,
             ) as stream:
                 for event in stream:
-                    if event.type == "chunk":
-                        delta = event.delta
-                        text = getattr(delta, "content", None) or ""
-                        if text:
-                            parts.append(text)
-                        think = getattr(delta, "reasoning_content", None) or ""
-                        think_chars += len(think) if isinstance(think, str) else 0
+                    if event.type == "content.delta":
+                        # the SDK fans raw chunks out into typed events;
+                        # text arrives here with delta as a plain str
+                        parts.append(event.delta)
+                    elif event.type == "chunk":
+                        # providers that expose the think stream put it on
+                        # the raw chunk's delta (SDK- and provider-dependent;
+                        # absent → think_chars just stays 0)
+                        try:
+                            choices = event.chunk.choices or []
+                            d = choices[0].delta if choices else None
+                            think = getattr(d, "reasoning_content", None) or ""
+                            think_chars += len(think) if isinstance(think, str) else 0
+                        except Exception:
+                            pass
                     now = time.monotonic()
                     if now - last_beat >= 30:
                         el = int(now - t0)
