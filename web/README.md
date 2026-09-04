@@ -8,7 +8,7 @@ The live scorecard/leaderboard for [mager-bench](../README.md), deployed at
 | Path | What |
 |------|------|
 | `/` | multi-model leaderboard + per-model challenge breakdowns + fund teaser |
-| `/challenges` | all 12 challenge cards |
+| `/challenges` | all 13 challenge cards |
 | `/challenges/<name>` | prompt, rubric, per-model scores |
 | `/fund` | crowdfunding drive, tiers, paid-model wishlist |
 | `/api/results` | same JSON as the dashboard |
