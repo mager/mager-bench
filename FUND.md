@@ -6,11 +6,11 @@ mager-bench is designed to run **without a credit card**.
 |------|--------|------------------|
 | **free** | Llama 3.3 70B, Llama 3.1 8B (Groq), Gemini Flash | free API quotas |
 | **cheap** | Claude Haiku 4.5, GPT-4o mini | pennies per full suite |
-| **paid** | Sonnet, Opus, GPT-4o, Gemini Pro | crowdfunded or BYO key |
+| **paid** | Sonnet, Opus, GPT-4o, Gemini Pro, GLM 5.3 | crowdfunded or BYO key |
 
 ## Why crowdfund?
 
-Paid model evals are the interesting head-to-heads — and they cost real money when you re-run 12 challenges × multi-run averages × multi-judge panels. Free tiers cover the always-on leaderboard; crowdfunding unlocks the expensive seats.
+Paid model evals are the interesting head-to-heads — and they cost real money when you re-run 13 challenges × multi-run averages × multi-judge panels. Free tiers cover the always-on leaderboard; crowdfunding unlocks the expensive seats.
 
 **Where the money goes:** API tokens for published evals only. Every funded run ships raw responses + scores in `results.json`. No ads, no merch.
 
@@ -25,7 +25,7 @@ Paid model evals are the interesting head-to-heads — and they cost real money 
 | Name | Amount | What it does |
 |------|--------|--------------|
 | one coffee | $5 | sponsors roll |
-| eval sprint | $25 | fund one full 12-challenge paid-model run |
+| eval sprint | $25 | fund one full 13-challenge paid-model run |
 | season pass | $100 | a month of new-model drops + challenge vote |
 
 ## Run free yourself
@@ -33,7 +33,7 @@ Paid model evals are the interesting head-to-heads — and they cost real money 
 ```bash
 export GROQ_API_KEY=...
 export GEMINI_API_KEY=...
-python bench.py --tier free --judge gemini-2.0-flash --runs 3 --output results.json
+python bench.py --tier free --judge gemini-2.5-flash --runs 3 --output results.json
 cd web && node scripts/sync-results.mjs
 ```
 
