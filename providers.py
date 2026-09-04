@@ -1,8 +1,14 @@
-"""Model provider adapters — one class per API.
+"""
+Model provider adapters — one class per API.
 
 Models are tagged free | cheap | paid so the CLI can default to wallet-friendly
 runs. Free-tier keys (Groq, Gemini free) are enough for a full leaderboard;
 paid models are the ones crowdfunding is meant to unlock.
+
+A single Vercel AI Gateway key (AI_GATEWAY_API_KEY) can stand in for every
+per-provider key: families without their own key route through the gateway's
+OpenAI-compatible endpoint with creator-prefixed model ids (zai/glm-5.3,
+anthropic/claude-sonnet-5, …) and unified billing.
 """
 
 from __future__ import annotations
@@ -13,6 +19,18 @@ from dataclasses import dataclass
 from typing import Literal
 
 Tier = Literal["free", "cheap", "paid"]
+
+# Vercel AI Gateway — one OpenAI-compatible endpoint for every family.
+GATEWAY_KEY = "AI_GATEWAY_API_KEY"
+GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1"
+# creator/ prefix the gateway expects, per family
+_GATEWAY_CREATOR = {
+    "anthropic": "anthropic/",
+    "openai": "openai/",
+    "gemini": "google/",
+    "groq": "groq/",
+    "zai": "zai/",
+}
 
 
 @dataclass(frozen=True)
@@ -54,6 +72,10 @@ MODELS: list[ModelInfo] = [
     ModelInfo("claude-opus-4-8", "anthropic", "claude-opus-4-8", "paid", "Claude Opus 4.8"),
     ModelInfo("gpt-4o", "openai", "gpt-4o", "paid", "GPT-4o"),
     ModelInfo("gemini-2.5-pro", "gemini", "gemini-2.5-pro", "paid", "Gemini 2.5 Pro"),
+    # GLM 5.3 (2026-08): reasoning cannot be disabled — thinking is billed and
+    # counts against max_tokens, so it runs at high effort with thinking headroom
+    ModelInfo("glm-5.3", "zai", "glm-5.3", "paid", "GLM 5.3",
+              "Zhipu Z.ai flagship coder — reasoning always on", reasoning=True),
 ]
 
 _BY_ID = {m.id: m for m in MODELS}
@@ -74,6 +96,7 @@ _KEY_MAP = {
     "openai": "OPENAI_API_KEY",
     "gemini": "GEMINI_API_KEY",
     "groq": "GROQ_API_KEY",
+    "zai": "ZAI_API_KEY",
 }
 
 
@@ -197,6 +220,101 @@ class GeminiProvider(Provider):
             return resp.text
 
 
+class ZaiProvider(Provider):
+    """Z.ai (Zhipu) direct — OpenAI-compatible chat API.
+
+    GLM 5.3 cannot run with thinking disabled — reasoning tokens are billed
+    and count against max_tokens — so flagged models get generous headroom
+    and run at high effort so their *visible* answer budget matches everyone
+    else's. `reasoning_content` stays out of message.content, so the answer
+    text arrives clean.
+    """
+
+    THINKING_HEADROOM = 32768
+
+    def __init__(self, model: str, reasoning: bool = False) -> None:
+        from openai import OpenAI
+        # GLM Coding Plan keys must use the coding endpoint instead —
+        # override with ZAI_BASE_URL in .env.
+        base_url = os.environ.get("ZAI_BASE_URL", "https://api.z.ai/api/paas/v4")
+        self.client = OpenAI(
+            api_key=os.environ["ZAI_API_KEY"],
+            base_url=base_url,
+            max_retries=6,
+        )
+        self.model = model
+        self.reasoning = reasoning
+
+    def complete(self, prompt: str, max_tokens: int = 2048) -> str:
+        kwargs = {}
+        if self.reasoning:
+            max_tokens += self.THINKING_HEADROOM
+            # Z.ai-only params ride in extra_body (the OpenAI SDK rejects
+            # unknown top-level kwargs).
+            kwargs["extra_body"] = {
+                "thinking": {"type": "enabled"},
+                "reasoning_effort": "high",
+            }
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+            **kwargs,
+        )
+        text = resp.choices[0].message.content or ""
+        if not text:
+            raise RuntimeError(
+                f"{self.model}: empty response "
+                f"(finish_reason={resp.choices[0].finish_reason}) — raise max_tokens"
+            )
+        return text
+
+
+class GatewayProvider(Provider):
+    """Vercel AI Gateway — one OpenAI-compatible endpoint for every family.
+
+    Serves any creator/model id on the gateway (zai/glm-5.3,
+    anthropic/claude-sonnet-5, google/gemini-2.5-flash, …) with unified
+    billing, so a single AI_GATEWAY_API_KEY can run subjects and judges
+    without per-provider keys. Used only when a family's own key is absent.
+    """
+
+    THINKING_HEADROOM = 32768
+
+    def __init__(self, model: str, reasoning: bool = False) -> None:
+        from openai import OpenAI
+        self.client = OpenAI(
+            api_key=os.environ[GATEWAY_KEY],
+            base_url=GATEWAY_BASE_URL,
+            max_retries=6,
+        )
+        self.model = model
+        self.reasoning = reasoning
+
+    def complete(self, prompt: str, max_tokens: int = 2048) -> str:
+        kwargs = {}
+        if self.reasoning:
+            # The gateway maps provider-agnostic reasoning effort onto each
+            # model's native config; chat-completions takes it under
+            # reasoning.effort. Reasoning tokens count against max_tokens, so
+            # headroom keeps the visible answer budget whole.
+            max_tokens += self.THINKING_HEADROOM
+            kwargs["extra_body"] = {"reasoning": {"effort": "high"}}
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+            **kwargs,
+        )
+        text = resp.choices[0].message.content or ""
+        if not text:
+            raise RuntimeError(
+                f"{self.model}: empty response "
+                f"(finish_reason={resp.choices[0].finish_reason}) — raise max_tokens"
+            )
+        return text
+
+
 def model_info(model_id: str) -> ModelInfo | None:
     return _BY_ID.get(model_id)
 
@@ -207,6 +325,9 @@ def display_name(model_id: str) -> str:
 
 
 def has_key(family: str) -> bool:
+    # a gateway key stands in for any missing family key
+    if os.environ.get(GATEWAY_KEY):
+        return True
     env_key = _KEY_MAP.get(family)
     return bool(env_key and os.environ.get(env_key))
 
@@ -254,6 +375,14 @@ def get_provider(model_id: str) -> Provider | None:
         return None
     if not has_key(info.family):
         return None
+    # direct family key wins; otherwise route through the Vercel AI Gateway
+    if not os.environ.get(_KEY_MAP.get(info.family, "")):
+        if os.environ.get(GATEWAY_KEY):
+            return GatewayProvider(
+                _GATEWAY_CREATOR.get(info.family, "") + info.api_model,
+                reasoning=info.reasoning,
+            )
+        return None
     if info.family == "anthropic":
         return AnthropicProvider(info.api_model)
     if info.family == "openai":
@@ -262,6 +391,8 @@ def get_provider(model_id: str) -> Provider | None:
         return GroqProvider(info.api_model, reasoning=info.reasoning, tpm_ceiling=info.tpm_ceiling)
     if info.family == "gemini":
         return GeminiProvider(info.api_model)
+    if info.family == "zai":
+        return ZaiProvider(info.api_model, reasoning=info.reasoning)
     return None
 
 
