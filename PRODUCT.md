@@ -19,7 +19,7 @@ pitch in so the expensive models get a fair run.
 
 ## Product Purpose
 
-mager-bench is a small, opinionated, personally-curated benchmark: twelve
+mager-bench is a small, opinionated, personally-curated benchmark: thirteen
 coding tasks Mager actually cares about, run against any model, scored by
 an LLM judge on correctness, code quality, and documentation.
 
