@@ -30,6 +30,7 @@ _GATEWAY_CREATOR = {
     "gemini": "google/",
     "groq": "groq/",
     "zai": "zai/",
+    "meta": "meta/",
 }
 
 
@@ -69,6 +70,10 @@ MODELS: list[ModelInfo] = [
     # gateway promo (no direct-API equivalent — cheap + heavily prompt-cached)
     ModelInfo("glm-5.3-promo", "gateway", "zai/glm-5.3-promo-50", "cheap", "GLM 5.3 Promo",
               "AI Gateway promo pricing + heavy caching — best for big-context reruns"),
+    # Muse Spark via gateway ($0.10/$0.20 per M contributor pricing —
+    # subjects cost ~2¢ per full run; reasoning always on)
+    ModelInfo("muse-spark-1.3", "meta", "muse-spark-1.3-contributor", "cheap", "Muse Spark 1.3",
+              "Meta agentic coder, 1M context — reasoning always on", reasoning=True),
     # ── paid (real money — fund these via /fund) ──────────────────────────
     ModelInfo("claude-sonnet-4-6", "anthropic", "claude-sonnet-4-6", "paid", "Claude Sonnet 4.6"),
     ModelInfo("claude-sonnet-5", "anthropic", "claude-sonnet-5", "paid", "Claude Sonnet 5"),

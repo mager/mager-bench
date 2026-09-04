@@ -1,0 +1,149 @@
+/Users/magerbot/Code/mager-bench/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+  [gateway meta/muse-spark-1.3-contributor +30s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +30s: 3225 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +30s: 2050 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +33s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +30s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +30s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +37s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +64s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +68s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +70s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +99s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +104s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +204s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +204s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +229s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +34s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +36s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +36s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +32s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +36s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +38s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +68s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +71s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +75s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +132s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +136s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +162s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +192s: 20282 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +32s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +37s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +38s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +63s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +70s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +72s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +103s: 0 text chars, 0 think chars]
+  [gateway meta/muse-spark-1.3-contributor +140s: 0 text chars, 0 think chars]
+mager-bench
+🔭 OpenTelemetry Tracing Details 🔭
+|  Arize Project: mager-bench
+|  Span Processor: BatchSpanProcessor
+|  Collector Endpoint: otlp.arize.com
+|  Transport: gRPC
+|  Transport Headers: {'authorization': '****', 'api_key': '****', 'arize-space-id': '****', 'space_id': '****', 'arize-interface': '****'}
+|  
+|  Using a default SpanProcessor. `add_span_processor` will overwrite this default.
+|  
+|  `register` has set this TracerProvider as the global OpenTelemetry default.
+|  To disable this behavior, call `register` with `set_global_tracer_provider=False`.
+
+  tracing: Arize AX enabled (project=mager-bench)
+  models : muse-spark-1.3
+  judges : claude-sonnet-5
+  runs   : 3
+  mode   : parallel
+  thinking-headroom : 32768
+  gateway-timeout   : 1800s
+  judge-max-tokens: 16384
+  unpaid : claude-sonnet-4-6, claude-sonnet-5, claude-opus-4-8, gpt-4o, gemini-2.5-pro, glm-5.3  → fund at /fund to unlock
+
+── fizzbuzz ──────────────────────────────────
+  muse-spark-1.3: total=9.7  (7890ms)
+  muse-spark-1.3 r3: total=9.7  (7980ms)
+  muse-spark-1.3 r2: total=9.7  (9545ms)
+
+── binary-search ──────────────────────────────────
+  muse-spark-1.3 r3: total=8.0  (9736ms)
+  muse-spark-1.3 r2: total=7.7  (12770ms)
+  muse-spark-1.3: total=9.0  (16229ms)
+
+── api-client ──────────────────────────────────
+  muse-spark-1.3: total=8.0  (16182ms)
+  muse-spark-1.3 r3: total=7.7  (22934ms)
+  muse-spark-1.3 r2: total=8.0  (35093ms)
+
+── readme-writer ──────────────────────────────────
+  muse-spark-1.3 r3: total=9.0  (18295ms)
+  muse-spark-1.3 r2: total=9.0  (18800ms)
+  muse-spark-1.3: total=9.0  (27462ms)
+
+── refactor ──────────────────────────────────
+  muse-spark-1.3 r2: total=9.3  (16329ms)
+  muse-spark-1.3 r3: total=9.7  (18900ms)
+  muse-spark-1.3: total=9.3  (19002ms)
+
+── test-writing ──────────────────────────────────
+  muse-spark-1.3 r2: total=8.7  (32389ms)
+  muse-spark-1.3 r3: total=6.3  (47954ms)
+  muse-spark-1.3: total=5.7  (32165ms)
+
+── debug ──────────────────────────────────
+  muse-spark-1.3: total=6.3  (208729ms)
+  muse-spark-1.3 r2: total=7.3  (209094ms)
+  muse-spark-1.3 r3: total=8.3  (232838ms)
+
+── async-fetch ──────────────────────────────────
+  muse-spark-1.3 r2: total=9.0  (23348ms)
+  muse-spark-1.3: total=6.0  (26985ms)
+  muse-spark-1.3 r3: total=8.7  (45033ms)
+
+── sql ──────────────────────────────────
+  muse-spark-1.3 r3: total=8.7  (18881ms)
+  muse-spark-1.3: total=9.0  (20575ms)
+  muse-spark-1.3 r2: total=8.7  (25878ms)
+
+── go-test ──────────────────────────────────
+  muse-spark-1.3: total=7.7  (26044ms)
+  muse-spark-1.3 r3: total=8.0  (23178ms)
+  muse-spark-1.3 r2: total=7.3  (26730ms)
+
+── elixir-test ──────────────────────────────────
+  muse-spark-1.3: total=8.3  (24760ms)
+  muse-spark-1.3 r3: total=8.7  (38694ms)
+  muse-spark-1.3 r2: total=8.0  (54916ms)
+
+── doom ──────────────────────────────────
+  muse-spark-1.3: total=1.0  (155998ms)
+  muse-spark-1.3 r2: total=1.0  (158362ms)
+  muse-spark-1.3 r3: total=0.7  (192898ms)
+
+── slots ──────────────────────────────────
+  muse-spark-1.3: total=0.3  (78738ms)
+  muse-spark-1.3 r3: total=0.0  (125128ms)
+  muse-spark-1.3 r2: total=0.7  (153007ms)
+
+
+═══ RESULTS ═══════════════════════════════════════════════════
+Judge(s): claude-sonnet-5   runs=3
+Model                        Challenge        Correct Quality    Docs    Speed   Total     ±σ
+───────────────────────────────────────────────────────────────────────────────────────────────
+muse-spark-1.3               fizzbuzz            10.0     9.0    10.0   8471ms     9.7   0.00
+muse-spark-1.3               refactor            10.0     9.0     9.3  18077ms     9.4   0.19
+muse-spark-1.3               readme-writer        9.0     9.0     9.0  21519ms     9.0   0.00
+muse-spark-1.3               sql                  9.0     8.3     9.0  21778ms     8.8   0.14
+muse-spark-1.3               elixir-test          8.3     8.0     8.7  39456ms     8.3   0.29
+muse-spark-1.3               binary-search        9.0     7.3     8.3  12911ms     8.2   0.56
+muse-spark-1.3               api-client           8.0     6.7     9.0  24736ms     7.9   0.14
+muse-spark-1.3               async-fetch          7.3     7.3     9.0  31788ms     7.9   1.35
+muse-spark-1.3               go-test              9.0     8.3     5.7  25317ms     7.7   0.29
+muse-spark-1.3               debug                7.0     7.0     8.0 216887ms     7.3   0.82
+muse-spark-1.3               test-writing         8.3     6.0     6.3  37502ms     6.9   1.30
+muse-spark-1.3               doom                 0.7     1.0     1.0 169086ms     0.9   0.14
+muse-spark-1.3               slots                0.0     0.7     0.3 118957ms     0.3   0.29
+
+── Averages ─────────────────────────────────────────────────
+  Muse Spark 1.3               avg=7.1  avg_speed=57421ms  tier=cheap  n=13
+
+Results saved to runs/2026-09-04-muse-spark-1-3.json
