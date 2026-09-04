@@ -34,7 +34,7 @@
       "name": "eval sprint",
       "amount_cents": 2500,
       "perks": [
-        "fund one full 12-challenge run of a paid model",
+        "fund one full 13-challenge run of a paid model",
         "name the model in the request queue",
         "sponsors roll + shoutout in the next results drop"
       ]
@@ -55,7 +55,7 @@
       "model_id": "claude-opus-4-8",
       "name": "Claude Opus 4.8",
       "tier": "paid",
-      "why": "top-shelf coding model — expensive per full 12-challenge suite",
+      "why": "top-shelf coding model — expensive per full 13-challenge suite",
       "est_cost_cents": 800,
       "status": "unfunded"
     },
