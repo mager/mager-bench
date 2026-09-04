@@ -132,12 +132,12 @@
       "status": "unfunded"
     },
     {
-      "model_id": "glm-2.5",
-      "name": "GLM 2.5",
-      "tier": "cheap",
-      "why": "Zhipu's open-weight coder — cheap API, big claims",
-      "est_cost_cents": 150,
-      "status": "unfunded"
+      "model_id": "glm-5.3",
+      "name": "GLM 5.3",
+      "tier": "paid",
+      "why": "Zhipu's flagship coder — Terminal-Bench standout, open weights since Aug 28",
+      "est_cost_cents": 100,
+      "status": "scored"
     },
     {
       "model_id": "kimi-k3",
