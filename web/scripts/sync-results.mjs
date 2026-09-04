@@ -68,6 +68,7 @@ const DISPLAY_NAMES = {
   "llama-3.3-70b": "Llama 3.3 70B",
   "llama-3.1-8b": "Llama 3.1 8B",
   "gpt-oss-120b": "GPT-OSS 120B",
+  "glm-5.3": "GLM 5.3",
 };
 
 const TIERS = {
@@ -83,6 +84,7 @@ const TIERS = {
   "claude-opus-4-8": "paid",
   "gpt-4o": "paid",
   "gemini-2.5-pro": "paid",
+  "glm-5.3": "paid",
 };
 
 const byModel = new Map();
