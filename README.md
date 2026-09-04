@@ -1,10 +1,10 @@
 # mager-bench
 
-A personal coding model benchmark. Twelve tasks I actually care about — from FizzBuzz to a Doom-style raycaster in a single HTML file — run against any combination of models, scored by an LLM judge on correctness, code quality, and documentation. When a new model drops, run `python bench.py` and see where it stands.
+A personal coding model benchmark. Thirteen tasks I actually care about — from FizzBuzz to a Doom-style raycaster in a single HTML file — run against any combination of models, scored by an LLM judge on correctness, code quality, and documentation. When a new model drops, run `python bench.py` and see where it stands.
 
 The idea is [Simon Willison's pelican-on-a-bicycle test](https://simonwillison.net/tags/pelican-riding-a-bicycle/), but for code: you don't need a giant eval suite to have opinions about models — you need something small and consistent that you run yourself, every time.
 
-**Live dashboard:** [bench.mager.co](https://bench.mager.co) — Claude Haiku 4.5 (avg **6.9**/10) currently leads Claude Sonnet 4.6 (**6.6**) across all 12 challenges.
+**Live dashboard:** [bench.mager.co](https://bench.mager.co) — GLM 5.3 debuts at #1 (avg **6.8**/10) ahead of GPT-OSS 120B (**6.4**) across all 13 challenges, all judged by Claude Sonnet 5 — with doom + slots recorded as failed for GLM (see caveats).
 **Fund paid evals:** [bench.mager.co/fund](https://bench.mager.co/fund) · [FUND.md](./FUND.md)
 **JSON API:** [`/api/results`](https://bench.mager.co/api/results)
 
@@ -16,9 +16,9 @@ Default runs use **free + cheap** models so a full leaderboard doesn't torch you
 |------|--------|------|
 | free | `llama-3.3-70b`, `llama-3.1-8b`, `gpt-oss-120b` (Groq), `gemini-2.5-flash` | $0 free quotas |
 | cheap | `claude-haiku-4-5`, `gpt-4o-mini` | pennies / suite |
-| paid | `claude-sonnet-*`, `claude-opus-4-8`, `gpt-4o`, `gemini-2.5-pro` | crowdfund or BYO |
+| paid | `claude-sonnet-*`, `claude-opus-4-8`, `gpt-4o`, `gemini-2.5-pro`, `glm-5.3` | crowdfund or BYO |
 
-Judges are providers too. Default judge is a **free** model when a free key is present (Gemini Flash preferred). No Anthropic key required for free-tier runs.
+Judges are providers too. Default judge is a **free** model when a free key is present (Gemini Flash preferred). No Anthropic key required for free-tier runs. One `AI_GATEWAY_API_KEY` (Vercel AI Gateway) can serve any model — subject or judge — when a family's own key is missing.
 
 ## Challenges
 
@@ -36,6 +36,7 @@ Judges are providers too. Default judge is a **free** model when a free key is p
 | `go-test` | Idiomatic Go table-driven tests + benchmark |
 | `elixir-test` | ExUnit describe blocks + assert_raise + unicode handling |
 | `doom` | DDA raycaster FPS — the signature hard challenge |
+| `slots` | Vegas slot machine in a single HTML file — reels, pay table, betting, win animations |
 
 ## Setup
 
@@ -43,6 +44,7 @@ Judges are providers too. Default judge is a **free** model when a free key is p
 pip install -r requirements.txt
 cp .env.example .env
 # free path: just GROQ_API_KEY + GEMINI_API_KEY
+# one-key-everything: AI_GATEWAY_API_KEY (Vercel AI Gateway)
 ```
 
 ## Usage
@@ -117,12 +119,13 @@ print(json.dumps([dataclasses.asdict(c) for c in CHALLENGES], indent=2))
 
 - **The judge is a model too.** Prefer multi-judge panels (`--judges`) and free judges so Claude isn't grading Claude alone.
 - **Single-run variance is real.** Use `--runs 3` before quoting numbers.
-- **These are my tasks.** Fork it and swap in the twelve things *you* keep asking models to do.
+- **A failed challenge is a real result.** GLM 5.3's doom and slots rows are recorded as 0.0 — its reasoning consumed the entire token budget before producing any visible output, on both the standard budget and a 4× thinking-headroom retry. Nothing was judged because there was nothing to score; no number was invented to fill the gap.
+- **These are my tasks.** Fork it and swap in the thirteen things *you* keep asking models to do.
 
 ## Adding challenges / models
 
 - Challenges: add a `Challenge` to `CHALLENGES` in `challenges.py`.
-- Models: add a `ModelInfo` to `MODELS` in `providers.py` (tier + family + api id).
+- Models: add a `ModelInfo` to `MODELS` in `providers.py` (tier + family + api id — families without their own key route through the Vercel AI Gateway with a `creator/` prefix).
 
 ## License
 
