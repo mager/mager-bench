@@ -66,6 +66,9 @@ MODELS: list[ModelInfo] = [
     # ── cheap (pennies per full bench) ────────────────────────────────────
     ModelInfo("claude-haiku-4-5", "anthropic", "claude-haiku-4-5", "cheap", "Claude Haiku 4.5", "cheap Anthropic default"),
     ModelInfo("gpt-4o-mini", "openai", "gpt-4o-mini", "cheap", "GPT-4o mini"),
+    # gateway promo (no direct-API equivalent — cheap + heavily prompt-cached)
+    ModelInfo("glm-5.3-promo", "gateway", "zai/glm-5.3-promo-50", "cheap", "GLM 5.3 Promo",
+              "AI Gateway promo pricing + heavy caching — best for big-context reruns"),
     # ── paid (real money — fund these via /fund) ──────────────────────────
     ModelInfo("claude-sonnet-4-6", "anthropic", "claude-sonnet-4-6", "paid", "Claude Sonnet 4.6"),
     ModelInfo("claude-sonnet-5", "anthropic", "claude-sonnet-5", "paid", "Claude Sonnet 5"),
@@ -97,6 +100,7 @@ _KEY_MAP = {
     "gemini": "GEMINI_API_KEY",
     "groq": "GROQ_API_KEY",
     "zai": "ZAI_API_KEY",
+    "gateway": "AI_GATEWAY_API_KEY",
 }
 
 
@@ -106,17 +110,37 @@ class Provider(ABC):
 
 
 class AnthropicProvider(Provider):
-    def __init__(self, model: str) -> None:
+    # Sonnet 5+ thinks by default with an uncapped budget: live gateway logs
+    # showed 5–8k reasoning tokens per judge call ($0.05–0.08 a pop, 55–83s).
+    # thinking_budget caps it; None = leave the model to its own devices.
+    def __init__(self, model: str, thinking_budget: int | None = None) -> None:
         import anthropic
         self.client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         self.model = model
+        self.thinking_budget = thinking_budget
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
-        msg = self.client.messages.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}],
-        )
+        kwargs: dict = {}
+        if self.thinking_budget:
+            # budget must sit under max_tokens or the API rejects the call
+            max_tokens = max(max_tokens, self.thinking_budget + 1024)
+            kwargs["thinking"] = {"type": "enabled", "budget_tokens": self.thinking_budget}
+        try:
+            msg = self.client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}],
+                **kwargs,
+            )
+        except Exception:
+            if not kwargs:
+                raise
+            # older / non-thinking models reject the thinking param — retry plain
+            msg = self.client.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}],
+            )
         # Sonnet 5+ think by default and max_tokens caps thinking + text combined,
         # so a response can contain thinking blocks with no text block at all.
         text = "".join(
@@ -277,44 +301,91 @@ class GatewayProvider(Provider):
     anthropic/claude-sonnet-5, google/gemini-2.5-flash, …) with unified
     billing, so a single AI_GATEWAY_API_KEY can run subjects and judges
     without per-provider keys. Used only when a family's own key is absent.
+
+    Streams + accumulates: same return contract as blocking, but long calls
+    stay observable (stderr heartbeat every 30s) and a mid-stream cut reports
+    how far it got instead of vanishing silently. Thinking models are quiet
+    during the think phase regardless — the heartbeat is liveness, not a
+    progress bar. Live 2026-09-04: GLM 5.3 burned 15k thinking tokens before
+    writing a char on doom/slots, so reasoning models get 32768 headroom
+    (billed only on actual use).
     """
 
-    THINKING_HEADROOM = 32768
-
-    def __init__(self, model: str, reasoning: bool = False) -> None:
+    def __init__(self, model: str, reasoning: bool = False,
+                 reasoning_effort: str | None = None,
+                 thinking_headroom: int = 32768,
+                 timeout: float = 1800) -> None:
         from openai import OpenAI
         self.client = OpenAI(
             api_key=os.environ[GATEWAY_KEY],
             base_url=GATEWAY_BASE_URL,
             max_retries=6,
+            # big-build calls run 5–10+ min; the SDK's 10-min default
+            # decapitates them mid-generation
+            timeout=timeout,
         )
         self.model = model
         self.reasoning = reasoning
+        self.reasoning_effort = reasoning_effort or ("high" if reasoning else None)
+        self.thinking_headroom = thinking_headroom if reasoning else 0
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
-        kwargs = {}
-        if self.reasoning:
-            # The gateway maps provider-agnostic reasoning effort onto each
-            # model's native config; chat-completions takes it under
-            # reasoning.effort. Reasoning tokens count against max_tokens, so
-            # headroom keeps the visible answer budget whole.
-            max_tokens += self.THINKING_HEADROOM
-            kwargs["extra_body"] = {"reasoning": {"effort": "high"}}
-        resp = self.client.chat.completions.create(
-            model=self.model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}],
-            **kwargs,
-        )
-        text = resp.choices[0].message.content or ""
-        if not text:
+        import sys
+        import time
+
+        kwargs: dict = {}
+        max_tokens += self.thinking_headroom
+        if self.reasoning_effort:
+            # provider-agnostic effort; the gateway maps it onto each
+            # model's native config. Override per-run via --reasoning-effort.
+            kwargs["extra_body"] = {"reasoning_effort": self.reasoning_effort}
+
+        t0 = time.monotonic()
+        last_beat = t0
+        parts: list[str] = []
+        think_chars = 0
+        try:
+            with self.client.chat.completions.stream(
+                model=self.model,
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}],
+                **kwargs,
+            ) as stream:
+                for event in stream:
+                    if event.type == "chunk":
+                        delta = event.delta
+                        text = getattr(delta, "content", None) or ""
+                        if text:
+                            parts.append(text)
+                        think = getattr(delta, "reasoning_content", None) or ""
+                        think_chars += len(think) if isinstance(think, str) else 0
+                    now = time.monotonic()
+                    if now - last_beat >= 30:
+                        el = int(now - t0)
+                        print(f"  [gateway {self.model} +{el}s: "
+                              f"{sum(map(len, parts))} text chars, "
+                              f"{think_chars} think chars]",
+                              file=sys.stderr, flush=True)
+                        last_beat = now
+                final = stream.get_final_completion()
+        except Exception as e:
+            salvaged = sum(map(len, parts))
             raise RuntimeError(
-                f"{self.model}: empty response "
-                f"(finish_reason={resp.choices[0].finish_reason}) — raise max_tokens"
+                f"{self.model} via AI Gateway: stream cut after "
+                f"{int(time.monotonic() - t0)}s "
+                f"({salvaged} text chars, {think_chars} think chars salvaged): {e}"
+            )
+        text = "".join(parts) or (
+            (final.choices[0].message.content or "") if final.choices else ""
+        )
+        if not text:
+            finish = (final.choices[0].finish_reason
+                      if final.choices else "unknown")
+            raise RuntimeError(
+                f"{self.model} via AI Gateway: empty response "
+                f"(finish_reason={finish}) — raise max_tokens or thinking_headroom"
             )
         return text
-
-
 def model_info(model_id: str) -> ModelInfo | None:
     return _BY_ID.get(model_id)
 
@@ -368,7 +439,10 @@ def pick_default_judge() -> str:
     return "gemini-2.5-flash"
 
 
-def get_provider(model_id: str) -> Provider | None:
+def get_provider(model_id: str, thinking_budget: int | None = None,
+                 reasoning_effort: str | None = None,
+                 thinking_headroom: int = 32768,
+                 gateway_timeout: float = 1800) -> Provider | None:
     info = _BY_ID.get(model_id)
     if not info:
         print(f"Unknown model: {model_id}")
@@ -381,10 +455,13 @@ def get_provider(model_id: str) -> Provider | None:
             return GatewayProvider(
                 _GATEWAY_CREATOR.get(info.family, "") + info.api_model,
                 reasoning=info.reasoning,
+                reasoning_effort=reasoning_effort,
+                thinking_headroom=thinking_headroom,
+                timeout=gateway_timeout,
             )
         return None
     if info.family == "anthropic":
-        return AnthropicProvider(info.api_model)
+        return AnthropicProvider(info.api_model, thinking_budget=thinking_budget)
     if info.family == "openai":
         return OpenAIProvider(info.api_model)
     if info.family == "groq":
@@ -393,6 +470,12 @@ def get_provider(model_id: str) -> Provider | None:
         return GeminiProvider(info.api_model)
     if info.family == "zai":
         return ZaiProvider(info.api_model, reasoning=info.reasoning)
+    if info.family == "gateway":
+        return GatewayProvider(info.api_model,
+                               reasoning=info.reasoning,
+                               reasoning_effort=reasoning_effort,
+                               thinking_headroom=thinking_headroom,
+                               timeout=gateway_timeout)
     return None
 
 

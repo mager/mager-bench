@@ -76,8 +76,16 @@ def run_model_on_challenge(
     model_id: str,
     judges: list[str],
     run: int = 1,
+    thinking_budget: int | None = None,
+    reasoning_effort: str | None = None,
+    thinking_headroom: int = 32768,
+    gateway_timeout: float = 1800,
+    judge_max_tokens: int = 2048,
 ) -> tuple[Result | None, str]:
-    provider = get_provider(model_id)
+    provider = get_provider(model_id, thinking_budget=thinking_budget,
+                            reasoning_effort=reasoning_effort,
+                            thinking_headroom=thinking_headroom,
+                            gateway_timeout=gateway_timeout)
     if not provider:
         return None, f"{model_id}: no API key configured, skipping"
 
@@ -100,7 +108,8 @@ def run_model_on_challenge(
             return None, f"{model_id}: ERROR: {e}"
         elapsed_ms = int((time.perf_counter() - t0) * 1000)
 
-        scores = score_response_multi(challenge, response, model_id, judges)
+        scores = score_response_multi(challenge, response, model_id, judges,
+                                        judge_max_tokens=judge_max_tokens)
         span.set_attribute("output.value", response)
         span.set_attribute("metadata.correctness", scores["correctness"])
         span.set_attribute("metadata.quality", scores["quality"])
@@ -188,6 +197,11 @@ def run_benchmark(
     judges: list[str],
     serial: bool = False,
     runs: int = 1,
+    thinking_budget: int | None = None,
+    reasoning_effort: str | None = None,
+    thinking_headroom: int = 32768,
+    gateway_timeout: float = 1800,
+    judge_max_tokens: int = 2048,
 ) -> list[Result]:
     challenges = load_challenges(challenge_names)
     results: list[Result] = []
@@ -198,9 +212,19 @@ def run_benchmark(
             (m, run) for run in range(1, runs + 1) for m in models
         ]
 
+        def _run(model_id: str, run: int) -> tuple[Result | None, str]:
+            return run_model_on_challenge(
+                challenge, model_id, judges, run,
+                thinking_budget=thinking_budget,
+                reasoning_effort=reasoning_effort,
+                thinking_headroom=thinking_headroom,
+                gateway_timeout=gateway_timeout,
+                judge_max_tokens=judge_max_tokens,
+            )
+
         if serial:
             for model_id, run in jobs:
-                result, line = run_model_on_challenge(challenge, model_id, judges, run)
+                result, line = _run(model_id, run)
                 print(f"  {line}")
                 if result:
                     results.append(result)
@@ -208,7 +232,7 @@ def run_benchmark(
             workers = min(8, max(1, len(jobs)))
             with ThreadPoolExecutor(max_workers=workers) as pool:
                 futures = {
-                    pool.submit(run_model_on_challenge, challenge, m, judges, run): (m, run)
+                    pool.submit(_run, m, run): (m, run)
                     for m, run in jobs
                 }
                 for future in as_completed(futures):
@@ -328,6 +352,37 @@ def main() -> None:
     parser.add_argument("--output", default=None, help="save results to JSON file")
     parser.add_argument("--list-models", action="store_true", help="list models + key status")
     parser.add_argument("--list-challenges", action="store_true", help="list challenges")
+    parser.add_argument(
+        "--thinking-budget", type=int, default=None,
+        help="cap Anthropic thinking tokens per call (default: uncapped; "
+             "2048 is plenty for subjects — uncapped burned $0.08/call live)",
+    )
+    parser.add_argument(
+        "--reasoning-effort", default=None, choices=["low", "medium", "high"],
+        help="cap reasoning for AI Gateway models (default: model default; "
+             "low/medium tames GLM's 7–9k thinking blowups)",
+    )
+    parser.add_argument(
+        "--judge-max-tokens", type=int, default=16384,
+        help="max tokens per judge call (default: 16384 — Sonnet judge needs "
+             "the headroom on long responses; billed only on use)",
+    )
+    parser.add_argument(
+        "--thinking-headroom", type=int, default=32768,
+        help="extra tokens above challenge max_tokens for thinking models "
+             "on the gateway (default: 32768 — live-tested; doom/slots starve "
+             "without it. Billed only on actual use)",
+    )
+    parser.add_argument(
+        "--gateway-timeout", type=float, default=1800,
+        help="seconds before a gateway call is abandoned (default: 1800 — "
+             "big-build streams run 5–10+ min, SDK default 600 decapitates them)",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="print what would run (models × challenges × runs, tiers, judges) "
+             "and exit without spending a token",
+    )
     args = parser.parse_args()
 
     if args.list_models:
@@ -354,12 +409,35 @@ def main() -> None:
     print(f"  judges : {', '.join(judges)}")
     print(f"  runs   : {runs}")
     print(f"  mode   : {'serial' if args.serial else 'parallel'}")
+    if args.thinking_budget:
+        print(f"  thinking-budget : {args.thinking_budget}")
+    if args.reasoning_effort:
+        print(f"  reasoning-effort: {args.reasoning_effort}")
+    print(f"  thinking-headroom : {args.thinking_headroom}")
+    print(f"  gateway-timeout   : {int(args.gateway_timeout)}s")
+    print(f"  judge-max-tokens: {args.judge_max_tokens}")
     unpaid = [m for m in PAID_MODELS if m not in models]
     if unpaid:
         print(f"  unpaid : {', '.join(unpaid)}  → fund at /fund to unlock")
 
+    if args.dry_run:
+        challenges = load_challenges(challenge_names)
+        total_calls = len(challenges) * len(models) * runs
+        total_judges = total_calls * len(judges)
+        tiers = sorted({model_info(m).tier if model_info(m) else "?" for m in models})
+        print(f"\n  dry-run: {len(models)} models × {len(challenges)} challenges "
+              f"× {runs} runs = {total_calls} subject calls + "
+              f"{total_judges} judge calls (tiers: {', '.join(tiers)})")
+        print("  no API calls made.")
+        return
+
     results = run_benchmark(
-        models, challenge_names, judges, serial=args.serial, runs=runs
+        models, challenge_names, judges, serial=args.serial, runs=runs,
+        thinking_budget=args.thinking_budget,
+        reasoning_effort=args.reasoning_effort,
+        thinking_headroom=args.thinking_headroom,
+        gateway_timeout=args.gateway_timeout,
+        judge_max_tokens=args.judge_max_tokens,
     )
     print_table(results, judges, runs)
 

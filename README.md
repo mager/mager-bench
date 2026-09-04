@@ -15,10 +15,10 @@ Default runs use **free + cheap** models so a full leaderboard doesn't torch you
 | Tier | Models | Cost |
 |------|--------|------|
 | free | `llama-3.3-70b`, `llama-3.1-8b`, `gpt-oss-120b` (Groq), `gemini-2.5-flash` | $0 free quotas |
-| cheap | `claude-haiku-4-5`, `gpt-4o-mini` | pennies / suite |
+<| cheap | `claude-haiku-4-5`, `gpt-4o-mini`, `glm-5.3-promo` (AI Gateway) | pennies / suite |
 | paid | `claude-sonnet-*`, `claude-opus-4-8`, `gpt-4o`, `gemini-2.5-pro`, `glm-5.3` | crowdfund or BYO |
 
-Judges are providers too. Default judge is a **free** model when a free key is present (Gemini Flash preferred). No Anthropic key required for free-tier runs. One `AI_GATEWAY_API_KEY` (Vercel AI Gateway) can serve any model — subject or judge — when a family's own key is missing.
+Judges are providers too. Default judge is a **free** model when a free key is present (Gemini Flash preferred). No Anthropic key required for free-tier runs. One `AI_GATEWAY_API_KEY` (Vercel AI Gateway) can serve any model — subject or judge — when a family's own key is missing. Spend shows up under AI Gateway Logs/Usage. Cap the burn: `--thinking-budget 2048`, `--reasoning-effort low`, and `--dry-run` first on anything paid.
 
 ## Challenges
 
@@ -36,7 +36,7 @@ Judges are providers too. Default judge is a **free** model when a free key is p
 | `go-test` | Idiomatic Go table-driven tests + benchmark |
 | `elixir-test` | ExUnit describe blocks + assert_raise + unicode handling |
 | `doom` | DDA raycaster FPS — the signature hard challenge |
-| `slots` | Vegas slot machine in a single HTML file — reels, pay table, betting, win animations |
+<| `slots` | Vegas slot machine in a single HTML file — reels, pay table, betting, win animations |
 
 ## Setup
 
@@ -47,14 +47,23 @@ cp .env.example .env
 # one-key-everything: AI_GATEWAY_API_KEY (Vercel AI Gateway)
 ```
 
-## Usage
+## Usage (opencode first)
+
+`/bench` in opencode is the primary harness — dry-run, caps, merge, and
+publish flow. See `AGENTS.md`. Raw CLI for everything else:
 
 ```bash
 # free + cheap models, free judge (default)
 python bench.py
 
 # wallet-safe only
-python bench.py --tier free --judge gemini-2.0-flash
+python bench.py --tier free --judge gemini-2.5-flash
+
+# dry-run before spending (models × challenges × runs, no API calls)
+python bench.py --models glm-5.3 --runs 3 --dry-run
+
+# gateway run with caps on (tames thinking-token burn)
+python bench.py --models glm-5.3 --reasoning-effort low --thinking-budget 2048
 
 # multi-run mean ± stddev (variance is real — measure it)
 python bench.py --tier free --runs 3 --output results.json

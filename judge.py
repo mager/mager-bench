@@ -13,9 +13,16 @@ import statistics
 from typing import Iterable
 
 from challenges import Challenge
-from providers import get_provider, pick_default_judge, display_name
+from providers import get_provider, pick_default_judge, display_name, model_info
 
 DEFAULT_JUDGE_MODEL = "gemini-2.5-flash"  # free by default; overridden if unconfigured
+
+# Judge verdicts are ~300 tokens of JSON, but thinking judges spend the cap
+# on chain-of-thought first — live 2026-09-04: Sonnet 5 thought past an 8192
+# cap on long responses → empty verdict → 0.0 crash. 16384 is headroom, not
+# spend (billed only on use). Lower per-run with --judge-max-tokens.
+JUDGE_MAX_TOKENS = 16384
+JUDGE_THINKING_BUDGET = 1024
 
 JUDGE_PROMPT = """You are an expert code reviewer judging a model's response to a coding challenge.
 
@@ -88,6 +95,7 @@ def score_response(
     response: str,
     model_id: str,
     judge_model: str | None = None,
+    max_tokens: int = JUDGE_MAX_TOKENS,
 ) -> dict:
     """Ask one judge model to score a response."""
     judge_model = judge_model or pick_default_judge()
@@ -100,7 +108,11 @@ def score_response(
         response=response[:6000],
     )
 
-    provider = get_provider(judge_model)
+    thinking_budget = None
+    info = model_info(judge_model)
+    if info and info.family == "anthropic":
+        thinking_budget = min(JUDGE_THINKING_BUDGET, max_tokens - 1024)
+    provider = get_provider(judge_model, thinking_budget=thinking_budget)
     if not provider:
         msg = f"judge {judge_model} not configured"
         print(f"\n  [judge error for {model_id}]: {msg}")
@@ -116,8 +128,9 @@ def score_response(
         # generous cap: judges that think by default (Claude 5-era) spend
         # part of this budget on thinking before the JSON verdict. 8192 starved
         # gateway-routed Sonnet 5 on long responses (empty verdict = crash), so
-        # double it — thinking room only, scoring semantics unchanged.
-        raw = provider.complete(prompt, max_tokens=16384)
+        # the default is 16384 — thinking room only, scoring semantics
+        # unchanged. Override per-run with judge_max_tokens.
+        raw = provider.complete(prompt, max_tokens=max_tokens)
         scores = _normalize(_extract_json(raw))
         scores["judge"] = judge_model
         return scores
@@ -137,6 +150,7 @@ def score_response_multi(
     response: str,
     model_id: str,
     judges: Iterable[str],
+    judge_max_tokens: int = JUDGE_MAX_TOKENS,
 ) -> dict:
     """Score with multiple judges and average the numeric dimensions.
 
@@ -147,11 +161,13 @@ def score_response_multi(
         judge_list = [pick_default_judge()]
 
     if len(judge_list) == 1:
-        return score_response(challenge, response, model_id, judge_list[0])
+        return score_response(challenge, response, model_id, judge_list[0],
+                              max_tokens=judge_max_tokens)
 
     panels: list[dict] = []
     for j in judge_list:
-        panels.append(score_response(challenge, response, model_id, j))
+        panels.append(score_response(challenge, response, model_id, j,
+                                     max_tokens=judge_max_tokens))
 
     correctness = statistics.fmean(p["correctness"] for p in panels)
     quality = statistics.fmean(p["quality"] for p in panels)
