@@ -1,4 +1,5 @@
-"""LLM-as-judge: scores model responses on each dimension.
+"""
+LLM-as-judge: scores model responses on each dimension.
 
 Judges are regular providers — Gemini Flash / Groq Llama keep scoring free.
 Pass multiple judges to average scores and reduce single-model bias.
@@ -113,8 +114,10 @@ def score_response(
 
     try:
         # generous cap: judges that think by default (Claude 5-era) spend
-        # part of this budget on thinking before the JSON verdict
-        raw = provider.complete(prompt, max_tokens=8192)
+        # part of this budget on thinking before the JSON verdict. 8192 starved
+        # gateway-routed Sonnet 5 on long responses (empty verdict = crash), so
+        # double it — thinking room only, scoring semantics unchanged.
+        raw = provider.complete(prompt, max_tokens=16384)
         scores = _normalize(_extract_json(raw))
         scores["judge"] = judge_model
         return scores
