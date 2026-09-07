@@ -1,0 +1,159 @@
+/Users/magerbot/Code/mager-bench/.venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+  [gateway zai/glm-5.3 +30s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +30s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +30s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +60s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +60s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +60s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +90s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +90s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +90s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +120s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +120s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +120s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +150s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +150s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +150s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +180s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +180s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +180s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +210s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +210s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +210s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +240s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +240s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +240s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +270s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +270s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +270s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +300s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +300s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +300s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +330s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +330s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +330s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +360s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +360s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +360s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +390s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +390s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +390s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +420s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +420s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +420s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +450s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +450s: 449 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +450s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +480s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +480s: 7593 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +480s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +510s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +510s: 16397 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +510s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +540s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +540s: 23658 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +540s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +570s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +600s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +630s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +660s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +690s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +30s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +30s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +30s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +60s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +60s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +60s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +90s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +90s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +90s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +120s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +120s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +120s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +150s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +150s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +150s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +180s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +180s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +180s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +210s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +210s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +210s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +240s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +240s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +240s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +270s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +270s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +270s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +300s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +300s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +300s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +330s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +330s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +330s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +360s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +360s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +361s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +390s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +390s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +391s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +420s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +420s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +421s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +450s: 1709 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +450s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +451s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +480s: 10567 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +480s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +481s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +510s: 19704 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +510s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +511s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +542s: 0 text chars, 0 think chars]
+  [gateway zai/glm-5.3 +572s: 8223 text chars, 0 think chars]
+mager-bench
+🔭 OpenTelemetry Tracing Details 🔭
+|  Arize Project: mager-bench
+|  Span Processor: BatchSpanProcessor
+|  Collector Endpoint: otlp.arize.com
+|  Transport: gRPC
+|  Transport Headers: {'authorization': '****', 'api_key': '****', 'arize-space-id': '****', 'space_id': '****', 'arize-interface': '****'}
+|  
+|  Using a default SpanProcessor. `add_span_processor` will overwrite this default.
+|  
+|  `register` has set this TracerProvider as the global OpenTelemetry default.
+|  To disable this behavior, call `register` with `set_global_tracer_provider=False`.
+
+  tracing: Arize AX enabled (project=mager-bench)
+  models : glm-5.3
+  judges : claude-sonnet-5
+  runs   : 3
+  mode   : parallel
+  reasoning-effort: low
+  thinking-headroom : 32768
+  gateway-timeout   : 1800s
+  judge-max-tokens: 16384
+  unpaid : claude-sonnet-4-6, claude-sonnet-5, claude-opus-4-8, gpt-4o, gemini-2.5-pro  → fund at /fund to unlock
+
+── doom ──────────────────────────────────
+  glm-5.3: total=1.3  (553224ms)
+  glm-5.3: ERROR: zai/glm-5.3 via AI Gateway: stream cut after 566s (0 text chars, 0 think chars salvaged): Could not parse response content as the length limit was reached - CompletionUsage(completion_tokens=39768, prompt_tokens=681, total_tokens=40449, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=None, audio_tokens=None, reasoning_tokens=39768, rejected_prediction_tokens=None, image_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=680, video_tokens=0), cost=0.1751574, is_byok=False, cost_details={'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 0, 'upstream_inference_completions_cost': 0}, cache_creation_input_tokens=0, market_cost=0.1751574, gateway_cost=0.1751574)
+  glm-5.3: ERROR: zai/glm-5.3 via AI Gateway: stream cut after 701s (0 text chars, 0 think chars salvaged): Could not parse response content as the length limit was reached - CompletionUsage(completion_tokens=39768, prompt_tokens=681, total_tokens=40449, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=None, audio_tokens=None, reasoning_tokens=39767, rejected_prediction_tokens=None, image_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=8, video_tokens=0), cost=0.17592348, is_byok=False, cost_details={'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 0, 'upstream_inference_completions_cost': 0}, cache_creation_input_tokens=0, market_cost=0.17592348, gateway_cost=0.17592348)
+
+── slots ──────────────────────────────────
+  glm-5.3: ERROR: zai/glm-5.3 via AI Gateway: stream cut after 528s (25808 text chars, 0 think chars salvaged): Could not parse response content as the length limit was reached - CompletionUsage(completion_tokens=39768, prompt_tokens=616, total_tokens=40384, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=None, audio_tokens=None, reasoning_tokens=31467, rejected_prediction_tokens=None, image_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=0, video_tokens=0), cost=0.1758416, is_byok=False, cost_details={'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 0, 'upstream_inference_completions_cost': 0}, cache_creation_input_tokens=0, market_cost=0.1758416, gateway_cost=0.1758416)
+  glm-5.3: ERROR: zai/glm-5.3 via AI Gateway: stream cut after 540s (3964 text chars, 0 think chars salvaged): Could not parse response content as the length limit was reached - CompletionUsage(completion_tokens=39768, prompt_tokens=616, total_tokens=40384, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=None, audio_tokens=None, reasoning_tokens=38393, rejected_prediction_tokens=None, image_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=8, video_tokens=0), cost=0.17583248, is_byok=False, cost_details={'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 0, 'upstream_inference_completions_cost': 0}, cache_creation_input_tokens=0, market_cost=0.17583248, gateway_cost=0.17583248)
+  glm-5.3: ERROR: zai/glm-5.3 via AI Gateway: stream cut after 576s (9692 text chars, 0 think chars salvaged): Could not parse response content as the length limit was reached - CompletionUsage(completion_tokens=39768, prompt_tokens=616, total_tokens=40384, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=None, audio_tokens=None, reasoning_tokens=36387, rejected_prediction_tokens=None, image_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0, cached_tokens=0, video_tokens=0), cost=0.1758416, is_byok=False, cost_details={'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 0, 'upstream_inference_completions_cost': 0}, cache_creation_input_tokens=0, market_cost=0.1758416, gateway_cost=0.1758416)
+
+
+═══ RESULTS ═══════════════════════════════════════════════════
+Judge(s): claude-sonnet-5   runs=3
+Model                        Challenge        Correct Quality    Docs    Speed   Total     ±σ
+───────────────────────────────────────────────────────────────────────────────────────────────
+glm-5.3                      doom                 1.0     1.0     2.0 553224ms     1.3
+
+── Averages ─────────────────────────────────────────────────
+  GLM 5.3                      avg=1.3  avg_speed=553224ms  tier=paid  n=1
+
+Results saved to runs/2026-09-04-glm-5-3-bigbuild-low.json
