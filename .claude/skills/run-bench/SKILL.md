@@ -59,3 +59,13 @@ Scan the run for `judge error` in notes, `0.0` totals, and `ERROR:` lines — th
 | Publishing rows with 0.0 judge-error scores | Those are crashes, not scores — re-run first |
 | Merging rows from a run that logged `ERROR:` for that challenge | The call produced nothing — starvation or judge crash; re-run or record as failed |
 | Forgetting sync + deploy | Board on Vercel stays stale even though results.json updated |
+
+The CLI defaults to GPT-6 Sol (`gpt-6-sol`, paid), using low reasoning and a
+16384 total judge token cap. Select Gemini Flash explicitly for free scoring.
+The existing board remains Sonnet 5 until all retained responses are rejudged;
+save Sol runs separately and never relabel historical scores or mix judges.
+
+For a local ChatGPT subscription eval, use the `codex-cli/gpt-5.6-sol` model
+and judge, run `--dry-run` first, then save the run under `runs/`. This uses
+fresh read-only headless Codex sessions. The CLI output budget is prompted,
+not API-enforced, and self-judged scores must stay off the Sonnet board.

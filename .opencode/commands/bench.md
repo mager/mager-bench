@@ -42,5 +42,17 @@ cd ~/Code/mager-bench
    git add -A && git commit && git push
    ```
 
-Judge guidance: free judge (Gemini Flash) for bulk runs, Sonnet judge only for
-final validation. `glm-5.3-promo` for cheap reruns (prompt-cached).
+Judge guidance: the CLI defaults to GPT-6 Sol (`gpt-6-sol`, paid), with low
+reasoning and a total 16384-token judge cap. Select Gemini Flash explicitly
+for free bulk runs. `glm-5.3-promo` for cheap reruns (prompt-cached).
+
+The CLI default is GPT-6 Sol; the existing published board remains Sonnet 5
+until all retained responses have been rejudged. Save Sol runs separately;
+do not relabel historical scores or merge Sol rows into the Sonnet board.
+
+For a local ChatGPT subscription run, `codex-cli/gpt-5.6-sol` invokes a fresh
+read-only `codex exec` session per subject or judge call. Check `codex login
+status`, then dry-run with `--models codex-cli/gpt-5.6-sol --judge
+codex-cli/gpt-5.6-sol`. Run serially and save to `runs/`. The CLI does not
+enforce the API's output-token cap, and this configuration grades its own
+answers, so label these experimental results and keep them off the Sonnet board.

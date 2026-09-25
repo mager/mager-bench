@@ -14,11 +14,15 @@ anthropic/claude-sonnet-5, …) and unified billing.
 from __future__ import annotations
 
 import os
+import shutil
+import subprocess
+import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Literal
 
-Tier = Literal["free", "cheap", "paid"]
+Tier = Literal["free", "cheap", "paid", "subscription"]
 
 # Vercel AI Gateway — one OpenAI-compatible endpoint for every family.
 GATEWAY_KEY = "AI_GATEWAY_API_KEY"
@@ -79,6 +83,10 @@ MODELS: list[ModelInfo] = [
     ModelInfo("claude-sonnet-5", "anthropic", "claude-sonnet-5", "paid", "Claude Sonnet 5"),
     ModelInfo("claude-opus-4-8", "anthropic", "claude-opus-4-8", "paid", "Claude Opus 4.8"),
     ModelInfo("gpt-4o", "openai", "gpt-4o", "paid", "GPT-4o"),
+    ModelInfo("gpt-6-sol", "openai", "gpt-6-sol", "paid", "GPT-6 Sol",
+              "Default judge — bounded reasoning", reasoning=True),
+    ModelInfo("codex-cli/gpt-5.6-sol", "codex-cli", "gpt-5.6-sol", "subscription",
+              "GPT-5.6 Sol (Codex CLI)", "ChatGPT login; agent-style local eval"),
     ModelInfo("gemini-2.5-pro", "gemini", "gemini-2.5-pro", "paid", "Gemini 2.5 Pro"),
     # GLM 5.3 (2026-08): reasoning cannot be disabled — thinking is billed and
     # counts against max_tokens, so it runs at high effort with thinking headroom
@@ -92,12 +100,7 @@ FREE_MODELS = [m.id for m in MODELS if m.tier == "free"]
 CHEAP_MODELS = [m.id for m in MODELS if m.tier in ("free", "cheap")]
 PAID_MODELS = [m.id for m in MODELS if m.tier == "paid"]
 
-# Judges that work without spending money. Prefer free first.
-FREE_JUDGE_CANDIDATES = [
-    "gemini-2.5-flash",
-    "llama-3.3-70b",
-    "claude-haiku-4-5",
-]
+DEFAULT_JUDGE_MODEL = "gpt-6-sol"
 
 _KEY_MAP = {
     "anthropic": "ANTHROPIC_API_KEY",
@@ -112,6 +115,52 @@ _KEY_MAP = {
 class Provider(ABC):
     @abstractmethod
     def complete(self, prompt: str, max_tokens: int = 2048) -> str: ...
+
+
+class CodexCLIProvider(Provider):
+    """Run one isolated, read-only Codex session through ChatGPT login."""
+
+    def __init__(self, model: str, reasoning_effort: str | None = None,
+                 timeout: float = 1800) -> None:
+        self.model = model
+        self.reasoning_effort = reasoning_effort or "low"
+        self.timeout = timeout
+
+    def complete(self, prompt: str, max_tokens: int = 2048) -> str:
+        environment = os.environ.copy()
+        # Force the stored ChatGPT login, never an unrelated API or enterprise key.
+        for key in ("OPENAI_API_KEY", "CODEX_ACCESS_TOKEN", "OPENAI_IDENTITY_TOKEN_FILE",
+                    "OPENAI_FEDERATION_RULE_ID"):
+            environment.pop(key, None)
+        with tempfile.TemporaryDirectory(prefix="mager-bench-codex-") as workdir:
+            output = Path(workdir) / "answer.txt"
+            task = (
+                "Answer the following coding challenge directly. Do not inspect files, "
+                "run tools, or discuss the benchmark. Write only the answer requested "
+                f"by the challenge, targeting at most {max_tokens} output tokens.\n\n"
+                f"{prompt}"
+            )
+            try:
+                run = subprocess.run(
+                    ["codex", "exec", "--ephemeral", "--ignore-user-config",
+                     "--skip-git-repo-check", "--sandbox", "read-only",
+                     "--cd", workdir, "--model", self.model,
+                     "--config", f'model_reasoning_effort="{self.reasoning_effort}"',
+                     "--output-last-message", str(output), "-"],
+                    input=task, text=True, capture_output=True,
+                    timeout=self.timeout, env=environment, check=False,
+                )
+            except subprocess.TimeoutExpired as exc:
+                raise RuntimeError(f"Codex CLI {self.model} timed out after {self.timeout}s") from exc
+            if run.returncode != 0:
+                # The CLI's last error line is useful; do not include the echoed prompt.
+                errors = [line for line in run.stderr.splitlines() if line.startswith("ERROR:")]
+                reason = errors[-1][:500] if errors else f"exit {run.returncode}"
+                raise RuntimeError(f"Codex CLI {self.model}: {reason}")
+            answer = output.read_text().strip() if output.exists() else ""
+            if not answer:
+                raise RuntimeError(f"Codex CLI {self.model}: empty final answer")
+            return answer
 
 
 class AnthropicProvider(Provider):
@@ -161,18 +210,34 @@ class AnthropicProvider(Provider):
 
 
 class OpenAIProvider(Provider):
-    def __init__(self, model: str) -> None:
+    def __init__(self, model: str, reasoning: bool = False,
+                 reasoning_effort: str | None = None,
+                 thinking_headroom: int = 32768) -> None:
         from openai import OpenAI
         self.client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         self.model = model
+        self.reasoning = reasoning
+        self.reasoning_effort = reasoning_effort or "low"
+        self.thinking_headroom = thinking_headroom if reasoning else 0
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
+        kwargs = (
+            {"max_completion_tokens": max_tokens + self.thinking_headroom,
+             "reasoning_effort": self.reasoning_effort}
+            if self.reasoning else {"max_tokens": max_tokens}
+        )
         resp = self.client.chat.completions.create(
             model=self.model,
-            max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
+            **kwargs,
         )
-        return resp.choices[0].message.content or ""
+        text = resp.choices[0].message.content or ""
+        if not text:
+            raise RuntimeError(
+                f"{self.model}: empty response "
+                f"(finish_reason={resp.choices[0].finish_reason}) — raise max_tokens"
+            )
+        return text
 
 
 class GroqProvider(Provider):
@@ -331,7 +396,9 @@ class GatewayProvider(Provider):
         )
         self.model = model
         self.reasoning = reasoning
-        self.reasoning_effort = reasoning_effort or ("high" if reasoning else None)
+        self.reasoning_effort = reasoning_effort or (
+            "low" if model == "openai/gpt-6-sol" else "high" if reasoning else None
+        )
         self.thinking_headroom = thinking_headroom if reasoning else 0
 
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
@@ -340,6 +407,8 @@ class GatewayProvider(Provider):
 
         kwargs: dict = {}
         max_tokens += self.thinking_headroom
+        token_param = "max_completion_tokens" if self.model == "openai/gpt-6-sol" else "max_tokens"
+        kwargs[token_param] = max_tokens
         if self.reasoning_effort:
             # provider-agnostic effort; the gateway maps it onto each
             # model's native config. Override per-run via --reasoning-effort.
@@ -352,7 +421,6 @@ class GatewayProvider(Provider):
         try:
             with self.client.chat.completions.stream(
                 model=self.model,
-                max_tokens=max_tokens,
                 messages=[{"role": "user", "content": prompt}],
                 **kwargs,
             ) as stream:
@@ -410,6 +478,19 @@ def display_name(model_id: str) -> str:
 
 def has_key(family: str) -> bool:
     # a gateway key stands in for any missing family key
+    if family == "codex-cli":
+        if not shutil.which("codex"):
+            return False
+        environment = os.environ.copy()
+        for key in ("OPENAI_API_KEY", "CODEX_ACCESS_TOKEN", "OPENAI_IDENTITY_TOKEN_FILE",
+                    "OPENAI_FEDERATION_RULE_ID"):
+            environment.pop(key, None)
+        try:
+            status = subprocess.run(["codex", "login", "status"], capture_output=True,
+                                    text=True, timeout=10, env=environment, check=False)
+        except (OSError, subprocess.TimeoutExpired):
+            return False
+        return status.returncode == 0 and "Logged in using ChatGPT" in (status.stdout + status.stderr)
     if os.environ.get(GATEWAY_KEY):
         return True
     env_key = _KEY_MAP.get(family)
@@ -435,21 +516,14 @@ def configured_models(tier: Tier | Literal["all", "free", "cheap"] = "all") -> l
             out.append(m.id)
         elif tier == "cheap" and m.tier in ("free", "cheap"):
             out.append(m.id)
-        elif tier in ("free", "cheap", "paid") and m.tier == tier:
+        elif tier in ("free", "cheap", "paid", "subscription") and m.tier == tier:
             out.append(m.id)
     return out
 
 
 def pick_default_judge() -> str:
-    """Prefer a free/cheap configured judge so full runs stay free by default."""
-    for candidate in FREE_JUDGE_CANDIDATES:
-        if is_configured(candidate):
-            return candidate
-    # last resort: any configured model
-    for m in MODELS:
-        if has_key(m.family):
-            return m.id
-    return "gemini-2.5-flash"
+    """Keep judge identity stable regardless of which keys are configured."""
+    return DEFAULT_JUDGE_MODEL
 
 
 def get_provider(model_id: str, thinking_budget: int | None = None,
@@ -462,6 +536,9 @@ def get_provider(model_id: str, thinking_budget: int | None = None,
         return None
     if not has_key(info.family):
         return None
+    if info.family == "codex-cli":
+        return CodexCLIProvider(info.api_model, reasoning_effort=reasoning_effort,
+                                timeout=gateway_timeout)
     # direct family key wins; otherwise route through the Vercel AI Gateway
     if not os.environ.get(_KEY_MAP.get(info.family, "")):
         if os.environ.get(GATEWAY_KEY):
@@ -476,7 +553,9 @@ def get_provider(model_id: str, thinking_budget: int | None = None,
     if info.family == "anthropic":
         return AnthropicProvider(info.api_model, thinking_budget=thinking_budget)
     if info.family == "openai":
-        return OpenAIProvider(info.api_model)
+        return OpenAIProvider(info.api_model, reasoning=info.reasoning,
+                              reasoning_effort=reasoning_effort,
+                              thinking_headroom=thinking_headroom)
     if info.family == "groq":
         return GroqProvider(info.api_model, reasoning=info.reasoning, tpm_ceiling=info.tpm_ceiling)
     if info.family == "gemini":

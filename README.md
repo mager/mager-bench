@@ -18,7 +18,16 @@ Default runs use **free + cheap** models so a full leaderboard doesn't torch you
 <| cheap | `claude-haiku-4-5`, `gpt-4o-mini`, `glm-5.3-promo` (AI Gateway) | pennies / suite |
 | paid | `claude-sonnet-*`, `claude-opus-4-8`, `gpt-4o`, `gemini-2.5-pro`, `glm-5.3` | crowdfund or BYO |
 
-Judges are providers too. Default judge is a **free** model when a free key is present (Gemini Flash preferred). No Anthropic key required for free-tier runs. One `AI_GATEWAY_API_KEY` (Vercel AI Gateway) can serve any model — subject or judge — when a family's own key is missing. Spend shows up under AI Gateway Logs/Usage. Cap the burn: `--thinking-budget 2048`, `--reasoning-effort low`, and `--dry-run` first on anything paid.
+Judges are providers too. Default judge is **GPT-6 Sol** (`gpt-6-sol`, paid), using `OPENAI_API_KEY` or the AI Gateway fallback. Judge reasoning uses `low`, and `--judge-max-tokens` bounds the entire call, including reasoning. For free scoring, explicitly pass `--judge gemini-2.5-flash`. One `AI_GATEWAY_API_KEY` (Vercel AI Gateway) can serve any model — subject or judge — when a family's own key is missing. Spend shows up under AI Gateway Logs/Usage. Cap the burn: `--thinking-budget 2048`, `--reasoning-effort low`, and `--dry-run` first on anything paid.
+
+The published board still contains Claude Sonnet 5 scores. New Sol runs must go to separate `runs/` files. Rejudge every retained response with Sol and validate the results before switching the board; never relabel old scores or merge judges on one board.
+
+Headless Codex results use the `codex-cli/` model prefix so they remain distinct
+from API calls. The CLI receives an output-length instruction rather than a
+hard API token limit. When rescoring a saved single-run file, use
+`--rescore-file <run.json> --challenge doom,slots --output <new-run.json>`;
+the original run remains as a paper trail. CLI judges read full responses,
+including large one-file apps.
 
 ## Challenges
 
@@ -53,7 +62,7 @@ cp .env.example .env
 publish flow. See `AGENTS.md`. Raw CLI for everything else:
 
 ```bash
-# free + cheap models, free judge (default)
+# free + cheap subjects, paid GPT-6 Sol judge (default)
 python bench.py
 
 # wallet-safe only
@@ -78,6 +87,15 @@ python bench.py --challenge doom --serial
 # list models (shows tier + whether the key is present)
 python bench.py --list-models
 python bench.py --list-challenges
+
+# Use the local Codex CLI's ChatGPT login for both subject and judge.
+# This is an agent-style, self-judged run; save it outside the Sonnet board.
+codex login status
+python bench.py --models codex-cli/gpt-5.6-sol \
+  --judge codex-cli/gpt-5.6-sol --reasoning-effort low --serial --dry-run
+python bench.py --models codex-cli/gpt-5.6-sol \
+  --judge codex-cli/gpt-5.6-sol --reasoning-effort low --serial \
+  --output runs/YYYY-MM-DD-codex-cli-gpt-5.6-sol.json
 ```
 
 ## Scoring

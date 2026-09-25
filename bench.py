@@ -2,8 +2,8 @@
 mager-bench — rates coding models on correctness, code quality, docs, and speed.
 
 Usage:
-    python bench.py                            # free/cheap models, free judge
-    python bench.py --tier free                # wallet-safe only
+    python bench.py                            # free/cheap subjects, paid GPT-6 Sol judge
+    python bench.py --tier free --judge gemini-2.5-flash  # free subjects + judge
     python bench.py --models llama-3.3-70b,gemini-2.0-flash
     python bench.py --challenge fizzbuzz
     python bench.py --judge gemini-2.0-flash   # free judge
@@ -40,6 +40,7 @@ from providers import (
     get_provider,
     list_models_report,
     model_info,
+    is_configured,
     pick_default_judge,
 )
 from judge import score_response_multi, DEFAULT_JUDGE_MODEL
@@ -296,6 +297,8 @@ def resolve_models(args) -> list[str]:
         ids = configured_models("cheap") or CHEAP_MODELS
     elif args.tier == "paid":
         ids = configured_models("paid") or PAID_MODELS
+    elif args.tier == "subscription":
+        ids = configured_models("subscription")
     else:
         # default: cheap (free + cheap) so a fresh clone doesn't torch a credit card
         ids = configured_models("cheap")
@@ -323,7 +326,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--tier",
-        choices=["free", "cheap", "paid", "all"],
+        choices=["free", "cheap", "paid", "subscription", "all"],
         default="cheap",
         help="model tier when --models not set (default: cheap = free+haiku+mini)",
     )
@@ -335,7 +338,7 @@ def main() -> None:
     parser.add_argument(
         "--judge",
         default=None,
-        help=f"single judge model ID (default: free pick, e.g. {DEFAULT_JUDGE_MODEL})",
+        help=f"single judge model ID (default: {DEFAULT_JUDGE_MODEL}, paid)",
     )
     parser.add_argument(
         "--judges",
@@ -350,6 +353,8 @@ def main() -> None:
     )
     parser.add_argument("--serial", action="store_true", help="run one job at a time")
     parser.add_argument("--output", default=None, help="save results to JSON file")
+    parser.add_argument("--rescore-file", default=None,
+                        help="rescore saved single-run responses without generating them again")
     parser.add_argument("--list-models", action="store_true", help="list models + key status")
     parser.add_argument("--list-challenges", action="store_true", help="list challenges")
     parser.add_argument(
@@ -359,7 +364,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--reasoning-effort", default=None, choices=["low", "medium", "high"],
-        help="cap reasoning for AI Gateway models (default: model default; "
+        help="cap subject reasoning for OpenAI and AI Gateway models (default: model default; "
              "low/medium tames GLM's 7–9k thinking blowups)",
     )
     parser.add_argument(
@@ -394,8 +399,61 @@ def main() -> None:
             print(f"  {c.name}: {c.description}")
         return
 
+    if args.rescore_file:
+        if not args.output or Path(args.output).resolve() == Path(args.rescore_file).resolve():
+            parser.error("--rescore-file requires a different --output path")
+        payload = json.loads(Path(args.rescore_file).read_text())
+        if payload.get("runs") != 1:
+            parser.error("--rescore-file currently supports only single-run files")
+        old_judges = payload.get("judges") or [payload["judge"]]
+        if args.judge or args.judges:
+            parser.error("--rescore-file reuses the saved judge; omit --judge/--judges")
+        missing = [judge_id for judge_id in old_judges if not is_configured(judge_id)]
+        if missing and not args.dry_run:
+            parser.error(f"judge(s) not configured: {', '.join(missing)}")
+        selected = ({name.strip() for name in args.challenge.split(",")}
+                    if args.challenge else {row["challenge"] for row in payload["results"]})
+        challenges = {challenge.name: challenge for challenge in load_challenges(None)}
+        rows = [row for row in payload["results"] if row["challenge"] in selected]
+        if selected - {row["challenge"] for row in rows}:
+            parser.error("--challenge includes a challenge missing from --rescore-file")
+        print(f"rescore: {len(rows)} saved responses × {len(old_judges)} judges "
+              f"= {len(rows) * len(old_judges)} judge calls")
+        if args.dry_run:
+            return
+        for row in rows:
+            scores = score_response_multi(challenges[row["challenge"]], row["response"],
+                                          row["model"], old_judges,
+                                          judge_max_tokens=args.judge_max_tokens)
+            if "judge error" in scores.get("notes", "").lower():
+                raise RuntimeError(f"judge failed for {row['challenge']}; no file written")
+            total = round((scores["correctness"] + scores["quality"] +
+                           scores["documentation"]) / 3, 1)
+            row.update({key: scores[key] for key in
+                        ("correctness", "quality", "documentation", "notes", "judge")})
+            row["total_score"] = total
+            row["scores_per_run"] = [total]
+            if row.get("run_details"):
+                row["run_details"][0].update({
+                    "correctness": scores["correctness"], "quality": scores["quality"],
+                    "documentation": scores["documentation"], "notes": scores["notes"],
+                    "total": total,
+                })
+            print(f"  {row['challenge']}: {total:.1f} — {scores['notes']}")
+        payload["generated_at"] = datetime.now(timezone.utc).isoformat()
+        payload["rescore_source"] = args.rescore_file
+        Path(args.output).write_text(json.dumps(payload, indent=2))
+        print(f"Rescored results saved to {args.output}")
+        return
+
     models = resolve_models(args)
     judges = resolve_judges(args)
+    if not args.dry_run:
+        missing_judges = [j for j in judges if not is_configured(j)]
+        if missing_judges:
+            parser.error(f"judge(s) not configured: {', '.join(missing_judges)}; "
+                         "GPT-6 Sol requires OPENAI_API_KEY or AI_GATEWAY_API_KEY. "
+                         "Use --judge to choose another configured model.")
     runs = max(1, args.runs)
     challenge_names = (
         [c.strip() for c in args.challenge.split(",") if c.strip()]
@@ -425,9 +483,11 @@ def main() -> None:
         total_calls = len(challenges) * len(models) * runs
         total_judges = total_calls * len(judges)
         tiers = sorted({model_info(m).tier if model_info(m) else "?" for m in models})
+        judge_tiers = sorted({model_info(j).tier if model_info(j) else "?" for j in judges})
         print(f"\n  dry-run: {len(models)} models × {len(challenges)} challenges "
               f"× {runs} runs = {total_calls} subject calls + "
-              f"{total_judges} judge calls (tiers: {', '.join(tiers)})")
+              f"{total_judges} judge calls (subject tiers: {', '.join(tiers)}; "
+              f"judge tiers: {', '.join(judge_tiers)})")
         print("  no API calls made.")
         return
 

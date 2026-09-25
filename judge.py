@@ -1,7 +1,7 @@
 """
 LLM-as-judge: scores model responses on each dimension.
 
-Judges are regular providers — Gemini Flash / Groq Llama keep scoring free.
+GPT-6 Sol is the default judge; select Gemini Flash / Groq Llama for free scoring.
 Pass multiple judges to average scores and reduce single-model bias.
 """
 
@@ -13,9 +13,7 @@ import statistics
 from typing import Iterable
 
 from challenges import Challenge
-from providers import get_provider, pick_default_judge, display_name, model_info
-
-DEFAULT_JUDGE_MODEL = "gemini-2.5-flash"  # free by default; overridden if unconfigured
+from providers import DEFAULT_JUDGE_MODEL, get_provider, pick_default_judge, display_name, model_info
 
 # Judge verdicts are ~300 tokens of JSON, but thinking judges spend the cap
 # on chain-of-thought first — live 2026-09-04: Sonnet 5 thought past an 8192
@@ -99,20 +97,27 @@ def score_response(
 ) -> dict:
     """Ask one judge model to score a response."""
     judge_model = judge_model or pick_default_judge()
+    # CLI runs can produce complete one-file apps well past 6000 characters.
+    # The historic API board used the 6000-character cap; preserve it there.
+    judged_response = response if judge_model.startswith("codex-cli/") else response[:6000]
     prompt = JUDGE_PROMPT.format(
         challenge_name=challenge.name,
         prompt=challenge.prompt,
         rubric_correctness=challenge.rubric["correctness"],
         rubric_quality=challenge.rubric["quality"],
         rubric_documentation=challenge.rubric["documentation"],
-        response=response[:6000],
+        response=judged_response,
     )
 
     thinking_budget = None
     info = model_info(judge_model)
     if info and info.family == "anthropic":
         thinking_budget = min(JUDGE_THINKING_BUDGET, max_tokens - 1024)
-    provider = get_provider(judge_model, thinking_budget=thinking_budget)
+    judge_options = {}
+    if judge_model == "gpt-6-sol":
+        # The judge cap includes reasoning; never add subject-sized headroom.
+        judge_options = {"reasoning_effort": "low", "thinking_headroom": 0}
+    provider = get_provider(judge_model, thinking_budget=thinking_budget, **judge_options)
     if not provider:
         msg = f"judge {judge_model} not configured"
         print(f"\n  [judge error for {model_id}]: {msg}")

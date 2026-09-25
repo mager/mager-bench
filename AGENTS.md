@@ -14,9 +14,9 @@ tokens ($0.05–0.08 each, 55–83s); GLM generate calls hit 7–9k (127–165s)
    models × challenges × runs + judge calls before spending a token.
 2. **Cap thinking on paid runs:** `--thinking-budget 2048` (Anthropic),
    `--reasoning-effort low|medium` (gateway). `low` for generate, `medium` max.
-3. **Judge cheap by default.** Free judge (Gemini Flash) for bulk runs; Sonnet
-   judge only for final validation. `--judge-max-tokens` defaults to 2048 —
-   verdicts are ~300 tokens of JSON, don't raise it to fix judge errors.
+3. **Default judge is GPT-6 Sol** (`gpt-6-sol`, paid), with `low` reasoning
+   and a 16384 total token cap (no extra judge headroom). Explicitly choose
+   `--judge gemini-2.5-flash` for free bulk runs.
 4. **Prefer `glm-5.3-promo` for reruns** — heavy prompt caching (120–154k cached
    tokens in live logs), 3–8s vs 25–165s uncached.
 5. **Judge errors are crashes, not scores.** 0.0 totals / `judge error` notes,
@@ -51,3 +51,7 @@ tokens ($0.05–0.08 each, 55–83s); GLM generate calls hit 7–9k (127–165s)
 cd ~/Code/mager-bench
 .venv/bin/python -c "from providers import get_provider; print(get_provider('<model-id>').complete('Say OK'))"
 ```
+
+The CLI default is GPT-6 Sol; the existing published board remains Sonnet 5
+until all retained responses have been rejudged. Save Sol runs separately;
+do not relabel historical scores or merge Sol rows into the Sonnet board.
