@@ -3,14 +3,13 @@ mager-bench — rates coding models on correctness, code quality, docs, and spee
 
 Usage:
     python bench.py                            # subscription subjects and judge through Codex CLI
-    python bench.py --tier free --judge gemini-2.5-flash  # free subjects + judge
-    python bench.py --models llama-3.3-70b,gemini-2.0-flash
+    python bench.py --tier free --judge gemini-2.5-flash --allow-api  # legacy API run
+    python bench.py --models codex-cli/gpt-6-astra
     python bench.py --challenge fizzbuzz
-    python bench.py --judge gemini-2.0-flash   # free judge
-    python bench.py --judges gemini-2.0-flash,llama-3.3-70b
+    python bench.py --judge gemini-2.5-flash --allow-api   # legacy API judge
     python bench.py --runs 3                   # mean ± stddev across runs
     python bench.py --serial
-    python bench.py --output results.json
+    python bench.py --output runs/YYYY-MM-DD-model.json
 """
 
 from __future__ import annotations
@@ -81,7 +80,7 @@ def run_model_on_challenge(
     reasoning_effort: str | None = None,
     thinking_headroom: int = 32768,
     gateway_timeout: float = 1800,
-    judge_max_tokens: int = 2048,
+    judge_max_tokens: int = 16384,
 ) -> tuple[Result | None, str]:
     provider = get_provider(model_id, thinking_budget=thinking_budget,
                             reasoning_effort=reasoning_effort,
@@ -202,7 +201,7 @@ def run_benchmark(
     reasoning_effort: str | None = None,
     thinking_headroom: int = 32768,
     gateway_timeout: float = 1800,
-    judge_max_tokens: int = 2048,
+    judge_max_tokens: int = 16384,
 ) -> list[Result]:
     challenges = load_challenges(challenge_names)
     results: list[Result] = []

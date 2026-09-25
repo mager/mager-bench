@@ -1,9 +1,9 @@
 """
 Model provider adapters — one class per API.
 
-Models are tagged free | cheap | paid so the CLI can default to wallet-friendly
-runs. Free-tier keys (Groq, Gemini free) are enough for a full leaderboard;
-paid models are the ones crowdfunding is meant to unlock.
+Models are tagged free | cheap | paid | subscription. The active bench defaults
+to ChatGPT-signed-in Codex CLI providers; API families remain for reproducing
+older runs and require an explicit --allow-api in bench.py.
 
 A single Vercel AI Gateway key (AI_GATEWAY_API_KEY) can stand in for every
 per-provider key: families without their own key route through the gateway's
@@ -84,7 +84,7 @@ MODELS: list[ModelInfo] = [
     ModelInfo("claude-opus-4-8", "anthropic", "claude-opus-4-8", "paid", "Claude Opus 4.8"),
     ModelInfo("gpt-4o", "openai", "gpt-4o", "paid", "GPT-4o"),
     ModelInfo("gpt-6-sol", "openai", "gpt-6-sol", "paid", "GPT-6 Sol",
-              "Default judge — bounded reasoning", reasoning=True),
+              "Legacy API judge — bounded reasoning", reasoning=True),
     ModelInfo("codex-cli/gpt-5.6-sol", "codex-cli", "gpt-5.6-sol", "subscription",
               "GPT-5.6 Sol (Codex CLI)", "ChatGPT login; default subscription judge"),
     ModelInfo("codex-cli/gpt-6-astra", "codex-cli", "gpt-6-astra", "subscription",
