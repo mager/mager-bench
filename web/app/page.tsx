@@ -2,6 +2,7 @@ import Link from "next/link";
 import resultsData from "@/data/results.json";
 import fundingData from "@/data/funding.json";
 import challengesData from "@/data/challenges.json";
+import cliExperiment from "@/data/codex-cli-sol.json";
 
 type Challenge = {
   name: string;
@@ -164,6 +165,23 @@ export default function Home() {
             </dl>
           </section>
         )}
+
+        <section className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4" style={{ animationDelay: "110ms" }}>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-xl">
+              <h2 className="text-xs uppercase tracking-[0.2em] text-amber-bright">from the lab</h2>
+              <p className="mt-2 text-sm leading-relaxed text-fg">
+                GPT-5.6 Sol finished all 13 challenges through headless Codex and scored{" "}
+                <strong>{cliExperiment.average.toFixed(1)}/10</strong> with a Sol judge. This
+                self-judged ChatGPT subscription run uses a different scoring setup from
+                the leaderboard.
+              </p>
+            </div>
+            <Link href="/experiments/codex-cli-sol" className="shrink-0 text-sm text-amber hover:text-amber-bright">
+              inspect the run →
+            </Link>
+          </div>
+        </section>
 
         <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
           <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-fg-dim">leaderboard</h2>

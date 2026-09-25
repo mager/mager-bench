@@ -11,6 +11,7 @@ The live scorecard/leaderboard for [mager-bench](../README.md), deployed at
 | `/challenges` | all 13 challenge cards |
 | `/challenges/<name>` | prompt, rubric, per-model scores |
 | `/fund` | crowdfunding drive, tiers, paid-model wishlist |
+| `/experiments/codex-cli-sol` | separate GPT-5.6 Sol headless Codex run with full responses and judge notes |
 | `/api/results` | same JSON as the dashboard |
 
 ## Data flow
@@ -20,6 +21,7 @@ The live scorecard/leaderboard for [mager-bench](../README.md), deployed at
 3. Pages render it; `app/api/results/route.ts` re-serves the same file as JSON.
 4. `data/challenges.json` is an export of prompts/rubrics from `../challenges.py` — re-export if challenges change.
 5. `data/funding.json` is the crowdfunding config (goal, tiers, wishlist, sponsor links). Edit it when the season goal or wishlist changes.
+6. `node scripts/sync-cli-result.mjs` validates and exports the separate Codex CLI run to `data/codex-cli-sol.json`. Its self-judged scores never enter the Sonnet leaderboard.
 
 ## Design system
 

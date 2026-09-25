@@ -39,9 +39,9 @@ export function SiteHeader() {
               </Link>
             );
           })}
-          <a className="text-fg-dim hover:text-amber-bright" href="/#api">
+          <Link className="text-fg-dim hover:text-amber-bright" href="/#api">
             api
-          </a>
+          </Link>
           <a
             className="text-fg-dim hover:text-amber-bright"
             href="https://github.com/mager/mager-bench"
