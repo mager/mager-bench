@@ -26,6 +26,12 @@ const raw = JSON.parse(readFileSync(rawPath, "utf8"));
     if (!(r.response ?? "").trim()) {
       problems.push(`${label}: empty response scored ${r.total_score}`);
     }
+    if (r.judge !== raw.judge) {
+      problems.push(`${label}: row judge ${r.judge ?? "missing"}, board judge ${raw.judge}`);
+    }
+    if (/judge error/i.test(r.notes ?? "")) {
+      problems.push(`${label}: judge error cannot be published as a score`);
+    }
     const judged = /^judge:\s*(\S+)/.exec(r.notes ?? "");
     if (judged && judged[1] !== raw.judge) {
       problems.push(`${label}: scored by ${judged[1]}, board judge is ${raw.judge}`);
@@ -69,6 +75,8 @@ const DISPLAY_NAMES = {
   "llama-3.1-8b": "Llama 3.1 8B",
   "gpt-oss-120b": "GPT-OSS 120B",
   "glm-5.3": "GLM 5.3",
+  "codex-cli/gpt-5.6-sol": "GPT-5.6 Sol",
+  "codex-cli/gpt-6-astra": "GPT-6 Astra",
 };
 
 const TIERS = {
@@ -85,6 +93,8 @@ const TIERS = {
   "gpt-4o": "paid",
   "gemini-2.5-pro": "paid",
   "glm-5.3": "paid",
+  "codex-cli/gpt-5.6-sol": "subscription",
+  "codex-cli/gpt-6-astra": "subscription",
 };
 
 const byModel = new Map();
@@ -155,7 +165,7 @@ const models = [...byModel.entries()]
   .sort((a, b) => b.average - a.average);
 
 let funding = null;
-if (existsSync(fundingPath)) {
+if (raw.tier !== "subscription" && existsSync(fundingPath)) {
   funding = JSON.parse(readFileSync(fundingPath, "utf8"));
   // mark wishlist items that already appear on the leaderboard
   const present = new Set(models.map((m) => m.id));
@@ -175,7 +185,7 @@ const out = {
   runs: raw.runs ?? 1,
   tier: raw.tier ?? null,
   models,
-  funding,
+  ...(funding ? { funding } : {}),
 };
 
 mkdirSync(path.join(__dirname, "../data"), { recursive: true });

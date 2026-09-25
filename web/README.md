@@ -1,43 +1,39 @@
 # mager-bench (web)
 
-The live scorecard/leaderboard for [mager-bench](../README.md), deployed at
-[bench.mager.co](https://bench.mager.co).
+The live ChatGPT-subscription scorecard for [mager-bench](../README.md), deployed at [bench.mager.co](https://bench.mager.co).
 
 ## Routes
 
 | Path | What |
-|------|------|
-| `/` | multi-model leaderboard + per-model challenge breakdowns + fund teaser |
+|---|---|
+| `/` | current Codex CLI leaderboard |
+| `/models/<id>` | each model's challenge scores |
 | `/challenges` | all 13 challenge cards |
-| `/challenges/<name>` | prompt, rubric, per-model scores |
-| `/fund` | crowdfunding drive, tiers, paid-model wishlist |
-| `/experiments/codex-cli-sol` | separate GPT-5.6 Sol headless Codex run with full responses and judge notes |
-| `/api/results` | same JSON as the dashboard |
+| `/challenges/<name>` | prompt, rubric, and current-board scores |
+| `/archive/sonnet-5` | earlier API-model board, judged by Sonnet 5 |
+| `/experiments/codex-cli-sol` | original GPT-5.6 Sol run with full answers and judge notes |
+| `/fund` | notice that the former API funding drive is archived |
+| `/api/results` | current board as JSON |
 
 ## Data flow
 
-1. `python bench.py --tier free --runs 3 --output results.json` at the repo root.
-2. `node scripts/sync-results.mjs` reshapes that into `data/results.json` (grouped by model, with averages + tier tags) and merges wishlist status from `data/funding.json`.
-3. Pages render it; `app/api/results/route.ts` re-serves the same file as JSON.
-4. `data/challenges.json` is an export of prompts/rubrics from `../challenges.py` — re-export if challenges change.
-5. `data/funding.json` is the crowdfunding config (goal, tiers, wishlist, sponsor links). Edit it when the season goal or wishlist changes.
-6. `node scripts/sync-cli-result.mjs` validates and exports the separate Codex CLI run to `data/codex-cli-sol.json`. Its self-judged scores never enter the Sonnet leaderboard.
+1. `bench.py` saves each subscription-backed model run under `../runs/`.
+2. `node scripts/merge-subscription-run.mjs <run-file>` verifies all 13 rows and merges them into `../results.json` without mixing judges.
+3. `node scripts/sync-results.mjs` exports the current board to `data/results.json`. Pages and `app/api/results/route.ts` read that file.
+4. `data/sonnet-5-board.json` preserves the previous Sonnet board, with its original source in `../runs/2026-09-25-sonnet-5-board-archive.json`.
+5. `data/challenges.json` exports prompts and rubrics from `../challenges.py`.
+6. `node scripts/sync-cli-result.mjs` exports the original Sol run to `data/codex-cli-sol.json` for its dedicated inspection page.
 
-## Design system
+The old `data/funding.json` remains as an API-era archive. New runs use the local ChatGPT subscription.
 
-See [`../DESIGN.md`](../DESIGN.md) for the color/typography tokens (CRT amber
-theme + green/magenta/cyan per-dimension accents) and [`../PRODUCT.md`](../PRODUCT.md)
-for the register/brand brief. Crowdfunding voice lives in [`../FUND.md`](../FUND.md).
+## Design and development
 
-## Develop
+See [`../DESIGN.md`](../DESIGN.md) and [`../PRODUCT.md`](../PRODUCT.md) for the CRT design system and product brief.
 
 ```bash
 npm install
 npm run dev
-```
-
-## Deploy
-
-```bash
+npm run lint
+npm run build
 vercel --prod
 ```

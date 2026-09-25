@@ -86,7 +86,9 @@ MODELS: list[ModelInfo] = [
     ModelInfo("gpt-6-sol", "openai", "gpt-6-sol", "paid", "GPT-6 Sol",
               "Default judge — bounded reasoning", reasoning=True),
     ModelInfo("codex-cli/gpt-5.6-sol", "codex-cli", "gpt-5.6-sol", "subscription",
-              "GPT-5.6 Sol (Codex CLI)", "ChatGPT login; agent-style local eval"),
+              "GPT-5.6 Sol (Codex CLI)", "ChatGPT login; default subscription judge"),
+    ModelInfo("codex-cli/gpt-6-astra", "codex-cli", "gpt-6-astra", "subscription",
+              "GPT-6 Astra (Codex CLI)", "ChatGPT login; agent-style local eval"),
     ModelInfo("gemini-2.5-pro", "gemini", "gemini-2.5-pro", "paid", "Gemini 2.5 Pro"),
     # GLM 5.3 (2026-08): reasoning cannot be disabled — thinking is billed and
     # counts against max_tokens, so it runs at high effort with thinking headroom
@@ -100,7 +102,7 @@ FREE_MODELS = [m.id for m in MODELS if m.tier == "free"]
 CHEAP_MODELS = [m.id for m in MODELS if m.tier in ("free", "cheap")]
 PAID_MODELS = [m.id for m in MODELS if m.tier == "paid"]
 
-DEFAULT_JUDGE_MODEL = "gpt-6-sol"
+DEFAULT_JUDGE_MODEL = "codex-cli/gpt-5.6-sol"
 
 _KEY_MAP = {
     "anthropic": "ANTHROPIC_API_KEY",
@@ -129,7 +131,9 @@ class CodexCLIProvider(Provider):
     def complete(self, prompt: str, max_tokens: int = 2048) -> str:
         environment = os.environ.copy()
         # Force the stored ChatGPT login, never an unrelated API or enterprise key.
-        for key in ("OPENAI_API_KEY", "CODEX_ACCESS_TOKEN", "OPENAI_IDENTITY_TOKEN_FILE",
+        for key in ("OPENAI_API_KEY", "AI_GATEWAY_API_KEY", "ANTHROPIC_API_KEY",
+                    "GEMINI_API_KEY", "GROQ_API_KEY", "ZAI_API_KEY",
+                    "CODEX_ACCESS_TOKEN", "OPENAI_IDENTITY_TOKEN_FILE",
                     "OPENAI_FEDERATION_RULE_ID"):
             environment.pop(key, None)
         with tempfile.TemporaryDirectory(prefix="mager-bench-codex-") as workdir:

@@ -21,7 +21,7 @@ const challengeCount = (challengesData as unknown[]).length;
 
 export const metadata: Metadata = {
   title: "mager-bench",
-  description: `Personal coding-model benchmark — ${challengeCount} tasks, free-tier models first, crowdfunded paid evals, LLM-judged on correctness, quality, and docs.`,
+  description: `Personal coding-model benchmark — ${challengeCount} tasks run through headless Codex with a ChatGPT subscription, scored on correctness, quality, and docs.`,
 };
 
 export default function RootLayout({

@@ -1,7 +1,7 @@
 """
 LLM-as-judge: scores model responses on each dimension.
 
-GPT-6 Sol is the default judge; select Gemini Flash / Groq Llama for free scoring.
+The ChatGPT-signed-in Codex CLI GPT-5.6 Sol is the default judge.
 Pass multiple judges to average scores and reduce single-model bias.
 """
 

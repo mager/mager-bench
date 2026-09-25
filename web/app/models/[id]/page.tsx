@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import resultsData from "@/data/results.json";
+import { modelHref, modelSlug } from "@/lib/model-path";
 
 type ChallengeResult = {
   name: string;
@@ -40,6 +41,7 @@ const DIMENSION_STYLE = {
 } as const;
 
 const COST_TIER_STYLE: Record<string, string> = {
+  subscription: "text-cyan",
   free: "text-green",
   cheap: "text-cyan",
   paid: "text-magenta",
@@ -53,7 +55,7 @@ function tier(score: number) {
 }
 
 export function generateStaticParams() {
-  return data.models.map((m) => ({ id: m.id }));
+  return data.models.map((m) => ({ id: modelSlug(m.id) }));
 }
 
 export async function generateMetadata({
@@ -62,7 +64,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const m = data.models.find((x) => x.id === id);
+  const m = data.models.find((x) => modelSlug(x.id) === id);
   return {
     title: m ? `${m.name} runs — mager-bench` : "model runs — mager-bench",
     description: m
@@ -77,7 +79,7 @@ export default async function ModelPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const model = data.models.find((m) => m.id === id);
+  const model = data.models.find((m) => modelSlug(m.id) === id);
   if (!model) return notFound();
 
   const t = tier(model.average);
@@ -123,7 +125,7 @@ export default async function ModelPage({
             return (
               <Link
                 key={c.name}
-                href={`/models/${model.id}/${c.name}`}
+                href={modelHref(model.id, c.name)}
                 className="lift group border border-amber-faint bg-bg-raised/40 px-4 py-4"
               >
                 <div className="flex items-center gap-3">

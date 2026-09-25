@@ -1,158 +1,63 @@
 # mager-bench
 
-A personal coding model benchmark. Thirteen tasks I actually care about — from FizzBuzz to a Doom-style raycaster in a single HTML file — run against any combination of models, scored by an LLM judge on correctness, code quality, and documentation. When a new model drops, run `python bench.py` and see where it stands.
+A personal coding-model benchmark: thirteen tasks from FizzBuzz to a one-file Doom-style raycaster, scored on correctness, code quality, and documentation. Each score links to the answer and the judge's notes.
 
-The idea is [Simon Willison's pelican-on-a-bicycle test](https://simonwillison.net/tags/pelican-riding-a-bicycle/), but for code: you don't need a giant eval suite to have opinions about models — you need something small and consistent that you run yourself, every time.
+**Live board:** [bench.mager.co](https://bench.mager.co)
 
-**Live dashboard:** [bench.mager.co](https://bench.mager.co) — GLM 5.3 debuts at #1 (avg **6.8**/10) ahead of GPT-OSS 120B (**6.4**) across all 13 challenges, all judged by Claude Sonnet 5 — with doom + slots recorded as failed for GLM (see caveats).
-**Fund paid evals:** [bench.mager.co/fund](https://bench.mager.co/fund) · [FUND.md](./FUND.md)
-**JSON API:** [`/api/results`](https://bench.mager.co/api/results)
+**Original Sonnet 5 board:** [archive](https://bench.mager.co/archive/sonnet-5)
 
-## Free first
+**Current board JSON:** [`/api/results`](https://bench.mager.co/api/results)
 
-Default runs use **free + cheap** models so a full leaderboard doesn't torch your card:
+## ChatGPT subscription workflow
 
-| Tier | Models | Cost |
-|------|--------|------|
-| free | `llama-3.3-70b`, `llama-3.1-8b`, `gpt-oss-120b` (Groq), `gemini-2.5-flash` | $0 free quotas |
-<| cheap | `claude-haiku-4-5`, `gpt-4o-mini`, `glm-5.3-promo` (AI Gateway) | pennies / suite |
-| paid | `claude-sonnet-*`, `claude-opus-4-8`, `gpt-4o`, `gemini-2.5-pro`, `glm-5.3` | crowdfund or BYO |
+All new benchmark calls run through fresh, read-only headless Codex CLI sessions signed in to a local ChatGPT subscription. The default subjects are `codex-cli/gpt-5.6-sol` and `codex-cli/gpt-6-astra`; the single board judge is `codex-cli/gpt-5.6-sol`. GPT-6 Sol itself was not available through this account's Codex CLI on 2026-09-25, so the earlier GPT-6 Sol API default has been retired.
 
-Judges are providers too. Default judge is **GPT-6 Sol** (`gpt-6-sol`, paid), using `OPENAI_API_KEY` or the AI Gateway fallback. Judge reasoning uses `low`, and `--judge-max-tokens` bounds the entire call, including reasoning. For free scoring, explicitly pass `--judge gemini-2.5-flash`. One `AI_GATEWAY_API_KEY` (Vercel AI Gateway) can serve any model — subject or judge — when a family's own key is missing. Spend shows up under AI Gateway Logs/Usage. Cap the burn: `--thinking-budget 2048`, `--reasoning-effort low`, and `--dry-run` first on anything paid.
+The CLI receives an instruction to target each challenge's output length, but does not impose the API's hard output-token cap. This is an agent-harness benchmark. Sol judging its own answers is a possible source of bias. We preserve the earlier Sonnet 5 API board separately rather than mix judges in one ranking.
 
-The published board still contains Claude Sonnet 5 scores. New Sol runs must go to separate `runs/` files. Rejudge every retained response with Sol and validate the results before switching the board; never relabel old scores or merge judges on one board.
+```bash
+# Install requirements in .venv, then sign the Codex CLI in to ChatGPT.
+codex login status
 
-Headless Codex results use the `codex-cli/` model prefix so they remain distinct
-from API calls. The CLI receives an output-length instruction rather than a
-hard API token limit. When rescoring a saved single-run file, use
-`--rescore-file <run.json> --challenge doom,slots --output <new-run.json>`;
-the original run remains as a paper trail. CLI judges read full responses,
-including large one-file apps.
+# Dry-run first: this prints models × challenges × runs and judge calls.
+.venv/bin/python bench.py --dry-run
+
+# Smoke-test a new model before its full suite.
+.venv/bin/python -c "from providers import get_provider; print(get_provider('codex-cli/gpt-6-astra').complete('Say OK'))"
+
+# Run one model and save the full paper trail.
+.venv/bin/python bench.py --models codex-cli/gpt-6-astra --serial \
+  --reasoning-effort low --output runs/YYYY-MM-DD-codex-cli-gpt-6-astra.json
+
+# Validate and merge its rows into the subscription board, then update web data.
+node web/scripts/merge-subscription-run.mjs runs/YYYY-MM-DD-codex-cli-gpt-6-astra.json
+node web/scripts/sync-results.mjs
+```
+
+Never write a model run directly to `results.json`. The merge script requires all 13 challenges, full responses, one judge, and valid scores. A failed subject or judge call is a crash to rerun, not a score of zero. `/bench` in opencode is the canonical publish workflow, with the detailed rules in `AGENTS.md`.
+
+The older API providers remain in code for reproducibility, but a new API or gateway run requires explicit `--allow-api` and cannot be merged into the current subscription board. The former API funding drive is archived.
 
 ## Challenges
 
 | Name | What it tests |
-|------|--------------|
-| `fizzbuzz` | Baseline correctness + code style |
-| `binary-search` | Algorithm + full docstring (Args/Returns/Raises + examples) |
-| `api-client` | Class design + error handling + type hints + docs |
-| `readme-writer` | Pure documentation ability — no code at all |
-| `refactor` | Code clarity + whether the model can explain its changes |
-| `test-writing` | Edge-case thinking + pytest parametrize discipline |
-| `debug` | Careful reading + correctness reasoning over broken code |
-| `async-fetch` | Async concurrency patterns + retry/timeout handling |
-| `sql` | CTE + window function fluency on a real schema |
-| `go-test` | Idiomatic Go table-driven tests + benchmark |
-| `elixir-test` | ExUnit describe blocks + assert_raise + unicode handling |
-| `doom` | DDA raycaster FPS — the signature hard challenge |
-<| `slots` | Vegas slot machine in a single HTML file — reels, pay table, betting, win animations |
+|---|---|
+| `fizzbuzz` | Baseline correctness and style |
+| `binary-search` | Algorithm and full documentation |
+| `api-client` | Class design, errors, type hints, docs |
+| `readme-writer` | Documentation ability |
+| `refactor` | Code clarity and change explanation |
+| `test-writing` | pytest edge cases and assertions |
+| `debug` | Finding and fixing three Python bugs |
+| `async-fetch` | Concurrency, timeouts, retries |
+| `sql` | CTEs, windows, aggregations |
+| `go-test` | Idiomatic Go table-driven tests |
+| `elixir-test` | ExUnit tests and Unicode handling |
+| `doom` | One-file DDA raycaster game |
+| `slots` | One-file slot machine with reels and betting |
 
-## Setup
+Each challenge is scored 0–10 on correctness, quality, and documentation. The displayed total is their mean, rounded to one decimal. Speed is reported but not scored. Single-run variance and model-judge bias mean small score gaps should be treated cautiously.
 
-```bash
-pip install -r requirements.txt
-cp .env.example .env
-# free path: just GROQ_API_KEY + GEMINI_API_KEY
-# one-key-everything: AI_GATEWAY_API_KEY (Vercel AI Gateway)
-```
-
-## Usage (opencode first)
-
-`/bench` in opencode is the primary harness — dry-run, caps, merge, and
-publish flow. See `AGENTS.md`. Raw CLI for everything else:
-
-```bash
-# free + cheap subjects, paid GPT-6 Sol judge (default)
-python bench.py
-
-# wallet-safe only
-python bench.py --tier free --judge gemini-2.5-flash
-
-# dry-run before spending (models × challenges × runs, no API calls)
-python bench.py --models glm-5.3 --runs 3 --dry-run
-
-# gateway run with caps on (tames thinking-token burn)
-python bench.py --models glm-5.3 --reasoning-effort low --thinking-budget 2048
-
-# multi-run mean ± stddev (variance is real — measure it)
-python bench.py --tier free --runs 3 --output results.json
-
-# multi-judge panel (averages scores — reduces single-model bias)
-python bench.py --models llama-3.3-70b,gemini-2.5-flash \
-  --judges gemini-2.5-flash,llama-3.3-70b --runs 2
-
-# one challenge / serial latency
-python bench.py --challenge doom --serial
-
-# list models (shows tier + whether the key is present)
-python bench.py --list-models
-python bench.py --list-challenges
-
-# Use the local Codex CLI's ChatGPT login for both subject and judge.
-# This is an agent-style, self-judged run; save it outside the Sonnet board.
-codex login status
-python bench.py --models codex-cli/gpt-5.6-sol \
-  --judge codex-cli/gpt-5.6-sol --reasoning-effort low --serial --dry-run
-python bench.py --models codex-cli/gpt-5.6-sol \
-  --judge codex-cli/gpt-5.6-sol --reasoning-effort low --serial \
-  --output runs/YYYY-MM-DD-codex-cli-gpt-5.6-sol.json
-```
-
-## Scoring
-
-Each response is scored 0–10 on three dimensions:
-
-- **Correctness** — does the code actually solve the problem, including edge cases?
-- **Code Quality** — idiomatic, clean, well-structured?
-- **Documentation** — docstrings, comments, examples — useful, not boilerplate?
-
-**Total** = average of the three. Speed (ms) is shown but not scored.
-
-With `--runs N`, totals are means and the table shows ±σ. With `--judges a,b`, numeric scores are averaged across the panel.
-
-## Crowdfunding
-
-Paid models (Opus, GPT-4o, …) stay on a public wishlist until funded. See **[FUND.md](./FUND.md)** and the live `/fund` page. Dollars only buy API tokens for published evals — every funded run ships raw responses in `results.json`.
-
-```
-Buy Me a Coffee  →  https://www.buymeacoffee.com/mager
-GitHub Sponsors  →  coming soon
-```
-
-## Web dashboard
-
-`web/` is a Next.js CRT amber dashboard (Vercel) with multi-model leaderboard, per-challenge pages, fund drive, and `GET /api/results`.
-
-```bash
-python bench.py --tier free --runs 3 --output results.json
-cd web
-node scripts/sync-results.mjs   # reshapes ../results.json → web/data/results.json
-npm run dev
-```
-
-The dashboard leaderboard stacks every model in `results.json` — run more models through `bench.py`, re-sync, redeploy, and they show up ranked.
-
-Each challenge also has its own definition page at `/challenges/<name>` — the exact prompt, the rubric per dimension, and how every model that's run it scored. Re-export challenge definitions after editing `challenges.py`:
-
-```bash
-python3 -c "
-import json, dataclasses
-from challenges import CHALLENGES
-print(json.dumps([dataclasses.asdict(c) for c in CHALLENGES], indent=2))
-" > web/data/challenges.json
-```
-
-## Caveats
-
-- **The judge is a model too.** Prefer multi-judge panels (`--judges`) and free judges so Claude isn't grading Claude alone.
-- **Single-run variance is real.** Use `--runs 3` before quoting numbers.
-- **A failed challenge is a real result.** GLM 5.3's doom and slots rows are recorded as 0.0 — its reasoning consumed the entire token budget before producing any visible output, on both the standard budget and a 4× thinking-headroom retry. Nothing was judged because there was nothing to score; no number was invented to fill the gap.
-- **These are my tasks.** Fork it and swap in the thirteen things *you* keep asking models to do.
-
-## Adding challenges / models
-
-- Challenges: add a `Challenge` to `CHALLENGES` in `challenges.py`.
-- Models: add a `ModelInfo` to `MODELS` in `providers.py` (tier + family + api id — families without their own key route through the Vercel AI Gateway with a `creator/` prefix).
+To add a new subscription model, add a `ModelInfo` with the `codex-cli` family and `subscription` tier in `providers.py`, smoke-test it, then run the full suite under the board's judge. The web app in `web/` is a Next.js dashboard deployed on Vercel.
 
 ## License
 

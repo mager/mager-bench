@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import challengesData from "@/data/challenges.json";
 import resultsData from "@/data/results.json";
+import { modelHref } from "@/lib/model-path";
 
 type ChallengeDef = {
   name: string;
@@ -172,7 +173,7 @@ export default async function ChallengePage({
                       {r.notes}
                     </p>
                     <Link
-                      href={`/models/${r.modelId}/${challenge.name}`}
+                      href={modelHref(r.modelId, challenge.name)}
                       className="mt-3 inline-block text-xs text-amber hover:text-amber-bright"
                     >
                       inspect full trace →

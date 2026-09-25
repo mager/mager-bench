@@ -5,7 +5,7 @@ import challengeDefs from "@/data/challenges.json";
 
 export const metadata: Metadata = {
   title: "GPT-5.6 Sol via Codex CLI — mager-bench",
-  description: "An inspectable 13-challenge Codex CLI run, scored separately from the main leaderboard.",
+  description: "An inspectable 13-challenge Codex CLI run on the ChatGPT subscription leaderboard.",
 };
 
 type Row = (typeof experimentData.rows)[number];
@@ -39,7 +39,7 @@ export default function CodexCLIExperiment() {
             ← mager-bench
           </Link>
           <p className="mt-6 text-xs uppercase tracking-[0.25em] text-amber-dim">
-            separate experiment / 2026-09-25
+            original subscription run / 2026-09-25
           </p>
           <h1 className="mt-2 font-display text-4xl text-amber sm:text-5xl">
             GPT-5.6 Sol through Codex CLI
@@ -60,9 +60,10 @@ export default function CodexCLIExperiment() {
             How to read this run
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-fg">
-            These scores use a different judge from the Sonnet 5 leaderboard, and Sol graded
-            its own work. Codex CLI follows an output-length instruction; it has no matching
-            hard API token cap. Read the responses below as a separate agent-harness experiment.
+            These scores now appear on the ChatGPT subscription board alongside GPT-6 Astra.
+            Both runs use the same GPT-5.6 Sol judge, which graded its own answers here.
+            Codex CLI follows an output-length instruction; it has no matching hard API token cap.
+            The older Sonnet 5 scores remain in a separate archive.
           </p>
           <p className="mt-2 text-xs text-fg-dim">
             Doom and Slots were rescored after the judge was changed to read their full saved responses.

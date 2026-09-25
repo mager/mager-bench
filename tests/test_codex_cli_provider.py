@@ -10,12 +10,14 @@ from judge import score_response
 
 
 class CodexCLIProviderTests(unittest.TestCase):
-    @patch.dict(os.environ, {"OPENAI_API_KEY": "api-key", "CODEX_ACCESS_TOKEN": "token"})
+    @patch.dict(os.environ, {"OPENAI_API_KEY": "api-key", "AI_GATEWAY_API_KEY": "gateway-key",
+                           "CODEX_ACCESS_TOKEN": "token"})
     @patch("providers.subprocess.run")
     def test_uses_chatgpt_login_and_returns_only_final_message(self, run):
         def fake_run(args, **kwargs):
             Path(args[args.index("--output-last-message") + 1]).write_text("Answer\n")
             self.assertNotIn("OPENAI_API_KEY", kwargs["env"])
+            self.assertNotIn("AI_GATEWAY_API_KEY", kwargs["env"])
             self.assertNotIn("CODEX_ACCESS_TOKEN", kwargs["env"])
             self.assertIn("--ephemeral", args)
             self.assertIn("read-only", args)

@@ -19,8 +19,7 @@ def completion(text=VERDICT):
 class SolJudgeTests(unittest.TestCase):
     def test_default_does_not_silently_change_with_credentials(self):
         with patch.dict(os.environ, {"GEMINI_API_KEY": "test"}, clear=True):
-            self.assertEqual(pick_default_judge(), "gpt-6-sol")
-            self.assertIsNone(get_provider(pick_default_judge()))
+            self.assertEqual(pick_default_judge(), "codex-cli/gpt-5.6-sol")
 
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test"}, clear=True)
     @patch("openai.OpenAI")
@@ -28,6 +27,7 @@ class SolJudgeTests(unittest.TestCase):
         create = sdk.return_value.chat.completions.create
         create.return_value = completion()
         result = score_response(load_challenges(["fizzbuzz"])[0], "answer", "subject",
+                                judge_model="gpt-6-sol",
                                 max_tokens=4096)
         request = create.call_args.kwargs
         self.assertEqual(request["model"], "gpt-6-sol")
@@ -47,6 +47,7 @@ class SolJudgeTests(unittest.TestCase):
         call = sdk.return_value.chat.completions.stream
         call.return_value.__enter__.return_value = stream
         result = score_response(load_challenges(["fizzbuzz"])[0], "answer", "subject",
+                                judge_model="gpt-6-sol",
                                 max_tokens=4096)
         request = call.call_args.kwargs
         self.assertEqual(request["model"], "openai/gpt-6-sol")

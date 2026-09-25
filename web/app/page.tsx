@@ -1,8 +1,7 @@
 import Link from "next/link";
 import resultsData from "@/data/results.json";
-import fundingData from "@/data/funding.json";
 import challengesData from "@/data/challenges.json";
-import cliExperiment from "@/data/codex-cli-sol.json";
+import { modelHref } from "@/lib/model-path";
 
 type Challenge = {
   name: string;
@@ -46,12 +45,6 @@ const data = resultsData as {
 
 const challengeDefs = challengesData as ChallengeDef[];
 
-const funding = fundingData as {
-  goal_cents: number;
-  raised_cents: number;
-  wishlist: { model_id: string; name: string; status: string; est_cost_cents: number }[];
-};
-
 function formatDate(iso: string) {
   return new Date(iso).toUTCString().replace("GMT", "UTC");
 }
@@ -71,25 +64,17 @@ const TIER_STYLE: Record<Tier, { dot: string; text: string; glow: string }> = {
 };
 
 const COST_TIER_STYLE: Record<string, string> = {
+  subscription: "text-cyan",
   free: "text-green",
   cheap: "text-cyan",
   paid: "text-magenta",
   unknown: "text-fg-dim",
 };
 
-function money(cents: number) {
-  return `$${(cents / 100).toFixed(0)}`;
-}
-
 export default function Home() {
   const models = data.models;
+  const top = models[0];
   const challengeCount = challengeDefs.length;
-  const fundPct = Math.min(
-    100,
-    Math.round((funding.raised_cents / Math.max(1, funding.goal_cents)) * 100)
-  );
-  const unfunded = funding.wishlist.filter((w) => w.status === "unfunded").length;
-  const scoredIds = new Set(models.map((m) => m.id));
 
   const boardAvg = (name: string) => {
     const scores = models
@@ -118,54 +103,57 @@ export default function Home() {
             </span>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-fg">
-            Opinionated coding tasks, scored by an LLM judge on{" "}
+            Thirteen coding tasks, run through headless Codex with a ChatGPT subscription
+            and scored on{" "}
             <span className="font-semibold text-green">correctness</span>,{" "}
             <span className="font-semibold text-magenta">code quality</span>, and{" "}
-            <span className="font-semibold text-cyan">documentation</span>. Free-tier models
-            run free. Paid models get crowdfunded.
+            <span className="font-semibold text-cyan">documentation</span>.
           </p>
         </header>
 
-        <section
-          className="rise flex flex-col gap-5 border border-amber-faint bg-bg-raised/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
-          style={{ animationDelay: "80ms" }}
-        >
-          <div className="crt-flicker">
-            <h2 className="text-xs uppercase tracking-[0.3em] text-amber-bright">
-              latest experiment / GPT-5.6 Sol
-            </h2>
-            <div className="glow font-display text-[6.5rem] leading-none text-amber sm:text-[9rem]">
-              {cliExperiment.average.toFixed(1)}
+        {top && (
+          <section
+            className="rise flex flex-col gap-5 border border-amber-faint bg-bg-raised/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+            style={{ animationDelay: "80ms" }}
+          >
+            <div className="crt-flicker">
+              <h2 className="text-xs uppercase tracking-[0.3em] text-amber-bright">
+                #01 / {top.name}
+              </h2>
+              <div className={`font-display text-[6.5rem] leading-none sm:text-[9rem] ${TIER_STYLE[scoreTier(top.average)].text} ${TIER_STYLE[scoreTier(top.average)].glow}`}>
+                {top.average.toFixed(1)}
+              </div>
+              <p className="text-sm uppercase tracking-[0.2em] text-fg-dim">
+                / 10 · {top.challenges.length}/{challengeCount} challenges
+              </p>
             </div>
-            <p className="text-sm uppercase tracking-[0.2em] text-fg-dim">
-              / 10 · {cliExperiment.rows.length}/{challengeCount} challenges
-            </p>
-          </div>
-          <div className="max-w-xs space-y-3 text-sm leading-relaxed text-fg">
-            <p>
-              Sol answered all 13 coding challenges through headless Codex, then judged its
-              own answers using a local ChatGPT sign-in.
-            </p>
-            <p className="text-fg-dim">
-              This 9.0 is a separate CLI result. The leaderboard below uses a Sonnet 5 judge,
-              so its scores are not directly comparable.
-            </p>
-            <Link href="/experiments/codex-cli-sol" className="inline-block text-amber hover:text-amber-bright">
-              inspect every answer and verdict →
-            </Link>
-          </div>
-        </section>
+            <div className="max-w-xs space-y-3 text-sm leading-relaxed text-fg">
+              <p>
+                The current board uses one ChatGPT-signed-in judge:
+                {" "}<span className="text-amber-bright">GPT-5.6 Sol through Codex CLI</span>.
+              </p>
+              <p className="text-fg-dim">
+                Each subject ran in a fresh, read-only Codex session. Sol also grades its
+                own run; read the full answers and verdicts before treating small gaps as meaningful.
+              </p>
+              <Link href={modelHref(top.id)} className="inline-block text-amber hover:text-amber-bright">
+                inspect the leading run →
+              </Link>
+            </div>
+          </section>
+        )}
 
         <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
-              Sonnet 5 judged leaderboard
+              ChatGPT subscription leaderboard
             </h2>
             <span className="text-xs text-fg-dim">{models.length} models · {formatDate(data.generated_at)}</span>
           </div>
           <p className="mb-3 text-sm text-fg-dim">
-            GLM 5.3 leads this same-judge board. Sol’s self-judged CLI run is shown above,
-            outside these rankings.
+            GPT-6 Astra and GPT-5.6 Sol share the same Sol judge. The older Sonnet 5 results
+            are preserved in the{" "}
+            <Link href="/archive/sonnet-5" className="text-amber hover:text-amber-bright">archive</Link>.
           </p>
           <div className="overflow-x-auto border border-amber-faint">
             <table className="w-full min-w-[720px] border-collapse text-sm">
@@ -173,7 +161,7 @@ export default function Home() {
                 <tr className="border-b border-amber-faint text-left text-xs uppercase tracking-wider text-fg-dim">
                   <th className="px-4 py-3 font-normal">#</th>
                   <th className="px-4 py-3 font-normal">model</th>
-                  <th className="px-4 py-3 font-normal">cost</th>
+                  <th className="px-4 py-3 font-normal">access</th>
                   <th
                     className="px-4 py-3 text-right font-normal"
                     title="average correctness · quality · documentation"
@@ -201,7 +189,7 @@ export default function Home() {
                       <td className="px-4 py-3 text-fg-dim">{String(i + 1).padStart(2, "0")}</td>
                       <td className="px-4 py-3 font-medium">
                         <Link
-                          href={`/models/${m.id}`}
+                          href={modelHref(m.id)}
                           className="inline-flex items-center gap-2 hover:text-amber-bright"
                         >
                           <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
@@ -247,11 +235,7 @@ export default function Home() {
           </p>
           <p className="mt-2 text-xs text-fg-dim">
             click a model for its full challenge breakdown, raw responses, and judge notes.
-            free + cheap run by default; paid models land when{" "}
-            <Link href="/fund" className="text-amber hover:text-amber-bright">
-              crowdfunded
-            </Link>
-            .
+            each published result comes from a saved headless Codex run.
           </p>
         </section>
 
@@ -308,74 +292,22 @@ export default function Home() {
           className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4"
           style={{ animationDelay: "260ms" }}
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">fund the bench</h2>
-              <p className="mt-1 max-w-lg text-sm text-fg">
-                {unfunded} paid model{unfunded === 1 ? "" : "s"} still waiting. Free tiers
-                (Groq / Gemini) never need a card — crowdfunding buys the expensive head-to-heads.
-              </p>
-            </div>
-            <Link
-              href="/fund"
-              className="border border-amber bg-amber/15 px-4 py-2 text-sm font-medium text-amber-bright hover:bg-amber/25"
-            >
-              open fund drive →
-            </Link>
-          </div>
-          <div className="mt-4 h-2 w-full border border-amber-faint bg-bg">
-            <div className="h-full bg-amber" style={{ width: `${fundPct}%` }} />
-          </div>
-          <p className="mt-2 text-xs text-fg-dim">
-            {money(funding.raised_cents)} / {money(funding.goal_cents)} season goal · {fundPct}%
-          </p>
-        </section>
-
-        <section
-          className="rise border border-amber-faint px-4 py-4"
-          style={{ animationDelay: "300ms" }}
-        >
-          <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">not scored on the Sonnet board yet</h2>
-          <ul className="flex flex-col gap-1 text-sm text-fg-dim">
-            {funding.wishlist
-              .filter((w) => !scoredIds.has(w.model_id))
-              .map((w) => (
-                <li key={w.model_id} className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="text-amber-bright">{w.name}</span>
-                  <span className="text-xs uppercase tracking-wider">{w.status}</span>
-                  <span>
-                    {w.est_cost_cents === 0 ? "free to run" : `~${money(w.est_cost_cents)} / full suite`}
-                  </span>
-                </li>
-              ))}
-          </ul>
-          <Link href="/fund" className="mt-3 inline-block text-xs text-amber hover:text-amber-bright">
-            put them on the board →
-          </Link>
-        </section>
-
-        <section
-          className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4"
-          style={{ animationDelay: "310ms" }}
-        >
           <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">
             methodology, honestly
           </h2>
           <p className="text-sm leading-relaxed text-fg">
-            Every score comes from a single LLM judge — currently{" "}
-            <span className="font-semibold text-amber-bright">{data.judge}</span> — pinned across
-            all runs so scores stay comparable. That judge is a Claude model scoring a board that
-            includes Claude models: same-family bias is real, so treat cross-family gaps as
-            directional, not gospel. Thinking and verdict budgets are separate contracts in the
-            harness, and every score links to its raw response and judge notes so you can audit
-            the reasoning instead of trusting the number.
+            Every score here uses <span className="font-semibold text-amber-bright">{data.judge}</span>.
+            The judge is also a subject on this board, so self-judging bias is possible.
+            Codex CLI prompts for an output length but does not enforce the API token cap.
+            Every model page links to its full response and judge notes. The earlier API runs
+            remain in the <Link href="/archive/sonnet-5" className="text-amber hover:text-amber-bright">Sonnet 5 archive</Link>.
           </p>
         </section>
 
         <section
           id="api"
           className="rise scroll-mt-6 border border-amber-faint bg-bg-raised/40 px-4 py-4 text-xs"
-          style={{ animationDelay: "320ms" }}
+          style={{ animationDelay: "280ms" }}
         >
           <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">api</h2>
           <p className="text-fg-dim">

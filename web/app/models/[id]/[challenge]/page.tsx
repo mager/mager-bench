@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import challengesData from "@/data/challenges.json";
 import resultsData from "@/data/results.json";
 import { arizeTraceUrl } from "@/lib/arize";
+import { modelHref, modelSlug } from "@/lib/model-path";
 
 type ChallengeDef = {
   name: string;
@@ -61,7 +62,7 @@ function tier(score: number) {
 
 export function generateStaticParams() {
   return data.models.flatMap((m) =>
-    m.challenges.map((c) => ({ id: m.id, challenge: c.name }))
+    m.challenges.map((c) => ({ id: modelSlug(m.id), challenge: c.name }))
   );
 }
 
@@ -71,7 +72,7 @@ export async function generateMetadata({
   params: Promise<{ id: string; challenge: string }>;
 }): Promise<Metadata> {
   const { id, challenge } = await params;
-  const m = data.models.find((x) => x.id === id);
+  const m = data.models.find((x) => modelSlug(x.id) === id);
   return {
     title: m ? `${m.name} × ${challenge} — mager-bench` : "trace — mager-bench",
     description: m
@@ -113,7 +114,7 @@ export default async function TracePage({
   params: Promise<{ id: string; challenge: string }>;
 }) {
   const { id, challenge: challengeName } = await params;
-  const model = data.models.find((m) => m.id === id);
+  const model = data.models.find((m) => modelSlug(m.id) === id);
   const result = model?.challenges.find((c) => c.name === challengeName);
   if (!model || !result) return notFound();
 
@@ -141,7 +142,7 @@ export default async function TracePage({
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
           <nav className="flex flex-wrap gap-x-4 text-xs text-fg-dim">
-            <Link href={`/models/${model.id}`} className="hover:text-amber-bright">
+            <Link href={modelHref(model.id)} className="hover:text-amber-bright">
               ← {model.name} runs
             </Link>
             <Link href={`/challenges/${result.name}`} className="hover:text-amber-bright">

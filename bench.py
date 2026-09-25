@@ -2,7 +2,7 @@
 mager-bench — rates coding models on correctness, code quality, docs, and speed.
 
 Usage:
-    python bench.py                            # free/cheap subjects, paid GPT-6 Sol judge
+    python bench.py                            # subscription subjects and judge through Codex CLI
     python bench.py --tier free --judge gemini-2.5-flash  # free subjects + judge
     python bench.py --models llama-3.3-70b,gemini-2.0-flash
     python bench.py --challenge fizzbuzz
@@ -300,10 +300,7 @@ def resolve_models(args) -> list[str]:
     elif args.tier == "subscription":
         ids = configured_models("subscription")
     else:
-        # default: cheap (free + cheap) so a fresh clone doesn't torch a credit card
-        ids = configured_models("cheap")
-        if not ids:
-            ids = configured_models("all") or list(AVAILABLE_MODELS)
+        ids = configured_models("all") or list(AVAILABLE_MODELS)
     return ids
 
 
@@ -317,18 +314,18 @@ def resolve_judges(args) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="mager-bench: coding model benchmark (free-tier friendly)"
+        description="mager-bench: coding model benchmark (ChatGPT subscription by default)"
     )
     parser.add_argument(
         "--models",
         default=None,
-        help="comma-separated model IDs (default: configured free+cheap)",
+        help="comma-separated model IDs (default: configured subscription models)",
     )
     parser.add_argument(
         "--tier",
         choices=["free", "cheap", "paid", "subscription", "all"],
-        default="cheap",
-        help="model tier when --models not set (default: cheap = free+haiku+mini)",
+        default="subscription",
+        help="model tier when --models not set (default: subscription via Codex CLI)",
     )
     parser.add_argument(
         "--challenge",
@@ -338,7 +335,7 @@ def main() -> None:
     parser.add_argument(
         "--judge",
         default=None,
-        help=f"single judge model ID (default: {DEFAULT_JUDGE_MODEL}, paid)",
+        help=f"single judge model ID (default: {DEFAULT_JUDGE_MODEL}, ChatGPT subscription)",
     )
     parser.add_argument(
         "--judges",
@@ -351,7 +348,10 @@ def main() -> None:
         default=1,
         help="repeat each model×challenge N times and report mean ± stddev",
     )
-    parser.add_argument("--serial", action="store_true", help="run one job at a time")
+    parser.add_argument("--serial", action="store_true", help="run one job at a time (subscription default)")
+    parser.add_argument("--parallel", action="store_true", help="allow concurrent subscription subject calls")
+    parser.add_argument("--allow-api", action="store_true",
+                        help="explicitly allow paid/free API or gateway calls instead of subscription-only Codex CLI")
     parser.add_argument("--output", default=None, help="save results to JSON file")
     parser.add_argument("--rescore-file", default=None,
                         help="rescore saved single-run responses without generating them again")
@@ -369,8 +369,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--judge-max-tokens", type=int, default=16384,
-        help="max tokens per judge call (default: 16384 — Sonnet judge needs "
-             "the headroom on long responses; billed only on use)",
+        help="judge output-length target (default: 16384; CLI treats this as an instruction)",
     )
     parser.add_argument(
         "--thinking-headroom", type=int, default=32768,
@@ -389,6 +388,9 @@ def main() -> None:
              "and exit without spending a token",
     )
     args = parser.parse_args()
+
+    if args.output and Path(args.output).resolve() == Path(__file__).resolve().parent / "results.json":
+        parser.error("save runs under runs/ and merge them; --output results.json would erase the board")
 
     if args.list_models:
         print(list_models_report())
@@ -411,6 +413,10 @@ def main() -> None:
         missing = [judge_id for judge_id in old_judges if not is_configured(judge_id)]
         if missing and not args.dry_run:
             parser.error(f"judge(s) not configured: {', '.join(missing)}")
+        if not args.dry_run and not args.allow_api and any(
+            model_info(judge_id).family != "codex-cli" for judge_id in old_judges
+        ):
+            parser.error("API judging requires --allow-api; subscription-only is the default")
         selected = ({name.strip() for name in args.challenge.split(",")}
                     if args.challenge else {row["challenge"] for row in payload["results"]})
         challenges = {challenge.name: challenge for challenge in load_challenges(None)}
@@ -448,13 +454,25 @@ def main() -> None:
 
     models = resolve_models(args)
     judges = resolve_judges(args)
+    if not models:
+        parser.error("no subscription models configured; install Codex CLI and run `codex login`")
+    if args.serial and args.parallel:
+        parser.error("choose either --serial or --parallel")
+    if not args.dry_run and not args.allow_api and any(
+        model_info(model_id) is None or model_info(model_id).family != "codex-cli"
+        for model_id in models + judges
+    ):
+        parser.error("API or gateway models require --allow-api; subscription-only is the default")
     if not args.dry_run:
         missing_judges = [j for j in judges if not is_configured(j)]
         if missing_judges:
             parser.error(f"judge(s) not configured: {', '.join(missing_judges)}; "
-                         "GPT-6 Sol requires OPENAI_API_KEY or AI_GATEWAY_API_KEY. "
-                         "Use --judge to choose another configured model.")
+                         "sign in with `codex login` for subscription runs.")
     runs = max(1, args.runs)
+    serial = args.serial or (not args.parallel and all(
+        model_info(model_id) and model_info(model_id).family == "codex-cli"
+        for model_id in models
+    ))
     challenge_names = (
         [c.strip() for c in args.challenge.split(",") if c.strip()]
         if args.challenge
@@ -462,11 +480,14 @@ def main() -> None:
     )
 
     print("mager-bench")
-    setup_tracing()
+    if args.allow_api:
+        setup_tracing()
+    else:
+        print("  tracing: disabled for subscription-only runs")
     print(f"  models : {', '.join(models)}")
     print(f"  judges : {', '.join(judges)}")
     print(f"  runs   : {runs}")
-    print(f"  mode   : {'serial' if args.serial else 'parallel'}")
+    print(f"  mode   : {'serial' if serial else 'parallel'}")
     if args.thinking_budget:
         print(f"  thinking-budget : {args.thinking_budget}")
     if args.reasoning_effort:
@@ -475,7 +496,7 @@ def main() -> None:
     print(f"  gateway-timeout   : {int(args.gateway_timeout)}s")
     print(f"  judge-max-tokens: {args.judge_max_tokens}")
     unpaid = [m for m in PAID_MODELS if m not in models]
-    if unpaid:
+    if args.allow_api and unpaid:
         print(f"  unpaid : {', '.join(unpaid)}  → fund at /fund to unlock")
 
     if args.dry_run:
@@ -488,11 +509,11 @@ def main() -> None:
               f"× {runs} runs = {total_calls} subject calls + "
               f"{total_judges} judge calls (subject tiers: {', '.join(tiers)}; "
               f"judge tiers: {', '.join(judge_tiers)})")
-        print("  no API calls made.")
+        print("  no model calls made.")
         return
 
     results = run_benchmark(
-        models, challenge_names, judges, serial=args.serial, runs=runs,
+        models, challenge_names, judges, serial=serial, runs=runs,
         thinking_budget=args.thinking_budget,
         reasoning_effort=args.reasoning_effort,
         thinking_headroom=args.thinking_headroom,
