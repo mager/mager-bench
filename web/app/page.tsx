@@ -83,7 +83,6 @@ function money(cents: number) {
 
 export default function Home() {
   const models = data.models;
-  const top = models[0];
   const challengeCount = challengeDefs.length;
   const fundPct = Math.min(
     100,
@@ -127,64 +126,47 @@ export default function Home() {
           </p>
         </header>
 
-        {top && (
-          <section
-            className="rise flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:justify-between"
-            style={{ animationDelay: "80ms" }}
-          >
-            <div className="crt-flicker">
-              <div className="text-xs uppercase tracking-[0.3em] text-fg-dim">
-                #{String(1).padStart(2, "0")} {top.name}
-              </div>
-              <div
-                className={`font-display text-[6.5rem] leading-none sm:text-[9rem] ${TIER_STYLE[scoreTier(top.average)].text} ${TIER_STYLE[scoreTier(top.average)].glow}`}
-              >
-                {top.average.toFixed(1)}
-              </div>
-              <div className="text-sm uppercase tracking-[0.3em] text-fg-dim">
-                / 10 leader · {models.length} model{models.length === 1 ? "" : "s"} scored
-              </div>
+        <section
+          className="rise flex flex-col gap-5 border border-amber-faint bg-bg-raised/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+          style={{ animationDelay: "80ms" }}
+        >
+          <div className="crt-flicker">
+            <h2 className="text-xs uppercase tracking-[0.3em] text-amber-bright">
+              latest experiment / GPT-5.6 Sol
+            </h2>
+            <div className="glow font-display text-[6.5rem] leading-none text-amber sm:text-[9rem]">
+              {cliExperiment.average.toFixed(1)}
             </div>
-            <dl className="grid grid-cols-2 gap-x-10 gap-y-4 text-sm sm:text-right">
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-fg-dim">avg latency</dt>
-                <dd className="mt-0.5 font-medium">{top.avg_speed_ms}ms</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-fg-dim">challenges</dt>
-                <dd className="mt-0.5 font-medium">{challengeCount}</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-fg-dim">judge</dt>
-                <dd className="mt-0.5 font-medium">{data.judge}</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-fg-dim">last run</dt>
-                <dd className="mt-0.5 font-medium">{formatDate(data.generated_at)}</dd>
-              </div>
-            </dl>
-          </section>
-        )}
-
-        <section className="rise border border-amber-faint bg-bg-raised/40 px-4 py-4" style={{ animationDelay: "110ms" }}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="max-w-xl">
-              <h2 className="text-xs uppercase tracking-[0.2em] text-amber-bright">from the lab</h2>
-              <p className="mt-2 text-sm leading-relaxed text-fg">
-                GPT-5.6 Sol finished all 13 challenges through headless Codex and scored{" "}
-                <strong>{cliExperiment.average.toFixed(1)}/10</strong> with a Sol judge. This
-                self-judged ChatGPT subscription run uses a different scoring setup from
-                the leaderboard.
-              </p>
-            </div>
-            <Link href="/experiments/codex-cli-sol" className="shrink-0 text-sm text-amber hover:text-amber-bright">
-              inspect the run →
+            <p className="text-sm uppercase tracking-[0.2em] text-fg-dim">
+              / 10 · {cliExperiment.rows.length}/{challengeCount} challenges
+            </p>
+          </div>
+          <div className="max-w-xs space-y-3 text-sm leading-relaxed text-fg">
+            <p>
+              Sol answered all 13 coding challenges through headless Codex, then judged its
+              own answers using a local ChatGPT sign-in.
+            </p>
+            <p className="text-fg-dim">
+              This 9.0 is a separate CLI result. The leaderboard below uses a Sonnet 5 judge,
+              so its scores are not directly comparable.
+            </p>
+            <Link href="/experiments/codex-cli-sol" className="inline-block text-amber hover:text-amber-bright">
+              inspect every answer and verdict →
             </Link>
           </div>
         </section>
 
         <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
-          <h2 className="mb-3 text-xs uppercase tracking-[0.3em] text-fg-dim">leaderboard</h2>
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
+              Sonnet 5 judged leaderboard
+            </h2>
+            <span className="text-xs text-fg-dim">{models.length} models · {formatDate(data.generated_at)}</span>
+          </div>
+          <p className="mb-3 text-sm text-fg-dim">
+            GLM 5.3 leads this same-judge board. Sol’s self-judged CLI run is shown above,
+            outside these rankings.
+          </p>
           <div className="overflow-x-auto border border-amber-faint">
             <table className="w-full min-w-[720px] border-collapse text-sm">
               <thead>
@@ -353,7 +335,7 @@ export default function Home() {
           className="rise border border-amber-faint px-4 py-4"
           style={{ animationDelay: "300ms" }}
         >
-          <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">not scored yet</h2>
+          <h2 className="mb-2 text-xs uppercase tracking-[0.3em] text-fg-dim">not scored on the Sonnet board yet</h2>
           <ul className="flex flex-col gap-1 text-sm text-fg-dim">
             {funding.wishlist
               .filter((w) => !scoredIds.has(w.model_id))
