@@ -1,6 +1,6 @@
 # mager-bench 1.1: make the model find the bug
 
-Published · 2026-09-27
+Draft · September 26, 2026
 
 Astra got 9.3 on mager-bench. Four of the thirteen task totals were perfect.
 That's one run, with a model judge, so it doesn't prove the benchmark is solved.

@@ -7,8 +7,6 @@ The live ChatGPT-subscription scorecard for [mager-bench](../README.md), deploye
 | Path | What |
 |---|---|
 | `/` | current Codex CLI leaderboard |
-| `/blog` | published benchmark notes |
-| `/blog/mager-bench-1-1` | the Counterexample Lab announcement |
 | `/models/<id>` | each model's challenge scores |
 | `/challenges` | all 13 challenge cards |
 | `/challenges/<name>` | prompt, rubric, and current-board scores |
@@ -27,20 +25,6 @@ The live ChatGPT-subscription scorecard for [mager-bench](../README.md), deploye
 6. `node scripts/sync-cli-result.mjs` exports the original Sol run to `data/codex-cli-sol.json` for its dedicated inspection page.
 
 The old `data/funding.json` remains as an API-era archive. New runs use the local ChatGPT subscription.
-
-## Publishing posts
-
-Markdown in `../posts/YYYY-MM-DD-slug.md` is the source. Keep the title on the
-first line (`# Title`), followed by a blank line and `Published · YYYY-MM-DD`.
-Posts marked `Draft · ...` are excluded. The filename supplies the public slug;
-dots become hyphens, so `mager-bench-1.1` is served as `/blog/mager-bench-1-1`.
-
-`npm run sync:posts` exports published articles to `data/posts.json`; local
-`npm run dev` and `npm run build` run it automatically. Commit the Markdown
-and generated JSON together. Run the sync before `vercel --prod`: web-only
-deployment uploads use the committed export because `../posts` is outside
-their build root. The pages render Markdown on the server, and relative source
-links resolve against the post's GitHub location.
 
 ## Design and development
 

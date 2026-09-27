@@ -98,7 +98,7 @@ export default function Home() {
               mager-bench
             </h1>
             <span className="text-xs text-fg-dim">
-              legacy // {challengeCount}-challenge personal coding bench
+              v1.1 // {challengeCount}-challenge personal coding bench
             </span>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-fg">
@@ -107,16 +107,6 @@ export default function Home() {
             <span className="font-semibold text-green">correctness</span>,{" "}
             <span className="font-semibold text-magenta">code quality</span>, and{" "}
             <span className="font-semibold text-cyan">documentation</span>.
-          </p>
-          <p className="max-w-xl text-sm leading-relaxed text-fg-dim">
-            v1.1 introduces Counterexample Lab. These scores remain on the legacy
-            board; no v1.1 model results yet.{" "}
-            <Link
-              href="/blog/mager-bench-1-1"
-              className="text-amber underline decoration-dotted underline-offset-4 hover:text-amber-bright"
-            >
-              Read the announcement →
-            </Link>
           </p>
         </header>
 
