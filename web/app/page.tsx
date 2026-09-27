@@ -73,7 +73,6 @@ const COST_TIER_STYLE: Record<string, string> = {
 
 export default function Home() {
   const models = data.models;
-  const top = models[0];
   const challengeCount = challengeDefs.length;
 
   const boardAvg = (name: string) => {
@@ -111,38 +110,6 @@ export default function Home() {
           </p>
         </header>
 
-        {top && (
-          <section
-            className="rise flex flex-col gap-5 border border-amber-faint bg-bg-raised/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"
-            style={{ animationDelay: "80ms" }}
-          >
-            <div className="crt-flicker">
-              <h2 className="text-xs uppercase tracking-[0.3em] text-amber-bright">
-                #01 / {top.name}
-              </h2>
-              <div className={`font-display text-[6.5rem] leading-none sm:text-[9rem] ${TIER_STYLE[scoreTier(top.average)].text} ${TIER_STYLE[scoreTier(top.average)].glow}`}>
-                {top.average.toFixed(1)}
-              </div>
-              <p className="text-sm uppercase tracking-[0.2em] text-fg-dim">
-                / 10 · {top.challenges.length}/{challengeCount} challenges
-              </p>
-            </div>
-            <div className="max-w-xs space-y-3 text-sm leading-relaxed text-fg">
-              <p>
-                The current board uses one ChatGPT-signed-in judge:
-                {" "}<span className="text-amber-bright">GPT-5.6 Sol through Codex CLI</span>.
-              </p>
-              <p className="text-fg-dim">
-                Each subject ran in a fresh, read-only Codex session. Sol also grades its
-                own run; read the full answers and verdicts before treating small gaps as meaningful.
-              </p>
-              <Link href={modelHref(top.id)} className="inline-block text-amber hover:text-amber-bright">
-                inspect the leading run →
-              </Link>
-            </div>
-          </section>
-        )}
-
         <section id="leaderboard" className="rise scroll-mt-6" style={{ animationDelay: "140ms" }}>
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
@@ -151,8 +118,8 @@ export default function Home() {
             <span className="text-xs text-fg-dim">{models.length} models · {formatDate(data.generated_at)}</span>
           </div>
           <p className="mb-3 text-sm text-fg-dim">
-            GPT-6 Astra and GPT-5.6 Sol share the same Sol judge. The older Sonnet 5 results
-            are preserved in the{" "}
+            Every model below uses GPT-5.6 Sol through Codex CLI as its judge. The older
+            Sonnet 5 results are preserved in the{" "}
             <Link href="/archive/sonnet-5" className="text-amber hover:text-amber-bright">archive</Link>.
           </p>
           <div className="overflow-x-auto border border-amber-faint">

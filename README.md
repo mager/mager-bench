@@ -37,6 +37,21 @@ Never write a model run directly to `results.json`. The merge script requires al
 
 The older API providers remain in code for reproducibility, but a new API or gateway run requires explicit `--allow-api` and cannot be merged into the current subscription board. The former API funding drive is archived.
 
+## Using Pro to judge other models
+
+The ChatGPT subscription covers the GPT calls made through the signed-in Codex CLI. It does not provide Claude, Gemini, GLM, or other providers' inference through Codex. Those subjects need their own provider or a local runtime; their saved answers can then be graded by the subscription-backed GPT judge.
+
+The harness already supports an explicitly opted-in external subject with the Codex judge, saving the result separately:
+
+```bash
+.venv/bin/python bench.py --models <external-model-id> \
+  --judge codex-cli/gpt-5.6-sol --allow-api --serial --dry-run
+```
+
+Remove `--dry-run` and add an output path under `runs/` to execute it. This makes external subject calls and is outside the current subscription-only run policy. The subscription board's merge script rejects those runs.
+
+For the archived board, we can reuse the original answers without making new subject calls. A migration must grade every saved run with GPT, recompute multi-run averages and variance, and record the new judge separately from the original Sonnet verdicts. The existing `--rescore-file` command only handles single-run files and retains their original judge, so it is not yet an archive migration command.
+
 ## Challenges
 
 | Name | What it tests |
