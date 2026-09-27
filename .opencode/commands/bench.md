@@ -1,8 +1,35 @@
 ---
-description: Run a subscription-backed mager-bench eval and publish it
+description: Run mager-bench 1.1 through the local ChatGPT subscription
 ---
 
-# /bench — run and publish a model
+# /bench — run mager-bench 1.1
+
+The active suite is Counterexample Lab. Read `docs/mager-bench-1.1.md` and
+`counterexample_lab/prompt.md`. The model supplies regression traces; a
+deterministic grader measures how many of eight ledger faults they expose.
+There are no LLM judge calls. Use the local ChatGPT subscription exclusively.
+
+```bash
+cd ~/Code/mager-bench
+codex login status
+.venv/bin/python bench_v1_1.py --model <codex-cli/model-id> --dry-run
+.venv/bin/python -c "from providers import get_provider; print(get_provider('<codex-cli/model-id>').complete('Say OK'))"
+.venv/bin/python bench_v1_1.py --model <codex-cli/model-id> \
+  --reasoning-effort low --output runs/v1.1/YYYY-MM-DD-<model>-r1.json
+```
+
+Save each independent attempt with a new filename. Inspect status, raw response,
+suite hash, reasoning effort, trace validity, and exposed faults. An empty or
+malformed response or provider error is an unscored failed call, never a zero.
+Preserve failed attempts when rerunning. Calibration requires repeated samples
+with matching effort and suite hashes; do not publish a new ranking yet.
+
+Commit new run artifacts with their frozen test source. Do not run the legacy
+merge/sync/deploy workflow for 1.1: `results.json` and the live board still carry
+the original scoring contract. FizzBuzz, binary search, and refactor are archived
+from the active suite; their historical evidence stays available.
+
+## Reproduce or publish the legacy thirteen-task board
 
 `AGENTS.md` contains the board rules. New subject and judge calls use fresh,
 read-only headless Codex sessions signed in with the local ChatGPT subscription.

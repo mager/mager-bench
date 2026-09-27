@@ -1,16 +1,40 @@
 # mager-bench
 
-A personal coding-model benchmark: thirteen tasks from FizzBuzz to a one-file Doom-style raycaster, scored on correctness, code quality, and documentation. Each score links to the answer and the judge's notes.
+A personal coding-model benchmark. **Version 1.1 introduces Counterexample Lab:**
+write compact regression tests that expose eight faults in a stateful ledger.
+The grader executes the submitted traces and checks their exact expected results.
 
-**Live board:** [bench.mager.co](https://bench.mager.co)
+[1.1 specification](docs/mager-bench-1.1.md) ·
+[Short announcement draft](posts/2026-09-26-mager-bench-1.1.md) ·
+[Archived easy tests](docs/archive/easy-tests.md)
+
+FizzBuzz, binary search, and the tiny refactor task are retired from the new
+suite. The original thirteen-task board and prompts remain available for
+reproduction. Its scores average correctness, quality, and documentation;
+they are not comparable to 1.1's mutation coverage. No 1.1 model scores have
+been published yet.
+
+```bash
+.venv/bin/python bench_v1_1.py --model codex-cli/gpt-6-astra --dry-run
+# Check codex login status and smoke-test a new model before its first run.
+.venv/bin/python bench_v1_1.py --model codex-cli/gpt-6-astra \
+  --reasoning-effort low --output runs/v1.1/YYYY-MM-DD-codex-cli-gpt-6-astra.json
+```
+
+Version 1.1 uses the local ChatGPT subscription for subjects and a deterministic
+grader with zero judge-model calls. Save every attempt separately under
+`runs/v1.1/`; these artifacts do not go through the legacy board's merge script.
+The [suite manifest](benchmark-suites.json) records active and retired tasks.
+
+**Legacy thirteen-task board:** [bench.mager.co](https://bench.mager.co)
 
 **Original Sonnet 5 board:** [archive](https://bench.mager.co/archive/sonnet-5)
 
 **Current board JSON:** [`/api/results`](https://bench.mager.co/api/results)
 
-## ChatGPT subscription workflow
+## Legacy thirteen-task reproduction
 
-All new benchmark calls run through fresh, read-only headless Codex CLI sessions signed in to a local ChatGPT subscription. The default subjects are `codex-cli/gpt-5.6-sol` and `codex-cli/gpt-6-astra`; the single board judge is `codex-cli/gpt-5.6-sol`. GPT-6 Sol itself was not available through this account's Codex CLI on 2026-09-25, so the earlier GPT-6 Sol API default has been retired.
+Legacy benchmark calls run through fresh, read-only headless Codex CLI sessions signed in to a local ChatGPT subscription. The default subjects are `codex-cli/gpt-5.6-sol` and `codex-cli/gpt-6-astra`; the single legacy board judge is `codex-cli/gpt-5.6-sol`. GPT-6 Sol itself was not available through this account's Codex CLI on 2026-09-25, so the earlier GPT-6 Sol API default has been retired.
 
 The CLI receives an instruction to target each challenge's output length, but does not impose the API's hard output-token cap. This is an agent-harness benchmark. Sol judging its own answers is a possible source of bias. We preserve the earlier Sonnet 5 API board separately rather than mix judges in one ranking.
 
@@ -52,15 +76,15 @@ Remove `--dry-run` and add an output path under `runs/` to execute it. This make
 
 For the archived board, we can reuse the original answers without making new subject calls. A migration must grade every saved run with GPT, recompute multi-run averages and variance, and record the new judge separately from the original Sonnet verdicts. The existing `--rescore-file` command only handles single-run files and retains their original judge, so it is not yet an archive migration command.
 
-## Challenges
+## Legacy challenges
 
 | Name | What it tests |
 |---|---|
-| `fizzbuzz` | Baseline correctness and style |
-| `binary-search` | Algorithm and full documentation |
+| `fizzbuzz` | Archived — baseline correctness and style |
+| `binary-search` | Archived — algorithm and full documentation |
 | `api-client` | Class design, errors, type hints, docs |
 | `readme-writer` | Documentation ability |
-| `refactor` | Code clarity and change explanation |
+| `refactor` | Archived — code clarity and change explanation |
 | `test-writing` | pytest edge cases and assertions |
 | `debug` | Finding and fixing three Python bugs |
 | `async-fetch` | Concurrency, timeouts, retries |

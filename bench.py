@@ -478,7 +478,8 @@ def main() -> None:
         else None
     )
 
-    print("mager-bench")
+    print("mager-bench / frozen legacy thirteen-task suite")
+    print("  active v1.1 Counterexample Lab: use bench_v1_1.py")
     if args.allow_api:
         setup_tracing()
     else:

@@ -3,7 +3,23 @@
 `/bench` in `.opencode/commands/bench.md` is the canonical workflow.
 `.claude/skills/run-bench/SKILL.md` mirrors it; if they disagree, `/bench` wins.
 
-## Current run policy
+## Active version: 1.1
+
+- Use `bench_v1_1.py` for the active Counterexample Lab. Read
+  `docs/mager-bench-1.1.md` and `counterexample_lab/prompt.md` first.
+- Dry-run first; subjects still use the local ChatGPT subscription exclusively.
+  There are zero LLM judge calls: a deterministic oracle and eight mutants score
+  submitted test traces. Save every attempt under `runs/v1.1/`.
+- FizzBuzz, binary search, and refactor are archived from the active suite;
+  `benchmark-suites.json` records the suite membership. Keep historical prompts
+  and scores intact. `bench.py` remains the frozen thirteen-task reproduction
+  entrypoint, including those archived tasks.
+- Never merge 1.1 mutation scores into `results.json` or use the legacy merge
+  script for them. Empty/malformed/provider failures remain unscored artifacts.
+  Publish no 1.1 ranking until repeated calibration runs are complete.
+- The next substantive contract, fault-corpus, budget, or scoring change is 1.2.
+
+## Legacy thirteen-task run policy
 
 - **Use the local ChatGPT subscription exclusively.** `bench.py` defaults to
   `codex-cli/` subjects and the `codex-cli/gpt-5.6-sol` judge. It does not fall

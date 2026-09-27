@@ -1,0 +1,30 @@
+{
+  "current_version": "1.1",
+  "suites": {
+    "1.1": {
+      "status": "active",
+      "entrypoint": "bench_v1_1.py",
+      "challenges": ["counterexample-ledger"],
+      "retired_challenges": ["fizzbuzz", "binary-search", "refactor"]
+    },
+    "legacy-13": {
+      "status": "frozen",
+      "entrypoint": "bench.py",
+      "challenges": [
+        "fizzbuzz",
+        "binary-search",
+        "api-client",
+        "readme-writer",
+        "refactor",
+        "test-writing",
+        "debug",
+        "async-fetch",
+        "sql",
+        "go-test",
+        "elixir-test",
+        "doom",
+        "slots"
+      ]
+    }
+  }
+}
