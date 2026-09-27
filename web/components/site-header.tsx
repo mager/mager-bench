@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const NAV_LINKS = [
   { href: "/", label: "leaderboard" },
   { href: "/challenges", label: "challenges" },
+  { href: "/blog", label: "blog" },
   { href: "/archive/sonnet-5", label: "Sonnet archive" },
 ];
 

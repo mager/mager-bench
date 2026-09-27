@@ -5,7 +5,7 @@ write compact regression tests that expose eight faults in a stateful ledger.
 The grader executes the submitted traces and checks their exact expected results.
 
 [1.1 specification](docs/mager-bench-1.1.md) ·
-[Short announcement draft](posts/2026-09-26-mager-bench-1.1.md) ·
+[Read the announcement](https://bench.mager.co/blog/mager-bench-1-1) ·
 [Archived easy tests](docs/archive/easy-tests.md)
 
 FizzBuzz, binary search, and the tiny refactor task are retired from the new
