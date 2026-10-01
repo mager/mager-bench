@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { VT323, IBM_Plex_Mono } from "next/font/google";
+import { Manrope, IBM_Plex_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import challengesData from "@/data/challenges.json";
 import "./globals.css";
 
-const display = VT323({
-  weight: "400",
+const display = Manrope({
   subsets: ["latin"],
-  variable: "--font-vt323",
+  variable: "--font-manrope",
 });
 
 const mono = IBM_Plex_Mono({
@@ -17,11 +15,11 @@ const mono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
 });
 
-const challengeCount = (challengesData as unknown[]).length;
-
 export const metadata: Metadata = {
-  title: "mager-bench",
-  description: `Personal coding-model benchmark — ${challengeCount} tasks run through headless Codex with a ChatGPT subscription, scored on correctness, quality, and docs.`,
+  title: "mager-bench | Counterexample Lab",
+  description:
+    "Can a coding model find the bug? Eight faulty ledgers, twelve events, and exact expectations. Explore mager-bench 1.1 and its open calibration results.",
+  metadataBase: new URL("https://bench.mager.co"),
 };
 
 export default function RootLayout({
@@ -31,9 +29,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${display.variable} ${mono.variable} h-full`}>
-      <body className="flex min-h-full flex-col font-mono antialiased">
+      <body className="flex min-h-screen flex-col font-sans antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-bg-raised focus:p-3"
+        >
+          Skip to content
+        </a>
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main id="main" className="flex-1">
+          {children}
+        </main>
         <SiteFooter />
       </body>
     </html>

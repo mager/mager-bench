@@ -89,8 +89,8 @@ export default async function ModelPage({
     <div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-4xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
-          <Link href="/" className="text-xs text-fg-dim hover:text-amber-bright">
-            ← leaderboard
+          <Link href="/archive/subscription" className="text-xs text-fg-dim hover:text-amber-bright">
+            ← historical leaderboard
           </Link>
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">

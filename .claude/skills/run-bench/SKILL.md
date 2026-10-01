@@ -16,6 +16,10 @@ response, suite hash, effort, trace validity, and mutation coverage. Failed call
 remain unscored; preserve them when rerunning. Calibration requires repeated
 samples with matching effort and suite hashes before publishing a ranking.
 
+Publish compatible 1.1 evidence with `web/scripts/sync-counterexample-data.py`
+and the version-specific workflow in `/bench`. The exporter regrades saved
+responses and rejects mixed suites/settings.
+
 Do not merge 1.1 artifacts into the legacy board. `bench.py` preserves the
 original thirteen tasks, including archived FizzBuzz, binary search, and
 refactor. For explicit legacy reproduction/publication only, follow the legacy

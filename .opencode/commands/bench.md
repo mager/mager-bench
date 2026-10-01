@@ -22,12 +22,27 @@ Save each independent attempt with a new filename. Inspect status, raw response,
 suite hash, reasoning effort, trace validity, and exposed faults. An empty or
 malformed response or provider error is an unscored failed call, never a zero.
 Preserve failed attempts when rerunning. Calibration requires repeated samples
-with matching effort and suite hashes; do not publish a new ranking yet.
+with matching effort, output targets, and suite hashes. The first six attempts
+are published as preliminary calibration, without ranking the models.
 
-Commit new run artifacts with their frozen test source. Do not run the legacy
-merge/sync/deploy workflow for 1.1: `results.json` and the live board still carry
-the original scoring contract. FizzBuzz, binary search, and refactor are archived
-from the active suite; their historical evidence stays available.
+Commit new run artifacts with their frozen test source and generated web data.
+Never run the legacy merge script on 1.1 artifacts. To publish compatible runs:
+
+```bash
+.venv/bin/python web/scripts/sync-counterexample-data.py
+cd web
+npm run lint
+npm run build
+vercel --prod
+```
+
+The exporter regrades each completed response and rejects mismatched suite
+hashes, prompts, or settings. Commit and push the source artifacts, exported
+`web/data/counterexample.json`, and any presentation changes together.
+The homepage and `/api/v1.1/results` use the new data. `results.json`,
+`/api/results`, and `/api/summary` retain the legacy scoring contract; the old
+subscription board lives at `/archive/subscription`. FizzBuzz, binary search,
+and refactor are retired from the active suite; historical evidence stays intact.
 
 ## Reproduce or publish the legacy thirteen-task board
 

@@ -1,3 +1,4 @@
+import { ArchiveNotice } from "@/components/archive-notice";
 import type { Metadata } from "next";
 import Link from "next/link";
 import archiveData from "@/data/sonnet-5-board.json";
@@ -28,16 +29,16 @@ const archive = archiveData as {
 
 export default function SonnetArchive() {
   return (
-    <main className="px-4 py-10 sm:px-8 md:py-16">
+    <><ArchiveNotice /><div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-4xl flex-col gap-9">
         <header className="border-b border-amber-faint pb-6">
-          <Link href="/" className="text-xs text-fg-dim hover:text-amber-bright">← current leaderboard</Link>
+          <Link href="/archive" className="text-xs text-fg-dim hover:text-amber-bright">← all historical boards</Link>
           <p className="mt-6 text-xs uppercase tracking-[0.25em] text-amber-dim">historical board / API era</p>
           <h1 className="mt-2 font-display text-4xl text-amber sm:text-5xl">Sonnet 5 board archive</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-fg">
             These {archive.models.length} models were scored by {archive.judge}. Their numbers
-            belong to this earlier judge and should not be ranked against the current
-            ChatGPT-subscription runs.
+            belong to this earlier judge and should not be ranked against the separate
+            ChatGPT-subscription board.
           </p>
           <p className="mt-3 text-xs text-fg-dim">Last updated {new Date(archive.generated_at).toUTCString()}</p>
         </header>
@@ -82,6 +83,6 @@ export default function SonnetArchive() {
           Inspect the original merged JSON →
         </a>
       </div>
-    </main>
+    </div></>
   );
 }

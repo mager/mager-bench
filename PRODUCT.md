@@ -4,74 +4,49 @@
 
 product
 
-## Users
+## Users and purpose
 
-Andrew ("Mager"), a solo developer who runs this bench himself every time a
-new coding model drops, plus other developers who land on the public site
-out of curiosity about how models stack up on tasks that actually resemble
-day-to-day coding work.
+Andrew (Mager) runs a small personal coding-model benchmark. Curious developers
+visit to understand what a score measures, inspect the actual model response,
+and reproduce the experiment. There is no signup, sales funnel, or enterprise
+platform to promote.
 
-Nobody is here to sign up or convert into a SaaS customer. They're here to
-read scores, inspect *why* a model scored what it scored, and optionally
-try the open-source harness themselves.
+The active benchmark is version 1.1, Counterexample Lab: models design compact
+regression traces for a stateful ledger. A deterministic oracle and eight faulty
+implementations check exact expectations and measure exposed faults. Subjects
+use fresh Codex CLI sessions through the local ChatGPT subscription. No LLM
+judges are used in 1.1.
 
-## Product Purpose
+The first calibration publishes three attempts each from Astra and Sol at the
+same reasoning setting. Show all attempts and the limited scope of the evidence,
+not a confident general-purpose ranking. Original thirteen-task LLM-judged
+boards are historical archives with intact prompts, responses, and scores.
 
-mager-bench is a small, opinionated, personally-curated benchmark: thirteen
-coding tasks Mager actually cares about, run against any model, scored by
-an LLM judge on correctness, code quality, and documentation.
+## Brand and scene
 
-**Subscription first.** New subjects and the judge run through fresh,
-read-only headless Codex sessions signed in to a local ChatGPT subscription.
-The earlier API-model board remains an archive with its Sonnet 5 judge.
+A developer opens the site on a laptop in daylight, curious and skeptical about
+another model score. They need to see a concrete failure and inspect the evidence
+without decoding terminal decoration. The site feels like a small experimental
+workbench: precise, inviting, candid, and quietly playful.
 
-The web dashboard is the public face of that CLI tool — a multi-model
-leaderboard plus a transparent paper trail (challenge prompt, rubric, and
-the model's actual response) so a visitor can inspect *why* a score landed
-where it did. The current board uses one judge for every row and states the
-limits of this agent-harness setup, including self-judging bias.
+A light mineral surface, ink typography, and restrained rust accents replace
+the old amber CRT presentation at the user's request for a complete redesign.
+The interactive ledger example carries the personality. No stock imagery is
+needed because the actual test is the most useful visual.
 
-Success = a developer looks at this and immediately understands both the
-ranking and the reasoning, and feels a little competitive urge to see their
-favorite model climb it.
+## Principles
 
-## Brand Personality
-
-Nerdy, playful, technically confident. CRT hacker-terminal energy — amber
-phosphor glow, monospace type, a blinking cursor — but legible first,
-retro-flavor second. Tone is "I built a scrappy benchmark in my basement
-and it's weirdly rigorous," not "enterprise AI eval platform." Confident
-and a little competitive: this should read like a benchmark models *want*
-to pass, not a dry spreadsheet.
+1. Show the measurement before the number. Eight exposed faults is a different
+   unit from an LLM's 0–10 verdict.
+2. Every model score links to its saved response and reproducible grading result.
+3. Separate scoring contracts and judge identities. Preserve historical evidence.
+4. Report all attempts, including unscored failures. Never present best-of runs.
+5. Prefer a working example, readable table, or direct explanation to decorative
+   cards, effects, or marketing claims.
+6. Design for keyboard, small screens, readable contrast, and reduced motion.
 
 ## Anti-references
 
-- Generic SaaS eval dashboards: cream/gray cards, hero-metric-with-gradient-accent
-  templates, tiny uppercase eyebrows over every section.
-- Sterile MLPerf/HuggingFace-leaderboard-style plain tables with no
-  personality and no way to see the actual model output behind a score.
-- Corporate AI-benchmark marketing sites (polished, faceless, blue-gradient).
-- Cute-but-illegible retro terminal skins where the aesthetic wins and the
-  actual numbers/text become hard to read.
-- Rankings that silently mix judges, API limits, and agent-harness runs.
-
-## Design Principles
-
-1. **Show your work.** Every score must trace back to the real prompt,
-   rubric, and model response — no black-box numbers.
-2. **One judge per board.** Keep each scoring method consistent, and preserve
-   prior boards as labeled archives rather than blending incompatible results.
-3. **One consistent nerdy-terminal voice.** Amber CRT aesthetic, applied
-   deliberately across every new surface (homepage, challenges, archive).
-4. **Small and honest.** This is a personal bench, not an enterprise eval
-   suite — lean into that self-aware, scrappy framing.
-5. **Legible first, glow second.** Retro effects are additive polish; they
-   must never reduce contrast or readability of the actual data.
-6. **Measure variance.** Single runs are vibes; multi-run means ±σ are how
-   you quote numbers.
-
-## Accessibility & Inclusion
-
-WCAG AA contrast minimum (4.5:1 body text, 3:1 large/bold text) even
-against the dark amber theme. All CRT-style motion (flicker, blink, scan)
-must respect `prefers-reduced-motion` with an instant/crossfade fallback.
+Avoid phosphor glow, scanlines, pixel fonts, corporate gradients, hero score
+counters, and interchangeable SaaS card grids. Avoid overstating benchmark
+hardness or treating a small preliminary sample as a definitive ranking.

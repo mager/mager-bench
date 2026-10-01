@@ -1,39 +1,55 @@
-# mager-bench (web)
+# mager-bench web
 
-The live ChatGPT-subscription scorecard for [mager-bench](../README.md), deployed at [bench.mager.co](https://bench.mager.co).
+The public Counterexample Lab and historical boards at [bench.mager.co](https://bench.mager.co).
 
-## Routes
-
-| Path | What |
+| Route | Content |
 |---|---|
-| `/` | current Codex CLI leaderboard |
-| `/models/<id>` | each model's challenge scores |
-| `/challenges` | all 13 challenge cards |
-| `/challenges/<name>` | prompt, rubric, and current-board scores |
-| `/archive/sonnet-5` | earlier API-model board, judged by Sonnet 5 |
-| `/experiments/codex-cli-sol` | original GPT-5.6 Sol run with full answers and judge notes |
-| `/fund` | notice that the former API funding drive is archived |
-| `/api/results` | current board as JSON |
+| `/` | Active 1.1 challenge, oracle-backed walkthrough, preliminary calibration |
+| `/challenges` | Current contract and methodology |
+| `/runs` and `/runs/<id>` | All saved 1.1 attempts, traces, exact coverage, source artifacts |
+| `/api/v1.1/results` | Current mutation coverage and full saved responses |
+| `/archive` | Historical scoring methods and preserved prompts |
+| `/archive/subscription` | Original thirteen-task board, GPT-5.6 Sol judge |
+| `/archive/sonnet-5` | Earlier API board with its original judge |
+| `/models/<id>` and `/models/<id>/<challenge>` | Preserved subscription scores and responses |
+| `/challenges/<legacy-name>` | Historical prompt, rubric, and scores |
+| `/api/results` and `/api/summary` | Backward-compatible legacy data, explicitly labeled archived |
 
-## Data flow
+## Current data flow
 
-1. `bench.py` saves each subscription-backed model run under `../runs/`.
-2. `node scripts/merge-subscription-run.mjs <run-file>` verifies all 13 rows and merges them into `../results.json` without mixing judges.
-3. `node scripts/sync-results.mjs` exports the current board to `data/results.json`. Pages and `app/api/results/route.ts` read that file.
-4. `data/sonnet-5-board.json` preserves the previous Sonnet board, with its original source in `../runs/2026-09-25-sonnet-5-board-archive.json`.
-5. `data/challenges.json` exports prompts and rubrics from `../challenges.py`.
-6. `node scripts/sync-cli-result.mjs` exports the original Sol run to `data/codex-cli-sol.json` for its dedicated inspection page.
-
-The old `data/funding.json` remains as an API-era archive. New runs use the local ChatGPT subscription.
-
-## Design and development
-
-See [`../DESIGN.md`](../DESIGN.md) and [`../PRODUCT.md`](../PRODUCT.md) for the CRT design system and product brief.
+`bench_v1_1.py` saves independent subscription attempts under `runs/v1.1/`.
+From the repository root, run:
 
 ```bash
-npm install
+.venv/bin/python web/scripts/sync-counterexample-data.py
+```
+
+The exporter verifies suite hashes and prompts, rejects mixed settings, and
+regrades every completed response before writing `data/counterexample.json`.
+Failed calls must have no score. Offline fixtures are excluded. The interactive
+examples are hand-authored and their outputs come directly from the same oracle
+and faulty implementations. They are never included as model measurements.
+
+The first calibration contains three attempts per model at low effort. It is
+preliminary evidence, shown alphabetically, not a definitive model ranking.
+Keep version 1.1 artifacts out of `results.json` and the legacy merge script.
+
+## Historical data
+
+`data/results.json` and `data/challenges.json` remain exports of the original
+thirteen-task board. `data/sonnet-5-board.json` preserves the older judge.
+Only use `merge-subscription-run.mjs` and `sync-results.mjs` for intentional
+legacy reproduction. See the canonical `.opencode/commands/bench.md` workflow.
+
+## Development and publication
+
+Read `../PRODUCT.md` and `../DESIGN.md` for the current light workbench design.
+
+```bash
 npm run dev
 npm run lint
 npm run build
 vercel --prod
 ```
+
+Commit source artifacts, exported data, and presentation changes together.

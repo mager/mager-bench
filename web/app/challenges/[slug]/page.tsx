@@ -1,3 +1,4 @@
+import { ArchiveNotice } from "@/components/archive-notice";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -75,11 +76,11 @@ export default async function ChallengePage({
     .sort((a, b) => b.total - a.total);
 
   return (
-    <div className="px-4 py-10 sm:px-8 md:py-16">
+    <><ArchiveNotice /><div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-3xl flex-col gap-10">
         <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
-          <Link href="/challenges" className="text-xs text-fg-dim hover:text-amber-bright">
-            ← all challenges
+          <Link href="/archive#challenges" className="text-xs text-fg-dim hover:text-amber-bright">
+            ← historical challenges
           </Link>
           <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
             {challenge.name}
@@ -186,6 +187,6 @@ export default async function ChallengePage({
         </section>
 
       </div>
-    </div>
+    </div></>
   );
 }

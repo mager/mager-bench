@@ -1,7 +1,9 @@
 # mager-bench 1.1: Counterexample Lab
 
-Status: executable prototype; model calibration is pending. No 1.1 model scores
-have been published. Counterexample Lab is the first active 1.1 track.
+Status: first preliminary calibration published, with three fresh attempts per
+model. Counterexample Lab is the active 1.1 track. See the
+[calibration protocol](../runs/v1.1/2026-09-30-calibration.md) and
+[public evidence](https://bench.mager.co/runs).
 
 We retire `fizzbuzz`, `binary-search`, and `refactor` from the current suite.
 Their prompts, responses, and scores remain in the frozen **legacy-13** suite
@@ -115,7 +117,12 @@ The hypothesis is that compact suites requiring exact state tracking will be
 harder than familiar implementation prompts. Test that with multiple independent
 samples per model, a frozen specification, the same reasoning effort, and
 reported failure counts and score distributions. Astra helping design the task
-is not evidence of its performance on it. No model rerun is part of this draft.
+is not evidence of its performance on it.
+
+The September 30 calibration used low reasoning effort for both models. Astra
+exposed 7/8 faults in each of three attempts; Sol exposed 7/8, 6/8, and 5/8.
+Every trace matched the oracle. Neither model exposed partial-transfer mutation
+in these attempts. This small sample is preliminary, not a general ranking.
 
 The code and faults are public. This release is not a secret holdout or a claim
 of resistance to future training contamination. Eight faults may themselves

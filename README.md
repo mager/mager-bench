@@ -11,8 +11,9 @@ The grader executes the submitted traces and checks their exact expected results
 FizzBuzz, binary search, and the tiny refactor task are retired from the new
 suite. The original thirteen-task board and prompts remain available for
 reproduction. Its scores average correctness, quality, and documentation;
-they are not comparable to 1.1's mutation coverage. No 1.1 model scores have
-been published yet.
+they are not comparable to 1.1's mutation coverage. The first preliminary calibration publishes three attempts per model:
+Astra exposed 7, 7, and 7 of eight faults; Sol exposed 7, 6, and 5. Both used
+low reasoning effort. See the [protocol and artifacts](runs/v1.1/2026-09-30-calibration.md).
 
 ```bash
 .venv/bin/python bench_v1_1.py --model codex-cli/gpt-6-astra --dry-run
@@ -26,11 +27,15 @@ grader with zero judge-model calls. Save every attempt separately under
 `runs/v1.1/`; these artifacts do not go through the legacy board's merge script.
 The [suite manifest](benchmark-suites.json) records active and retired tasks.
 
-**Legacy thirteen-task board:** [bench.mager.co](https://bench.mager.co)
+**Counterexample Lab 1.1:** [bench.mager.co](https://bench.mager.co)
+
+**Legacy thirteen-task board:** [subscription archive](https://bench.mager.co/archive/subscription)
 
 **Original Sonnet 5 board:** [archive](https://bench.mager.co/archive/sonnet-5)
 
-**Current board JSON:** [`/api/results`](https://bench.mager.co/api/results)
+**Current results JSON:** [`/api/v1.1/results`](https://bench.mager.co/api/v1.1/results)
+
+`/api/results` and `/api/summary` retain the legacy contract with archive metadata.
 
 ## Legacy thirteen-task reproduction
 
