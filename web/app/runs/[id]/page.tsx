@@ -178,7 +178,7 @@ export default async function RunPage({ params }: Props) {
         </p>
       </section>
       <div className="archive-teaser">
-        <Link className="text-link" href="/challenges#method">
+        <Link className="text-link" href="/challenges/counterexample-ledger#method">
           Read the scoring method
           <Arrow />
         </Link>

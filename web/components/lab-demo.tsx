@@ -13,9 +13,21 @@ function outputLabel(output: LedgerOutput) {
   );
 }
 
-export function LabDemo({ demos }: { demos: Demo[] }) {
-  const [selected, setSelected] = useState(0);
-  const [position, setPosition] = useState(demos[0].steps.length - 1);
+export function LabDemo({
+  demos,
+  initialDemoId,
+}: {
+  demos: Demo[];
+  initialDemoId?: string;
+}) {
+  const initialIndex = Math.max(
+    0,
+    demos.findIndex((demo) => demo.id === initialDemoId),
+  );
+  const [selected, setSelected] = useState(initialIndex);
+  const [position, setPosition] = useState(
+    demos[initialIndex].steps.length - 1,
+  );
   const demo = demos[selected];
   const step = demo.steps[position];
   const last = position === demo.steps.length - 1;

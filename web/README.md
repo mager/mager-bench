@@ -1,17 +1,19 @@
 # mager-bench web
 
-The public Counterexample Lab and historical boards at [bench.mager.co](https://bench.mager.co).
+The model lineup, challenge comparisons, and complete benchmark records at [bench.mager.co](https://bench.mager.co).
 
 | Route | Content |
 |---|---|
-| `/` | Active 1.1 challenge, oracle-backed walkthrough, preliminary calibration |
-| `/challenges` | Current contract and methodology |
+| `/` | Model lineup, both scoring histories, and a filterable challenge comparison |
+| `/challenges` | All thirteen original challenges plus Counterexample, with both scoring methods |
+| `/challenges/counterexample-ledger` | Complete Counterexample explanation, interactive example, contract, and methodology |
 | `/runs` and `/runs/<id>` | All saved 1.1 attempts, traces, exact coverage, source artifacts |
 | `/api/v1.1/results` | Current mutation coverage and full saved responses |
 | `/archive` | Historical scoring methods and preserved prompts |
 | `/archive/subscription` | Original thirteen-task board, GPT-5.6 Sol judge |
 | `/archive/sonnet-5` | Earlier API board with its original judge |
-| `/models/<id>` and `/models/<id>/<challenge>` | Preserved subscription scores and responses |
+| `/models/<id>` | Unified model profile, original box score, all Counterexample attempts |
+| `/models/<id>/<challenge>` | Preserved original submission and judge notes |
 | `/challenges/<legacy-name>` | Historical prompt, rubric, and scores |
 | `/api/results` and `/api/summary` | Backward-compatible legacy data, explicitly labeled archived |
 
@@ -31,7 +33,8 @@ examples are hand-authored and their outputs come directly from the same oracle
 and faulty implementations. They are never included as model measurements.
 
 The first calibration contains three attempts per model at low effort. It is
-preliminary evidence, shown alphabetically, not a definitive model ranking.
+preliminary evidence, not a definitive model ranking. Models appear together
+on the lineup, but the old average and new fault counts are never combined.
 Keep version 1.1 artifacts out of `results.json` and the legacy merge script.
 
 ## Historical data
@@ -43,7 +46,7 @@ legacy reproduction. See the canonical `.opencode/commands/bench.md` workflow.
 
 ## Development and publication
 
-Read `../PRODUCT.md` and `../DESIGN.md` for the current light workbench design.
+Read `../PRODUCT.md` and `../DESIGN.md` for the pickup-court design.
 
 ```bash
 npm run dev

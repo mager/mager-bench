@@ -112,7 +112,7 @@ export function Calibration() {
         Each score links to the complete response. Models are listed
         alphabetically. This is preliminary calibration, not a claim about
         general coding ability.{" "}
-        <Link href="/challenges#method">Read the method</Link>.
+        <Link href="/challenges/counterexample-ledger#method">Read the method</Link>.
       </p>
     </>
   );

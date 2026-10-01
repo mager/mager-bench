@@ -1,50 +1,45 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import { BallMark } from "@/components/court-mark";
 export function SiteHeader() {
-  const pathname = usePathname();
-  const isCurrentChallenge =
-    pathname === "/challenges" ||
-    pathname === "/challenges/counterexample-ledger";
-  const links = [
-    { href: "/", label: "Overview", active: pathname === "/" },
-    { href: "/challenges", label: "The test", active: isCurrentChallenge },
-    { href: "/runs", label: "Runs", active: pathname.startsWith("/runs") },
-    {
-      href: "/archive",
-      label: "Archive",
-      active:
-        pathname.startsWith("/archive") ||
-        pathname.startsWith("/models") ||
-        (pathname.startsWith("/challenges/") && !isCurrentChallenge),
-    },
-  ];
+  const path = usePathname();
   return (
     <header className="site-header">
       <div className="site-width header-inner">
         <Link href="/" className="wordmark" aria-label="mager-bench home">
-          <span className="brand-mark" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </span>
-          mager-bench
-          <span className="version-pill">v1.1</span>
+          <BallMark />
+          mager-bench<span className="version-pill">v1.1</span>
         </Link>
-        <nav aria-label="Main navigation" className="main-nav">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-current={link.active ? "page" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="main-nav" aria-label="Main navigation">
+          <Link
+            href="/#models"
+            aria-current={
+              path === "/" || path.startsWith("/models") ? "page" : undefined
+            }
+          >
+            Models
+          </Link>
+          <Link
+            href="/challenges"
+            aria-current={path.startsWith("/challenges") ? "page" : undefined}
+          >
+            Challenges
+          </Link>
+          <Link
+            href="/runs"
+            aria-current={path.startsWith("/runs") ? "page" : undefined}
+          >
+            Run log
+          </Link>
+          <Link
+            href="/archive"
+            aria-current={path.startsWith("/archive") ? "page" : undefined}
+          >
+            Archives
+          </Link>
           <a className="nav-source" href="https://github.com/mager/mager-bench">
-            GitHub ↗
+            Source ↗
           </a>
         </nav>
       </div>

@@ -1,182 +1,223 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import resultsData from "@/data/results.json";
-import { modelHref, modelSlug } from "@/lib/model-path";
+import { roster, challengeNotes, originalBoard } from "@/lib/bench";
+import { lab, dateLabel } from "@/lib/counterexample";
+import { modelHref } from "@/lib/model-path";
+import { Arrow } from "@/components/arrow";
 
-type ChallengeResult = {
-  name: string;
-  description: string;
-  correctness: number;
-  quality: number;
-  documentation: number;
-  total: number;
-  speed_ms: number;
-  notes: string;
-  stddev?: number | null;
-  runs?: number;
-};
-
-type ModelResult = {
-  id: string;
-  name: string;
-  tier?: string;
-  average: number;
-  avg_speed_ms: number;
-  avg_stddev?: number | null;
-  runs?: number;
-  challenges: ChallengeResult[];
-};
-
-const data = resultsData as {
-  generated_at: string;
-  judge: string;
-  models: ModelResult[];
-};
-
-const DIMENSION_STYLE = {
-  correctness: { dot: "bg-green", text: "text-green" },
-  quality: { dot: "bg-magenta", text: "text-magenta" },
-  documentation: { dot: "bg-cyan", text: "text-cyan" },
-} as const;
-
-const COST_TIER_STYLE: Record<string, string> = {
-  subscription: "text-cyan",
-  free: "text-green",
-  cheap: "text-cyan",
-  paid: "text-magenta",
-  unknown: "text-fg-dim",
-};
-
-function tier(score: number) {
-  if (score > 9.5) return { text: "text-green", glow: "glow-green" };
-  if (score >= 7) return { text: "text-amber", glow: "glow" };
-  return { text: "text-alert", glow: "glow-alert" };
-}
-
+type Props = { params: Promise<{ id: string }> };
 export function generateStaticParams() {
-  return data.models.map((m) => ({ id: modelSlug(m.id) }));
+  return roster.map((model) => ({ id: model.slug }));
 }
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const m = data.models.find((x) => modelSlug(x.id) === id);
+  const model = roster.find((m) => m.slug === id);
   return {
-    title: m ? `${m.name} runs — mager-bench` : "model runs — mager-bench",
-    description: m
-      ? `Every ${m.name} run on mager-bench: per-challenge scores and full response traces.`
+    title: model
+      ? `${model.name} | Player profile | mager-bench`
+      : "Model not found",
+    description: model
+      ? `${model.name}'s complete benchmark record: thirteen coding challenges, Counterexample Lab attempts, and the evidence behind each result.`
       : undefined,
   };
 }
-
-export default async function ModelPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ModelPage({ params }: Props) {
   const { id } = await params;
-  const model = data.models.find((m) => modelSlug(m.id) === id);
-  if (!model) return notFound();
-
-  const t = tier(model.average);
-  const runCount = model.runs ?? 1;
-
+  const model = roster.find((m) => m.slug === id);
+  if (!model) notFound();
+  const calibration = model.calibration;
+  const attempts = lab.runs.filter((run) => run.model === model.id);
+  const weakest = [...model.challenges].sort((a, b) => a.total - b.total)[0];
   return (
-    <div className="px-4 py-10 sm:px-8 md:py-16">
-      <div className="mx-auto flex max-w-4xl flex-col gap-10">
-        <header className="rise flex flex-col gap-2 border-b border-amber-faint pb-5">
-          <Link href="/archive/subscription" className="text-xs text-fg-dim hover:text-amber-bright">
-            ← historical leaderboard
-          </Link>
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h1 className="glow font-display text-4xl tracking-wide text-amber sm:text-5xl">
-              {model.name}
-            </h1>
-            <span className={`font-display text-5xl ${t.text} ${t.glow}`}>
-              {model.average.toFixed(1)}
-            </span>
+    <div className="site-width">
+      <header className="page-header" data-player={model.number}>
+        <Link className="text-link mb-7" href="/#models">
+          ← The lineup
+        </Link>
+        <div className="profile-hero">
+          <div>
+            <div className="eyebrow">Player profile / OpenAI</div>
+            <h1>{model.name}</h1>
+            <p className="prose-copy">
+              ChatGPT subscription · Codex CLI
+              <br />
+              {model.challenges.length} original challenges. {attempts.length}{" "}
+              Counterexample attempts. Every answer on the record.
+            </p>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-fg-dim">
-            <span className={`uppercase tracking-wider ${COST_TIER_STYLE[model.tier ?? "unknown"]}`}>
-              {model.tier ?? "unknown"} tier
-            </span>
-            <span>
-              {runCount} run{runCount === 1 ? "" : "s"} per challenge
-            </span>
-            <span>avg {model.avg_speed_ms}ms</span>
-            <span>judged by {data.judge}</span>
-          </div>
-          <p className="max-w-xl text-sm leading-relaxed text-fg">
-            Every challenge this model has run, with the full paper trail — click into any
-            row to read the raw response the judge scored.
-          </p>
-        </header>
-
-        <section className="rise flex flex-col gap-3" style={{ animationDelay: "80ms" }}>
-          <h2 className="text-xs uppercase tracking-[0.3em] text-fg-dim">
-            {model.challenges.length} challenges · best to worst
+          <span className="profile-jersey" aria-hidden="true">
+            {model.number}
+          </span>
+        </div>
+      </header>
+      <div className="profile-scores">
+        <div>
+          <div className="eyebrow">Original 13 / Historical coding results</div>
+          <h2>
+            {model.average.toFixed(1)}{" "}
+            <span className="text-fg-dim text-xl">out of 10</span>
           </h2>
-          {model.challenges.map((c) => {
-            const ct = tier(c.total);
-            return (
-              <Link
-                key={c.name}
-                href={modelHref(model.id, c.name)}
-                className="lift group border border-amber-faint bg-bg-raised/40 px-4 py-4"
-              >
-                <div className="flex items-center gap-3">
-                  <h3 className="whitespace-nowrap font-mono text-base font-semibold tracking-wide text-amber-bright group-hover:text-amber">
-                    {c.name}
-                  </h3>
-                  <div
-                    className="h-px flex-1"
-                    style={{
-                      backgroundImage:
-                        "repeating-linear-gradient(to right, var(--amber-dim) 0, var(--amber-dim) 4px, transparent 4px, transparent 8px)",
-                    }}
-                  />
-                  <span className={`font-display text-2xl ${ct.text} ${ct.glow}`}>
-                    {c.total.toFixed(1)}
-                    {c.stddev != null && c.stddev > 0 && (
-                      <span className="ml-1 font-mono text-xs text-fg-dim">±{c.stddev}</span>
-                    )}
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-fg-dim">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.correctness.dot}`} />
-                    correctness{" "}
-                    <b className={`font-semibold ${DIMENSION_STYLE.correctness.text}`}>
-                      {c.correctness.toFixed(1)}
-                    </b>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.quality.dot}`} />
-                    quality{" "}
-                    <b className={`font-semibold ${DIMENSION_STYLE.quality.text}`}>
-                      {c.quality.toFixed(1)}
-                    </b>
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className={`h-1.5 w-1.5 rounded-full ${DIMENSION_STYLE.documentation.dot}`} />
-                    documentation{" "}
-                    <b className={`font-semibold ${DIMENSION_STYLE.documentation.text}`}>
-                      {c.documentation.toFixed(1)}
-                    </b>
-                  </span>
-                  <span>{c.speed_ms}ms</span>
-                  <span className="ml-auto text-amber-dim transition-transform group-hover:translate-x-0.5">
-                    inspect trace →
-                  </span>
-                </div>
+          <p>
+            Mean across thirteen tasks, scored by GPT-5.6 Sol. {model.runs ?? 1}{" "}
+            run per task, {dateLabel(originalBoard.generated_at)}.
+          </p>
+          <div className="profile-dimensions">
+            <div>
+              Correctness<strong>{model.avg_correctness.toFixed(1)}</strong>
+            </div>
+            <div>
+              Code quality<strong>{model.avg_quality.toFixed(1)}</strong>
+            </div>
+            <div>
+              Documentation<strong>{model.avg_documentation.toFixed(1)}</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="eyebrow">Counterexample Lab / Version 1.1</div>
+          <h2>
+            {calibration ? "Three runs. Every result." : "Waiting for a run."}
+          </h2>
+          <div className="profile-lab-attempts">
+            {attempts.map((run, index) => (
+              <Link href={`/runs/${run.id}`} key={run.id}>
+                <span>Attempt {index + 1}</span>
+                <strong>
+                  {run.score ? `${run.score.killed}/8` : "Unscored"}
+                </strong>
               </Link>
-            );
-          })}
-        </section>
+            ))}
+          </div>
+          <p>
+            {calibration?.effort ?? "—"} reasoning · faulty versions exposed ·
+            preliminary calibration
+          </p>
+        </div>
+      </div>
+      <section className="section" id="original">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Original 13</span>
+            <h2>The full box score</h2>
+            <p>
+              Highest to lowest. The lowest score here is{" "}
+              {challengeNotes[weakest.name].title.toLowerCase()} at{" "}
+              {weakest.total.toFixed(1)}/10. Open any task to inspect the
+              submission and the judge’s notes.
+            </p>
+          </div>
+          <Link className="text-link" href="/challenges#scoring">
+            Scoring rules
+            <Arrow />
+          </Link>
+        </div>
+        <div className="profile-task-list">
+          {[...model.challenges]
+            .sort((a, b) => b.total - a.total)
+            .map((challenge) => (
+              <Link
+                className="profile-task"
+                href={modelHref(model.id, challenge.name)}
+                key={challenge.name}
+              >
+                <div>
+                  <h3>{challengeNotes[challenge.name].title}</h3>
+                  <p>{challengeNotes[challenge.name].question}</p>
+                </div>
+                <meter
+                  min="0"
+                  max="10"
+                  value={challenge.total}
+                  aria-label={`${challengeNotes[challenge.name].title} score`}
+                />
+                <span>
+                  {challenge.total.toFixed(1)}
+                  <small> /10</small>
+                </span>
+                <Arrow />
+              </Link>
+            ))}
+        </div>
+        <p className="section-note">
+          These scores are preserved from the original suite, including three
+          retired warm-ups. They are not a new run. The model-judge setup,
+          single samples, and self-judging for Sol limit how much to read into
+          small differences.
+        </p>
+      </section>
+      <section className="section" id="counterexample">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">New challenge / 1.1</span>
+            <h2>What did its tests actually catch?</h2>
+            <p>
+              A model must predict the correct ledger’s outputs exactly before
+              its tests can earn credit for exposing a fault. These counts show
+              how often {model.name} caught each fault.
+            </p>
+          </div>
+          <Link className="text-link" href="/challenges/counterexample-ledger">
+            Understand the test
+            <Arrow />
+          </Link>
+        </div>
+        <ul className="fault-status-list">
+          {lab.faults.map((fault, index) => (
+            <li key={fault.id}>
+              <div>
+                <span className="mr-3 text-fg-dim">0{index + 1}</span>
+                {fault.name}
+              </div>
+              <span
+                className={
+                  calibration?.faultCoverage[fault.id]
+                    ? "text-green"
+                    : "text-fg-dim"
+                }
+              >
+                {calibration
+                  ? `${calibration.faultCoverage[fault.id]} / ${calibration.completed} attempts`
+                  : "Not run"}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="run-list mt-6">
+          {attempts.map((run, index) => (
+            <Link className="run-row" href={`/runs/${run.id}`} key={run.id}>
+              <div>
+                <strong className="model-name">Attempt {index + 1}</strong>
+                <p className="model-detail">
+                  {run.reasoning_effort} reasoning ·{" "}
+                  {run.score?.events_used ?? "—"} events
+                </p>
+              </div>
+              <span className="run-date text-xs text-fg-dim">
+                {dateLabel(run.generated_at)}
+              </span>
+              <span className="font-mono text-sm">
+                {run.score ? `${run.score.killed} / 8 faults` : "Unscored"}
+              </span>
+              <Arrow />
+            </Link>
+          ))}
+        </div>
+        <p className="section-note">
+          Same frozen contract and settings across all three attempts. Every
+          trace in this calibration matched the reference. All responses are
+          preserved, including weaker attempts.
+        </p>
+      </section>
+      <div className="archive-teaser">
+        <Link className="text-link" href="/#models">
+          Compare the lineup
+          <Arrow />
+        </Link>
+        <Link className="text-link" href="/challenges">
+          Explore the challenges
+          <Arrow />
+        </Link>
       </div>
     </div>
   );

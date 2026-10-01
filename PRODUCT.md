@@ -6,47 +6,43 @@ product
 
 ## Users and purpose
 
-Andrew (Mager) runs a small personal coding-model benchmark. Curious developers
-visit to understand what a score measures, inspect the actual model response,
-and reproduce the experiment. There is no signup, sales funnel, or enterprise
-platform to promote.
+Mager-bench is a personal playground for comparing coding models. Mager runs
+it; curious builders come to see how their favorite model performs, where it
+struggles, what each challenge asks, and the actual evidence behind a score.
+The model is the organizing unit. A visitor starts with the lineup, opens a
+model profile, and follows results into challenge prompts and saved responses.
 
-The active benchmark is version 1.1, Counterexample Lab: models design compact
-regression traces for a stateful ledger. A deterministic oracle and eight faulty
-implementations check exact expectations and measure exposed faults. Subjects
-use fresh Codex CLI sessions through the local ChatGPT subscription. No LLM
-judges are used in 1.1.
+Show the complete record: the original thirteen coding challenges alongside
+Counterexample Lab. The original results use an LLM judge and a 0–10 scale.
+Version 1.1 measures exposed faulty implementations out of eight, with exact,
+deterministic scoring. These measurements remain separate within each profile.
+The first calibration has three fresh attempts per model at low effort.
 
-The first calibration publishes three attempts each from Astra and Sol at the
-same reasoning setting. Show all attempts and the limited scope of the evidence,
-not a confident general-purpose ranking. Original thirteen-task LLM-judged
-boards are historical archives with intact prompts, responses, and scores.
+## Brand and physical scene
 
-## Brand and scene
+A builder checks model results on a phone while sitting on the sideline bench
+at an outdoor pickup basketball court after dark. Floodlights pick out court
+lines; a black terminal-like scoreboard carries green, blue, and purple type. The
+mood is competitive, casual, open, and grounded in what happened on the court.
 
-A developer opens the site on a laptop in daylight, curious and skeptical about
-another model score. They need to see a concrete failure and inspect the evidence
-without decoding terminal decoration. The site feels like a small experimental
-workbench: precise, inviting, candid, and quietly playful.
-
-A light mineral surface, ink typography, and restrained rust accents replace
-the old amber CRT presentation at the user's request for a complete redesign.
-The interactive ledger example carries the personality. No stock imagery is
-needed because the actual test is the most useful visual.
+The user explicitly rejected the pale laboratory redesign. The new direction
+uses near-black surfaces, crisp green, blue, and purple accents, jersey-style
+headline type, terminal metadata, and native court graphics. Personality belongs in the identity and
+section titles. Scores, labels, and explanations stay clear and literal.
 
 ## Principles
 
-1. Show the measurement before the number. Eight exposed faults is a different
-   unit from an LLM's 0–10 verdict.
-2. Every model score links to its saved response and reproducible grading result.
-3. Separate scoring contracts and judge identities. Preserve historical evidence.
-4. Report all attempts, including unscored failures. Never present best-of runs.
-5. Prefer a working example, readable table, or direct explanation to decorative
-   cards, effects, or marketing claims.
-6. Design for keyboard, small screens, readable contrast, and reduced motion.
+1. Models first. A single profile connects every compatible result for a model.
+2. Explain all the challenges. Keep the original thirteen visible and explain
+   the newer counterexample task with a concrete failure, not only terminology.
+3. Show scoring units and provenance. Never blend LLM averages with fault counts.
+4. Preserve every attempt. Preliminary calibration is not a definitive ranking.
+5. Keep historical judges separate. Earlier API boards remain accessible in archives.
+6. Make mobile comparisons, keyboard navigation, and readable contrast work.
 
 ## Anti-references
 
-Avoid phosphor glow, scanlines, pixel fonts, corporate gradients, hero score
-counters, and interchangeable SaaS card grids. Avoid overstating benchmark
-hardness or treating a small preliminary sample as a definitive ranking.
+No sterile lab landing page, generic pale SaaS dashboard, phosphor glow,
+scanlines, or oversized abstract score that hides the models. Avoid excessive
+sports jargon, fictional live-game states, invented rankings, and visual effects
+that make the evidence harder to read.

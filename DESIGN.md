@@ -1,59 +1,64 @@
 ---
 name: mager-bench
-description: A light experimental workbench for exact, inspectable model evaluations.
+description: A pickup basketball court for coding models, with a model lineup and complete box scores.
 colors:
-  surface: "oklch(97.9% 0.004 250)"
-  raised: "oklch(99.5% 0.002 250)"
-  ink: "oklch(24% 0.018 255)"
-  secondary: "oklch(48% 0.017 255)"
-  accent: "oklch(49% 0.155 36)"
-  rule: "oklch(88% 0.008 250)"
-  verified: "oklch(42% 0.09 162)"
-  mismatch: "oklch(48% 0.17 28)"
+  court: "oklch(13% 0.006 270)"
+  raised: "oklch(18% 0.01 270)"
+  chalk: "oklch(94% 0.009 265)"
+  secondary: "oklch(71% 0.022 268)"
+  green: "oklch(83% 0.185 153)"
+  blue: "oklch(76% 0.14 249)"
+  purple: "oklch(76% 0.15 305)"
+  rule: "oklch(31% 0.017 270)"
 typography:
-  body: "Manrope, sans-serif"
-  code: "IBM Plex Mono, monospace"
+  headlines: "Barlow Condensed, 700–800"
+  body: "Manrope"
+  data: "IBM Plex Mono"
 ---
 
 ## Direction
 
-Restrained color: mineral neutrals, near-black ink, and rust for actions and
-identity. Green means verified coverage; red means a demonstrated output
-mismatch. Color always has accompanying text. A small three-bar mark identifies
-the bench. No illustration is required: the oracle-backed interactive trace is
-the central visual.
+Near-black surfaces with green identity, blue original scores, and purple
+Counterexample results. The model lineup is a dark, terminal-style scoreboard.
+A geometric basketball mark and native SVG
+court diagram make the pickup-game reference concrete. No stock imagery or
+AI-generated bitmap is needed. Avoid simulated grime, gradients, glow, or motion
+that suggests an actual live game.
 
-## Typography and layout
+## Hierarchy
 
-Manrope supplies a compact wordmark, 54px desktop / 43px mobile hero, 27px
-section titles, and readable body text. IBM Plex Mono is reserved for actual
-code, scores, event labels, and small provenance details. Keep prose under 75ch.
+The homepage begins with a compact court identity and the models. Model names,
+the original coding score, and every Counterexample attempt share a clear row.
+The next section compares both models across thirteen original challenges and
+the new test, with skill filters and inline explanations. A concrete failed
+transfer introduces the dedicated Counterexample walkthrough.
 
-The 1184px shell uses 32px desktop and 18px mobile outer space. The homepage
-pairs a short introduction with the working example, then moves through a
-horizontal specification strip, calibration table, fault list, and archive
-explanation. Vary section spacing, and use thin full-width rules for structure.
+Model profiles contain both scoring histories. Historical raw answers remain
+at their original routes, with the old scoring method labeled. The challenge
+index explains both systems and all fourteen prompts/records.
 
-## Components
+## Typography
 
-- Interactive demo: one bordered workbench, three scenario buttons, numbered
-  event buttons, dark code strip, paired correct/faulty outputs, and replay/next.
-  Show exact generated outputs; identify examples as hand-authored.
-- Calibration: alphabetic model rows, an inspectable link for every attempt,
-  numbered per-fault coverage cells with labels and a legend. On mobile use
-  stacked table rows, preserving the entire comparison without page overflow.
-- Evidence: run lists and trace tables. Put long raw responses and the complete
-  contract in accessible native disclosures.
-- Archive: full-width explanatory banner on historical boards, models, and
-  challenges. Keep original score values and provenance.
-- Actions: rust primary, quiet outlined secondary, and text links with small
-  directional arrows. Clear visible keyboard focus.
+Barlow Condensed carries the wordmark and sports-style headings. Use uppercase
+for short display text. Manrope carries prose, controls, and task names; IBM
+Plex Mono carries small metadata, units, and exact values. UI controls and data
+never use decorative display type. Keep explanation text under 75ch.
 
-## Guardrails
+## Layout and interaction
 
-No glow, scanlines, decorative terminal chrome, gradients, or infinite motion.
-No hero score that confuses the old and new contracts. Use flat lists instead
-of repeated marketing cards. Allow horizontal scrolling only inside long code
-or trace tables. Honor reduced motion and keep basic information available
-without interactive controls. Historical CSS token names remain compatible,
-but map to the new palette.
+1200px shell, 36px desktop gutters, 18px mobile gutters. Thin rules and flat
+rows organize the evidence. Avoid repeated promotional cards. The lineup
+is one shared scoreboard. On phones, each model
+and each challenge becomes a stacked record with visible labels for every unit.
+
+Skill filters use ordinary buttons with visible selection state. Inline native
+disclosures explain each challenge without leaving the comparison. Every score
+links to evidence. The Counterexample walkthrough retains scenario selection,
+step selection, replay, and exact oracle-generated outputs.
+
+## Accessibility
+
+High-contrast type, visible focus, semantic comparison tables, text labels with
+all color states, and reduced-motion support. Long code and trace tables can
+scroll locally. The page itself must never overflow on a phone. Court graphics
+are decorative and hidden from accessibility APIs.

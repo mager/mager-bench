@@ -27,7 +27,9 @@ grader with zero judge-model calls. Save every attempt separately under
 `runs/v1.1/`; these artifacts do not go through the legacy board's merge script.
 The [suite manifest](benchmark-suites.json) records active and retired tasks.
 
-**Counterexample Lab 1.1:** [bench.mager.co](https://bench.mager.co)
+**Model lineup and full challenge comparison:** [bench.mager.co](https://bench.mager.co)
+
+**Counterexample Lab explained:** [1.1 walkthrough](https://bench.mager.co/challenges/counterexample-ledger)
 
 **Legacy thirteen-task board:** [subscription archive](https://bench.mager.co/archive/subscription)
 

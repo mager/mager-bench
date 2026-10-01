@@ -5,7 +5,7 @@ export function ArchiveNotice() {
       <div className="site-width">
         <strong>Historical results</strong> · Original thirteen-task suite ·
         LLM-judged scores out of 10.{" "}
-        <Link href="/">Go to Counterexample Lab 1.1 →</Link>
+        <Link href="/">Explore model profiles →</Link>
       </div>
     </div>
   );

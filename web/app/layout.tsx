@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { Manrope, IBM_Plex_Mono } from "next/font/google";
+import { Barlow_Condensed, Manrope, IBM_Plex_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
+
+const sport = Barlow_Condensed({
+  weight: ["600", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-court",
+});
 
 const display = Manrope({
   subsets: ["latin"],
@@ -16,9 +22,9 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "mager-bench | Counterexample Lab",
+  title: "mager-bench | Who’s got next?",
   description:
-    "Can a coding model find the bug? Eight faulty ledgers, twelve events, and exact expectations. Explore mager-bench 1.1 and its open calibration results.",
+    "A pickup game for coding models. Compare each model across thirteen coding challenges and Counterexample Lab, with every score and response open for inspection.",
   metadataBase: new URL("https://bench.mager.co"),
 };
 
@@ -28,7 +34,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${display.variable} ${mono.variable} ${sport.variable} h-full`}
+    >
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <a
           href="#main"

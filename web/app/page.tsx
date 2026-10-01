@@ -1,137 +1,141 @@
 import Link from "next/link";
 import { Arrow } from "@/components/arrow";
-import { LabDemo } from "@/components/lab-demo";
-import { Calibration } from "@/components/calibration";
-import { lab, dateLabel } from "@/lib/counterexample";
+import { CourtMark } from "@/components/court-mark";
+import { ModelRoster } from "@/components/model-roster";
+import { ChallengeCourt } from "@/components/challenge-court";
+import { courtChallenges, roster } from "@/lib/bench";
 
 export default function Home() {
   return (
-    <div className="site-width">
-      <section className="hero">
-        <div>
+    <div className="site-width court-home">
+      <section className="court-hero">
+        <div className="court-hero-copy">
           <div className="eyebrow">
-            <span className="rule" />
-            The Counterexample Lab
+            <span className="court-dot" />A pickup game for coding models
           </div>
           <h1>
-            Make the model
-            <br />
-            <span>find the bug.</span>
+            Who’s got <span>next?</span>
           </h1>
-          <p className="hero-description">
-            Writing code is one test. Knowing how it breaks is another. Eight
-            faulty ledgers. Twelve events. Can a model design the tests that
-            catch them?
+          <p>
+            Same court. Same challenges. See how each model plays, from a simple
+            function to a whole game, then put its testing instincts under
+            pressure.
           </p>
-          <div className="hero-actions">
-            <Link className="button-primary" href="/challenges">
-              Explore the challenge
-              <Arrow />
-            </Link>
-            <a className="button-secondary" href="#calibration">
-              See the results
-              <Arrow />
-            </a>
-          </div>
-          <p className="hero-footnote">
-            mager-bench 1.1 · deterministic scoring · open source
-          </p>
+          <a className="court-hero-link" href="#models">
+            Meet the lineup <Arrow />
+          </a>
         </div>
-        <LabDemo demos={lab.demos} />
+        <div className="hero-court">
+          <CourtMark />
+          <div className="court-stamp">
+            <strong>
+              MAGER
+              <br />
+              BENCH
+            </strong>
+            <span>OPEN COURT / EST. 2026</span>
+          </div>
+          <span className="court-side-note">
+            BRING YOUR MODEL. SHOW YOUR WORK.
+          </span>
+        </div>
       </section>
-      <div className="spec-strip">
-        <div>
-          <strong>12 events</strong>
-          <span>total test budget</span>
-        </div>
-        <div>
-          <strong>8 faults</strong>
-          <span>one fixed corpus</span>
-        </div>
-        <div>
-          <strong>0 judges</strong>
-          <span>checked by code</span>
-        </div>
-        <div>
-          <strong>Every attempt</strong>
-          <span>open for inspection</span>
-        </div>
-      </div>
-      <section className="section" id="calibration">
-        <div className="section-heading">
+      <section id="models" className="lineup-section">
+        <div className="court-section-heading">
           <div>
-            <div className="eyebrow">01 / The evidence</div>
-            <h2>First calibration. All the attempts.</h2>
-            <p>
-              A score counts faulty implementations exposed by a model’s tests.
-              The expected outputs must be right, too.
-            </p>
+            <span className="eyebrow">On the court</span>
+            <h2>
+              The lineup
+              <span className="heading-count">{roster.length} models</span>
+            </h2>
           </div>
-          <span className="status-pill">
-            <span className="status-dot" />
-            {lab.calibrationReady
-              ? "Preliminary results"
-              : "Calibration in progress"}
-          </span>
-        </div>
-        <Calibration />
-        <div className="section-end">
-          <span>
-            {lab.lastRunAt ? dateLabel(lab.lastRunAt) : "No completed runs"} ·
-            ChatGPT subscription · no API calls
-          </span>
           <Link className="text-link" href="/runs">
-            Inspect all {lab.runs.length} attempts
+            Every new attempt
             <Arrow />
           </Link>
         </div>
+        <ModelRoster />
+        <p className="roster-explanation">
+          The 9.3 and 9.0 are the original coding averages. The new test counts
+          broken implementations caught out of eight. Both belong on the model’s
+          record, with their own scoring rules.
+        </p>
       </section>
-      <section className="section fault-section" id="faults">
-        <div className="fault-intro">
-          <div className="eyebrow">02 / The fault line-up</div>
-          <h2 className="section-title">
-            Small mistakes.
+      <section className="court-section" id="challenges">
+        <div className="court-section-heading">
+          <div>
+            <span className="eyebrow">Know their game</span>
+            <h2>Every challenge. Every model.</h2>
+          </div>
+          <Link className="text-link" href="/challenges">
+            The full playbook
+            <Arrow />
+          </Link>
+        </div>
+        <p className="court-section-intro">
+          Thirteen original challenges test what a model can build, explain, and
+          fix. Counterexample Lab adds a different question: can it write the
+          tests that catch someone else’s mistakes?
+        </p>
+        <ChallengeCourt
+          challenges={courtChallenges}
+          modelNames={roster.map((model) => model.name)}
+        />
+      </section>
+      <section className="counterexample-feature">
+        <div className="counterexample-feature-copy">
+          <span className="court-tag">The new challenge / 1.1</span>
+          <h2>
+            Good code is one thing.
             <br />
-            Interesting consequences.
+            <span>Catching bad code is another.</span>
           </h2>
           <p>
-            Each faulty ledger changes one behavior. The challenge is finding a
-            short sequence of events that makes that mistake visible.
+            Give a model the rules for a tiny money-transfer system. Ask it to
+            write tests. Then run those tests against eight broken versions. It
+            only gets credit when it knows the correct answer and exposes a bug.
           </p>
-          <Link className="text-link" href="/challenges#contract">
-            Read the exact contract
+          <Link
+            className="button-primary"
+            href="/challenges/counterexample-ledger"
+          >
+            See exactly how it works
             <Arrow />
           </Link>
         </div>
-        <ol className="fault-list">
-          {lab.faults.map((fault, index) => (
-            <li className="fault-item" key={fault.id}>
-              <span className="fault-number">0{index + 1}</span>
-              <div>
-                <h3>{fault.name}</h3>
-                <p>{fault.description}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-      <aside className="archive-teaser">
-        <div>
-          <span className="eyebrow">
-            A new chapter, a different measurement
-          </span>
-          <h2>Looking for the old leaderboard?</h2>
-          <p>
-            The 9.0 and 9.3 averages belong to the original thirteen-task,
-            LLM-judged suite. Those results are preserved in the archive. They
-            are not Counterexample Lab scores.
-          </p>
+        <div className="counterexample-play">
+          <div className="play-caption">ONE BUG THEY BOTH MISSED</div>
+          <div className="play-event">
+            <span>01</span>
+            <p>Send 3 to an account that doesn’t exist.</p>
+          </div>
+          <div className="play-event">
+            <span>02</span>
+            <p>The transfer fails. Check your balance.</p>
+          </div>
+          <div className="play-outcomes">
+            <div>
+              <span>Should be</span>
+              <strong>10</strong>
+            </div>
+            <div>
+              <span>Broken version</span>
+              <strong>7</strong>
+            </div>
+          </div>
+          <p>The error looks right. The missing money gives it away.</p>
+          <Link href="/challenges/counterexample-ledger#walkthrough">
+            Replay this counterexample <Arrow />
+          </Link>
         </div>
-        <Link className="button-secondary" href="/archive">
-          Open the archive
+      </section>
+      <div className="court-bottom">
+        <p>Built by Mager. Small sample, open evidence, room to get better.</p>
+        <Link className="text-link" href="/archive">
+          Earlier boards & judges
           <Arrow />
         </Link>
-      </aside>
+      </div>
     </div>
   );
 }
