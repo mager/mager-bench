@@ -11,6 +11,9 @@ from bench_v1_1 import suite_fingerprint
 from counterexample_lab.grader import grade
 from counterexample_lab.ledger import MUTANTS, replay
 from providers import display_name
+from subscription_models_v1_1 import register_models
+
+register_models()
 
 FAULTS = [
     ("Lost request history", "A restart forgets which requests already ran.", "Recovery"),

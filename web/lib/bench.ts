@@ -101,13 +101,27 @@ export const challengeNotes: Record<
   },
 };
 
-export const roster = results.models.map((model, index) => ({
-  ...model,
-  number: String(index + 1).padStart(2, "0"),
-  slug: modelSlug(model.id),
-  href: modelHref(model.id),
-  calibration: lab.models.find((entry) => entry.id === model.id),
-}));
+const modelIds = [
+  ...new Set([
+    ...results.models.map((model) => model.id),
+    ...lab.models.map((model) => model.id),
+  ]),
+];
+
+export const roster = modelIds.map((id, index) => {
+  const original = results.models.find((model) => model.id === id);
+  const calibration = lab.models.find((model) => model.id === id);
+  return {
+    id,
+    name: original?.name ?? calibration!.name,
+    original,
+    challenges: original?.challenges ?? [],
+    number: String(index + 1).padStart(2, "0"),
+    slug: modelSlug(id),
+    href: modelHref(id),
+    calibration,
+  };
+});
 
 export type CourtChallenge = {
   id: string;
@@ -133,8 +147,10 @@ export const courtChallenges: CourtChallenge[] = [
         model.challenges
           .find((c) => c.name === challenge.name)
           ?.total.toFixed(1) ?? "—",
-      unit: "/10",
-      href: modelHref(model.id, challenge.name),
+      unit: model.original ? "/10" : "not run",
+      href: model.original
+        ? modelHref(model.id, challenge.name)
+        : `${model.href}#original`,
     })),
   })),
   {
@@ -150,7 +166,9 @@ export const courtChallenges: CourtChallenge[] = [
     scores: roster.map((model) => ({
       model: model.name,
       label: model.calibration?.scores.join(" · ") ?? "—",
-      unit: "out of 8, each run",
+      unit: model.calibration?.failed
+        ? `out of 8 · ${model.calibration.failed} unscored`
+        : "out of 8, each run",
       href: `${model.href}#counterexample`,
     })),
   },

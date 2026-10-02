@@ -16,6 +16,12 @@ response, suite hash, effort, trace validity, and mutation coverage. Failed call
 remain unscored; preserve them when rerunning. Calibration requires repeated
 samples with matching effort and suite hashes before publishing a ranking.
 
+Additional subscription identities use `subscription_models_v1_1.py`, a
+metadata-only catalogue launcher that delegates to the frozen `bench_v1_1.main`.
+See the canonical workflow and `runs/v1.1/2026-10-01-calibration.md` for commands,
+source hashes, and retained availability checks. Do not edit fingerprinted files
+merely to extend the subject catalogue.
+
 Publish compatible 1.1 evidence with `web/scripts/sync-counterexample-data.py`
 and the version-specific workflow in `/bench`. The exporter regrades saved
 responses and rejects mixed suites/settings.

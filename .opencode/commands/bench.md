@@ -25,6 +25,15 @@ Preserve failed attempts when rerunning. Calibration requires repeated samples
 with matching effort, output targets, and suite hashes. The first six attempts
 are published as preliminary calibration, without ranking the models.
 
+For additional subjects (`codex-cli/gpt-5.6-terra`, `codex-cli/gpt-5.6-luna`,
+and `codex-cli/gpt-5.5`), use `subscription_models_v1_1.py` with the same
+arguments. It registers catalogue metadata and calls the frozen
+`bench_v1_1.main`; it does not change the provider or scoring implementation.
+Import and call `register_models()` from that module before a `get_provider`
+smoke test. See `runs/v1.1/2026-10-01-calibration.md` for source hashes and
+reproduction commands. A model appearing in the local catalogue does not prove
+subscription availability: retain failed smoke checks under `runs/v1.1/preflight/`.
+
 Commit new run artifacts with their frozen test source and generated web data.
 Never run the legacy merge script on 1.1 artifacts. To publish compatible runs:
 

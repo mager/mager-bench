@@ -34,10 +34,14 @@ export function ModelRoster() {
               Original 13 · judged score
             </span>
             <strong>
-              {model.average.toFixed(1)}
-              <small>/10</small>
+              {model.original?.average.toFixed(1) ?? "—"}
+              {model.original && <small>/10</small>}
             </strong>
-            <span>13 challenges · {model.runs ?? 1} run each</span>
+            <span>
+              {model.original
+                ? `13 challenges · ${model.original.runs ?? 1} run each`
+                : "Not run on the original suite"}
+            </span>
           </Link>
           <div className="player-new">
             <span className="mobile-stat-label">
@@ -61,7 +65,9 @@ export function ModelRoster() {
               }) ?? <span>Not run yet</span>}
             </div>
             <span>
-              {model.calibration?.effort ?? "—"} reasoning · preliminary
+              {model.calibration?.effort ?? "—"} reasoning ·{" "}
+              {model.calibration?.failed ? `${model.calibration.failed} unscored · ` : ""}
+              preliminary
             </span>
           </div>
           <Link

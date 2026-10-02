@@ -102,7 +102,7 @@ export default function Challenge() {
               average.
             </p>
             <Link className="text-link mt-4" href="/#models">
-              See both model profiles
+              See all model profiles
               <Arrow />
             </Link>
           </div>
@@ -171,11 +171,11 @@ export default function Challenge() {
               earn no points.
             </p>
             <p>
-              <strong>Same conditions.</strong> This calibration used three
-              fresh Codex CLI calls each for GPT-6 Astra and GPT-5.6 Sol,
-              interleaved at low reasoning effort with a 4,096-token output
-              target. Both used the local ChatGPT subscription. The token target
-              is an instruction, not an API-enforced cap.
+              <strong>Same conditions.</strong> Each calibration uses fresh
+              Codex CLI calls, interleaved across its subjects at low reasoning
+              effort with a 4,096-token output target. All subjects use the
+              local ChatGPT subscription. The token target is an instruction,
+              not an API-enforced cap.
             </p>
             <p>
               <strong>Every saved attempt.</strong> Responses, timing, settings,
@@ -187,7 +187,13 @@ export default function Challenge() {
               >
                 run protocol
               </a>
-              .
+              . The{" "}
+              <a
+                href={`${sourceRoot}/blob/main/runs/v1.1/2026-10-01-calibration.md`}
+              >
+                October 1 protocol
+              </a>{" "}
+              records the additional subjects and availability checks.
             </p>
           </div>
           <div>

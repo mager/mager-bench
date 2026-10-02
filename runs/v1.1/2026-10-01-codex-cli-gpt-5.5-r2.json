@@ -1,0 +1,68 @@
+{
+  "benchmark_version": "1.1",
+  "challenge": "counterexample-ledger",
+  "generated_at": "2026-10-02T00:37:19.962843+00:00",
+  "suite_sha256": "a56a4aadf5b20a319c7a57309608477d9e523da3d99c37a69bb6353f6b16f0c1",
+  "prompt": "# Counterexample Lab: durable ledger\n\nDesign a small, powerful regression suite for the ledger specified below.\nReturn only a JSON object, without Markdown fences, in this shape:\n\n```json\n{\"traces\":[{\"events\":[{\"op\":\"inspect\"}],\"expected\":[{\"balances\":{\"a\":10,\"b\":0,\"c\":0},\"revisions\":{\"a\":0,\"b\":0,\"c\":0}}]}]}\n```\n\nEach trace starts independently with balances `a=10, b=0, c=0`, revisions\n`a=0, b=0, c=0`, and an empty request cache. There must be 1\u20134 nonempty\ntraces with **at most 12 events TOTAL across all traces**. Each event has\nexactly one expected output at the corresponding position. Object key order\ndoes not matter. All numbers must be JSON integers, not booleans or floats.\n\n## Operations and exact outputs\n\n`{\"op\":\"transfer\",\"id\":\"r1\",\"from\":\"a\",\"to\":\"b\",\"amount\":3,\"expected_revision\":0}`\n\n- These six fields are required; no others are allowed. IDs match\n  `[A-Za-z0-9_-]{1,24}`. Accounts are `a`, `b`, `c`, or `missing` (an unknown\n  account). Amount is an integer 1\u201320; expected_revision is an integer 0\u201320.\n- The request fingerprint is `(from, to, amount, expected_revision)`.\n- Check the cache by ID **before any business validation**. An identical\n  fingerprint returns the exact original output without modifying anything.\n  A different fingerprint returns `{\"status\":\"conflict\"}`, modifying neither\n  balances, revisions, nor the original cache entry.\n- For a previously unseen ID, validate in this order. If either account is\n  unknown, return `{\"status\":\"unknown_account\"}`. Otherwise if the accounts\n  are equal, return `{\"status\":\"same_account\"}`. Otherwise if the source\n  revision differs from expected_revision, return `{\"status\":\"stale_revision\"}`.\n  Otherwise if the source has insufficient funds, return\n  `{\"status\":\"insufficient_funds\"}`.\n- If validation succeeds, move amount from source to destination atomically,\n  increment **both** endpoint revisions by one, and return `{\"status\":\"ok\"}`.\n- Cache the fingerprint and output of every new request, including rejected\n  requests. Rejection changes no balances or revisions. Reusing a rejected\n  request after circumstances change still returns the original rejection.\n\n`{\"op\":\"inspect\"}` returns exactly\n`{\"balances\":{\"a\":A,\"b\":B,\"c\":C},\"revisions\":{\"a\":RA,\"b\":RB,\"c\":RC}}`,\nwith current integer values. It changes nothing.\n\n`{\"op\":\"restart\"}` returns `{\"status\":\"restarted\"}`. It reloads all\ncommitted balances, revisions, and request-cache entries. Every preceding\nevent is fully committed, even if its output was a rejection. This is a\nlogical durable reload; there are no partial writes, clocks, or concurrency.\n\n## What earns credit\n\nYour suite is replayed against the correct ledger and eight independently\nfaulty implementations of this same contract. A trace earns credit only if\n**every** expected output agrees with the correct ledger. Such a trace exposes\na faulty implementation when any output differs from your expectations.\nEach exposed implementation counts once, regardless of how many tests expose\nit. Wrong expectations earn no coverage for that trace. The primary result\nis exposed implementations out of eight; explanations and formatting earn\nno points. Empty or malformed submissions are unscored failed calls.\n\nCover interactions between atomicity, revisions, idempotency, rejected\nrequests, conflicting reuse, and durable recovery within the event budget.\nThe fault corpus is fixed for version 1.1. It is public benchmark source,\nbut use only this contract for your answer; do not inspect files or use tools.\n",
+  "source": "subscription",
+  "model": "codex-cli/gpt-5.5",
+  "reasoning_effort": "low",
+  "output_token_target": 4096,
+  "response": "{\"traces\":[{\"events\":[{\"op\":\"transfer\",\"id\":\"r1\",\"from\":\"a\",\"to\":\"b\",\"amount\":3,\"expected_revision\":0},{\"op\":\"restart\"},{\"op\":\"transfer\",\"id\":\"r1\",\"from\":\"a\",\"to\":\"b\",\"amount\":3,\"expected_revision\":0},{\"op\":\"transfer\",\"id\":\"r1\",\"from\":\"a\",\"to\":\"b\",\"amount\":4,\"expected_revision\":0},{\"op\":\"inspect\"}],\"expected\":[{\"status\":\"ok\"},{\"status\":\"restarted\"},{\"status\":\"ok\"},{\"status\":\"conflict\"},{\"balances\":{\"a\":7,\"b\":3,\"c\":0},\"revisions\":{\"a\":1,\"b\":1,\"c\":0}}]},{\"events\":[{\"op\":\"transfer\",\"id\":\"r2\",\"from\":\"a\",\"to\":\"b\",\"amount\":5,\"expected_revision\":1},{\"op\":\"transfer\",\"id\":\"r3\",\"from\":\"a\",\"to\":\"c\",\"amount\":2,\"expected_revision\":0},{\"op\":\"restart\"},{\"op\":\"transfer\",\"id\":\"r2\",\"from\":\"a\",\"to\":\"b\",\"amount\":5,\"expected_revision\":1},{\"op\":\"inspect\"}],\"expected\":[{\"status\":\"stale_revision\"},{\"status\":\"ok\"},{\"status\":\"restarted\"},{\"status\":\"stale_revision\"},{\"balances\":{\"a\":8,\"b\":0,\"c\":2},\"revisions\":{\"a\":1,\"b\":0,\"c\":1}}]},{\"events\":[{\"op\":\"transfer\",\"id\":\"r4\",\"from\":\"missing\",\"to\":\"missing\",\"amount\":1,\"expected_revision\":0},{\"op\":\"transfer\",\"id\":\"r5\",\"from\":\"a\",\"to\":\"a\",\"amount\":1,\"expected_revision\":0}],\"expected\":[{\"status\":\"unknown_account\"},{\"status\":\"same_account\"}]}]}",
+  "status": "completed",
+  "score": {
+    "benchmark_version": "1.1",
+    "challenge": "counterexample-ledger",
+    "scorer": "mutation-v1",
+    "event_budget": 12,
+    "events_used": 12,
+    "valid_traces": 3,
+    "total_traces": 3,
+    "killed": 6,
+    "total_mutants": 8,
+    "mutation_score": 0.75,
+    "killed_mutants": [
+      "forget_cache_on_restart",
+      "cache_success_only",
+      "ignore_conflicting_payload",
+      "revalidate_duplicate",
+      "no_destination_revision",
+      "accept_stale_revision"
+    ],
+    "surviving_mutants": [
+      "debit_before_credit_validation",
+      "conflict_overwrites_cache"
+    ],
+    "trace_results": [
+      {
+        "index": 0,
+        "oracle_match": true,
+        "first_mismatch": null,
+        "killed_mutants": [
+          "forget_cache_on_restart",
+          "ignore_conflicting_payload",
+          "revalidate_duplicate",
+          "no_destination_revision"
+        ]
+      },
+      {
+        "index": 1,
+        "oracle_match": true,
+        "first_mismatch": null,
+        "killed_mutants": [
+          "forget_cache_on_restart",
+          "cache_success_only",
+          "no_destination_revision",
+          "accept_stale_revision"
+        ]
+      },
+      {
+        "index": 2,
+        "oracle_match": true,
+        "first_mismatch": null,
+        "killed_mutants": []
+      }
+    ]
+  },
+  "subject_elapsed_ms": 19667
+}

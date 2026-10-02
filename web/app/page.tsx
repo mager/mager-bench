@@ -104,7 +104,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="counterexample-play">
-          <div className="play-caption">ONE BUG THEY BOTH MISSED</div>
+          <div className="play-caption">A BUG THE FIRST TWO MODELS MISSED</div>
           <div className="play-event">
             <span>01</span>
             <p>Send 3 to an account that doesn’t exist.</p>

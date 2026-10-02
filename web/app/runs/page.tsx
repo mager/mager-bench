@@ -11,7 +11,7 @@ export default function Runs() {
         <div className="eyebrow">The paper trail</div>
         <h1>Every attempt is evidence.</h1>
         <p>
-          Complete responses and exact scores from the first Counterexample Lab
+          Complete responses and exact scores from Counterexample Lab
           calibration. All {lab.runs.length} saved attempts are here, including
           the weaker ones.
         </p>
@@ -39,15 +39,14 @@ export default function Runs() {
           <div>
             <h2>The calibration log</h2>
             <p>
-              Ordered by completion time. The score is exposed faults out of
-              eight.
+              Ordered by start time. The score is exposed faults out of eight.
             </p>
           </div>
           <a
             className="text-link"
-            href={`${sourceRoot}/blob/main/runs/v1.1/2026-09-30-calibration.md`}
+            href={`${sourceRoot}/blob/main/runs/v1.1/2026-10-01-calibration.md`}
           >
-            Run protocol
+            Latest run protocol
             <Arrow diagonal />
           </a>
         </div>
@@ -74,9 +73,14 @@ export default function Runs() {
             ))}
         </div>
         <p className="section-note">
-          The runner session was interrupted after three saved attempts. Those
-          artifacts were retained; only missing planned slots were resumed. See
-          the protocol for the execution note. No missing output is assigned a
+          The September 30 calibration resumed after an interruption; its{" "}
+          <a
+            href={`${sourceRoot}/blob/main/runs/v1.1/2026-09-30-calibration.md`}
+          >
+            original protocol
+          </a>{" "}
+          retains that execution note. The October 1 protocol records the new
+          subjects and availability checks. No missing output is assigned a
           score.
         </p>
       </section>

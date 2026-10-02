@@ -15,6 +15,12 @@ they are not comparable to 1.1's mutation coverage. The first preliminary calibr
 Astra exposed 7, 7, and 7 of eight faults; Sol exposed 7, 6, and 5. Both used
 low reasoning effort. See the [protocol and artifacts](runs/v1.1/2026-09-30-calibration.md).
 
+The [October 1 extension](runs/v1.1/2026-10-01-calibration.md) adds GPT-5.6 Terra
+(6, 6, 6), GPT-5.5 (6, 6, 5), and GPT-5.6 Luna (7, 5, an unscored schema
+failure, then 6 on a separately retained retry). All counts are out of eight,
+with the same suite hash and low effort. These remain preliminary observations,
+with every attempt preserved and no model ranking.
+
 ```bash
 .venv/bin/python bench_v1_1.py --model codex-cli/gpt-6-astra --dry-run
 # Check codex login status and smoke-test a new model before its first run.
@@ -26,6 +32,10 @@ Version 1.1 uses the local ChatGPT subscription for subjects and a deterministic
 grader with zero judge-model calls. Save every attempt separately under
 `runs/v1.1/`; these artifacts do not go through the legacy board's merge script.
 The [suite manifest](benchmark-suites.json) records active and retired tasks.
+
+For the additional subscription subjects, `subscription_models_v1_1.py` accepts
+the same runner arguments and adds only model catalogue metadata. It delegates
+to the frozen `bench_v1_1.main` without editing fingerprinted harness files.
 
 **Model lineup and full challenge comparison:** [bench.mager.co](https://bench.mager.co)
 

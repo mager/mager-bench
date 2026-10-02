@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `${model.name} | Player profile | mager-bench`
       : "Model not found",
     description: model
-      ? `${model.name}'s complete benchmark record: thirteen coding challenges, Counterexample Lab attempts, and the evidence behind each result.`
+      ? `${model.name}'s saved benchmark results, Counterexample Lab attempts, and the evidence behind each result.`
       : undefined,
   };
 }
@@ -27,6 +27,7 @@ export default async function ModelPage({ params }: Props) {
   const model = roster.find((m) => m.slug === id);
   if (!model) notFound();
   const calibration = model.calibration;
+  const original = model.original;
   const attempts = lab.runs.filter((run) => run.model === model.id);
   const weakest = [...model.challenges].sort((a, b) => a.total - b.total)[0];
   return (
@@ -54,30 +55,44 @@ export default async function ModelPage({ params }: Props) {
       <div className="profile-scores">
         <div>
           <div className="eyebrow">Original 13 / Historical coding results</div>
-          <h2>
-            {model.average.toFixed(1)}{" "}
-            <span className="text-fg-dim text-xl">out of 10</span>
-          </h2>
-          <p>
-            Mean across thirteen tasks, scored by GPT-5.6 Sol. {model.runs ?? 1}{" "}
-            run per task, {dateLabel(originalBoard.generated_at)}.
-          </p>
-          <div className="profile-dimensions">
-            <div>
-              Correctness<strong>{model.avg_correctness.toFixed(1)}</strong>
-            </div>
-            <div>
-              Code quality<strong>{model.avg_quality.toFixed(1)}</strong>
-            </div>
-            <div>
-              Documentation<strong>{model.avg_documentation.toFixed(1)}</strong>
-            </div>
-          </div>
+          {original ? (
+            <>
+              <h2>
+                {original.average.toFixed(1)}{" "}
+                <span className="text-fg-dim text-xl">out of 10</span>
+              </h2>
+              <p>
+                Mean across thirteen tasks, scored by GPT-5.6 Sol.{" "}
+                {original.runs ?? 1} run per task,{" "}
+                {dateLabel(originalBoard.generated_at)}.
+              </p>
+              <div className="profile-dimensions">
+                <div>
+                  Correctness
+                  <strong>{original.avg_correctness.toFixed(1)}</strong>
+                </div>
+                <div>
+                  Code quality<strong>{original.avg_quality.toFixed(1)}</strong>
+                </div>
+                <div>
+                  Documentation
+                  <strong>{original.avg_documentation.toFixed(1)}</strong>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>Not run.</h2>
+              <p>This model has only been tested on Counterexample Lab 1.1.</p>
+            </>
+          )}
         </div>
         <div>
           <div className="eyebrow">Counterexample Lab / Version 1.1</div>
           <h2>
-            {calibration ? "Three runs. Every result." : "Waiting for a run."}
+            {calibration
+              ? `${attempts.length} attempts. Every result.`
+              : "Waiting for a run."}
           </h2>
           <div className="profile-lab-attempts">
             {attempts.map((run, index) => (
@@ -95,57 +110,67 @@ export default async function ModelPage({ params }: Props) {
           </p>
         </div>
       </div>
-      <section className="section" id="original">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">Original 13</span>
-            <h2>The full box score</h2>
-            <p>
-              Highest to lowest. The lowest score here is{" "}
-              {challengeNotes[weakest.name].title.toLowerCase()} at{" "}
-              {weakest.total.toFixed(1)}/10. Open any task to inspect the
-              submission and the judge’s notes.
-            </p>
+      {original && weakest ? (
+        <section className="section" id="original">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">Original 13</span>
+              <h2>The full box score</h2>
+              <p>
+                Highest to lowest. The lowest score here is{" "}
+                {challengeNotes[weakest.name].title.toLowerCase()} at{" "}
+                {weakest.total.toFixed(1)}/10. Open any task to inspect the
+                submission and the judge’s notes.
+              </p>
+            </div>
+            <Link className="text-link" href="/challenges#scoring">
+              Scoring rules
+              <Arrow />
+            </Link>
           </div>
-          <Link className="text-link" href="/challenges#scoring">
-            Scoring rules
-            <Arrow />
-          </Link>
-        </div>
-        <div className="profile-task-list">
-          {[...model.challenges]
-            .sort((a, b) => b.total - a.total)
-            .map((challenge) => (
-              <Link
-                className="profile-task"
-                href={modelHref(model.id, challenge.name)}
-                key={challenge.name}
-              >
-                <div>
-                  <h3>{challengeNotes[challenge.name].title}</h3>
-                  <p>{challengeNotes[challenge.name].question}</p>
-                </div>
-                <meter
-                  min="0"
-                  max="10"
-                  value={challenge.total}
-                  aria-label={`${challengeNotes[challenge.name].title} score`}
-                />
-                <span>
-                  {challenge.total.toFixed(1)}
-                  <small> /10</small>
-                </span>
-                <Arrow />
-              </Link>
-            ))}
-        </div>
-        <p className="section-note">
-          These scores are preserved from the original suite, including three
-          retired warm-ups. They are not a new run. The model-judge setup,
-          single samples, and self-judging for Sol limit how much to read into
-          small differences.
-        </p>
-      </section>
+          <div className="profile-task-list">
+            {[...model.challenges]
+              .sort((a, b) => b.total - a.total)
+              .map((challenge) => (
+                <Link
+                  className="profile-task"
+                  href={modelHref(model.id, challenge.name)}
+                  key={challenge.name}
+                >
+                  <div>
+                    <h3>{challengeNotes[challenge.name].title}</h3>
+                    <p>{challengeNotes[challenge.name].question}</p>
+                  </div>
+                  <meter
+                    min="0"
+                    max="10"
+                    value={challenge.total}
+                    aria-label={`${challengeNotes[challenge.name].title} score`}
+                  />
+                  <span>
+                    {challenge.total.toFixed(1)}
+                    <small> /10</small>
+                  </span>
+                  <Arrow />
+                </Link>
+              ))}
+          </div>
+          <p className="section-note">
+            These scores are preserved from the original suite, including three
+            retired warm-ups. They are not a new run. The model-judge setup,
+            single samples, and self-judging for Sol limit how much to read into
+            small differences.
+          </p>
+        </section>
+      ) : (
+        <section className="section" id="original">
+          <h2>No original-suite results</h2>
+          <p className="section-note">
+            No historical coding score is assigned to this model. Its saved
+            evidence is the Counterexample Lab attempts below.
+          </p>
+        </section>
+      )}
       <section className="section" id="counterexample">
         <div className="section-heading">
           <div>
@@ -204,9 +229,18 @@ export default async function ModelPage({ params }: Props) {
           ))}
         </div>
         <p className="section-note">
-          Same frozen contract and settings across all three attempts. Every
-          trace in this calibration matched the reference. All responses are
-          preserved, including weaker attempts.
+          Same frozen contract and settings across all attempts.{" "}
+          {attempts.reduce(
+            (sum, run) => sum + (run.score?.valid_traces ?? 0),
+            0,
+          )}{" "}
+          of{" "}
+          {attempts.reduce(
+            (sum, run) => sum + (run.score?.total_traces ?? 0),
+            0,
+          )}{" "}
+          graded traces matched the reference. All responses are preserved,
+          including weaker attempts and unscored failures.
         </p>
       </section>
       <div className="archive-teaser">

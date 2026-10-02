@@ -1,8 +1,9 @@
 # mager-bench 1.1: Counterexample Lab
 
-Status: first preliminary calibration published, with three fresh attempts per
-model. Counterexample Lab is the active 1.1 track. See the
-[calibration protocol](../runs/v1.1/2026-09-30-calibration.md) and
+Status: preliminary calibration expanded to five models. Counterexample Lab
+is the active 1.1 track. See the
+[first protocol](../runs/v1.1/2026-09-30-calibration.md),
+[October 1 extension](../runs/v1.1/2026-10-01-calibration.md), and
 [public evidence](https://bench.mager.co/runs).
 
 We retire `fizzbuzz`, `binary-search`, and `refactor` from the current suite.
@@ -123,6 +124,13 @@ The September 30 calibration used low reasoning effort for both models. Astra
 exposed 7/8 faults in each of three attempts; Sol exposed 7/8, 6/8, and 5/8.
 Every trace matched the oracle. Neither model exposed partial-transfer mutation
 in these attempts. This small sample is preliminary, not a general ranking.
+
+The October 1 extension added GPT-5.6 Terra (6/8, 6/8, 6/8), GPT-5.5
+(6/8, 6/8, 5/8), and GPT-5.6 Luna (7/8, 5/8, an unscored schema failure,
+then 6/8 on a separately retained retry). All 21 graded traces in the new
+completed attempts matched the oracle. None exposed partial-transfer mutation.
+Every response, including the failed attempt, is retained. The provider,
+contract, fault corpus, budget, scorer, and combined suite hash are unchanged.
 
 The code and faults are public. This release is not a secret holdout or a claim
 of resistance to future training contamination. Eight faults may themselves

@@ -1,0 +1,8 @@
+{
+  "model": "codex-cli/gpt-5.5",
+  "generated_at": "2026-10-02T00:33:30.502458+00:00",
+  "prompt": "Say OK",
+  "purpose": "availability smoke test, not scored",
+  "response": "OK",
+  "status": "completed"
+}

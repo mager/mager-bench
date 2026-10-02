@@ -37,6 +37,12 @@ preliminary evidence, not a definitive model ranking. Models appear together
 on the lineup, but the old average and new fault counts are never combined.
 Keep version 1.1 artifacts out of `results.json` and the legacy merge script.
 
+The October 1 extension adds three subjects and retains Luna's schema failure
+alongside its separate retry. The lineup is the union of legacy and 1.1 models;
+missing legacy results are labeled "not run" and have no numeric score. The
+supplementary subscription catalogue delegates to the frozen runner. See
+`../runs/v1.1/2026-10-01-calibration.md` for the complete record.
+
 ## Historical data
 
 `data/results.json` and `data/challenges.json` remain exports of the original
