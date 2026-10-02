@@ -1,0 +1,515 @@
+/* Active 1.2 report. Historical surfaces keep their existing styles. */
+:root {
+  --report-muted: #adb5b5;
+  --report-rule: #343c3c;
+  --report-accent: #a6e2ce;
+}
+.bench-shell {
+  width: min(1080px, calc(100% - 64px));
+  margin-inline: auto;
+}
+.bench-header {
+  border-bottom: 1px solid var(--report-rule);
+}
+.bench-nav {
+  min-height: 86px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+.bench-wordmark {
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.bench-wordmark span {
+  font-size: 12px;
+  color: var(--report-accent);
+  border: 1px solid var(--report-rule);
+  padding: 3px 7px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.bench-nav nav,
+.bench-footer nav {
+  display: flex;
+  gap: 28px;
+  font-size: 14px;
+}
+.bench-nav nav a,
+.bench-footer {
+  color: var(--report-muted);
+}
+.bench-nav nav a:hover,
+.bench-nav nav a[aria-current],
+.bench-footer a:hover {
+  color: var(--fg);
+}
+.bench-intro {
+  padding-block: 52px 36px;
+  max-width: 900px;
+}
+.bench-shell h1,
+.bench-shell h2,
+.bench-shell h3,
+.bench-shell h4 {
+  font-family: var(--font-manrope), sans-serif;
+  text-transform: none;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.bench-intro h1 {
+  font-size: clamp(38px, 4.5vw, 54px);
+  line-height: 1.08;
+  font-weight: 650;
+  margin: 0 0 24px;
+}
+.bench-intro > p {
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 64ch;
+  color: var(--report-muted);
+  margin: 0 0 25px;
+}
+.bench-link {
+  color: var(--report-accent);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.bench-link:hover {
+  color: var(--fg);
+}
+.bench-link .arrow-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.baseline {
+  display: grid;
+  grid-template-columns: 1fr 1.65fr auto;
+  gap: 32px;
+  align-items: center;
+  border-block: 1px solid var(--report-rule);
+  padding-block: 26px;
+}
+.baseline h2 {
+  font-size: 22px;
+  margin: 0 0 8px;
+  font-weight: 650;
+}
+.baseline p {
+  color: var(--report-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+.result-status {
+  color: #edc897;
+  font-size: 13px;
+  font-weight: 650;
+}
+.result-status.is-complete {
+  color: var(--report-accent);
+}
+.baseline-note p {
+  margin-top: 7px;
+  max-width: 49ch;
+}
+.everyday-section {
+  padding-block: 54px 0;
+  scroll-margin-top: 24px;
+}
+.bench-section-title {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+}
+.bench-shell h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+.bench-section-title > span {
+  font-size: 13px;
+  color: var(--report-muted);
+}
+.task-selector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--report-rule);
+  gap: 24px;
+}
+.task-selector button {
+  text-align: left;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 20px;
+  color: var(--report-muted);
+  min-height: 96px;
+}
+.task-selector button[aria-pressed="true"] {
+  border-bottom-color: var(--report-accent);
+  color: var(--report-accent);
+}
+.task-selector button:hover {
+  color: var(--fg);
+}
+.task-selector button > span:first-child {
+  display: block;
+  font-size: 18px;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+.task-description {
+  display: block;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--report-muted);
+  max-width: 35ch;
+}
+.example-heading {
+  padding-top: 28px;
+}
+.example-heading h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.example-heading p {
+  color: var(--report-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.case-control {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 26px;
+}
+.case-control label {
+  font-size: 13px;
+}
+.case-control select {
+  background: var(--bg-raised);
+  border: 1px solid var(--report-rule);
+  color: var(--fg);
+  min-height: 44px;
+  padding: 8px 35px 8px 12px;
+  font: inherit;
+  font-size: 14px;
+  border-radius: 3px;
+  max-width: 100%;
+}
+.expected-answer {
+  margin-block: 24px;
+  padding: 20px 24px;
+  background: #172420;
+}
+.expected-answer span {
+  color: var(--report-accent);
+  font-size: 12px;
+}
+.expected-answer p {
+  margin: 8px 0 0;
+  font-size: 20px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.case-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.case-columns > div {
+  min-width: 0;
+}
+.bench-shell h4 {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 12px;
+  letter-spacing: 0;
+}
+.bench-shell pre {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  background: #151919;
+  padding: 20px;
+  overflow: auto;
+  max-height: 440px;
+  margin: 0;
+  border: 1px solid var(--report-rule);
+  tab-size: 2;
+}
+.quiet {
+  color: var(--report-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 16px;
+}
+.bench-details {
+  border-block-end: 1px solid var(--report-rule);
+  padding-block: 18px;
+  font-size: 14px;
+}
+.bench-details summary {
+  min-height: 24px;
+  line-height: 1.65;
+}
+.bench-details[open] summary {
+  margin-bottom: 18px;
+}
+.bench-shell .prose-code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: none;
+}
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin: 0 0 20px;
+}
+.method-grid dt {
+  font-size: 15px;
+  margin-bottom: 8px;
+  font-weight: 650;
+}
+.method-grid dd,
+.method-copy p {
+  color: var(--report-muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0;
+}
+.method-copy p {
+  max-width: 72ch;
+  margin-bottom: 16px;
+}
+.history-note {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  align-items: center;
+  margin-block: 50px;
+  padding-top: 28px;
+  border-top: 1px solid var(--report-rule);
+}
+.history-note p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--report-muted);
+  max-width: 65ch;
+}
+.history-note a {
+  flex-shrink: 0;
+}
+.bench-footer {
+  margin-top: 32px;
+  padding-block: 32px;
+  border-top: 1px solid var(--report-rule);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 13px;
+}
+.bench-footer a {
+  text-underline-offset: 4px;
+}
+.bench-page-heading {
+  padding-block: 64px 40px;
+}
+.bench-page-heading h1 {
+  font-size: clamp(34px, 5vw, 50px);
+  line-height: 1.2;
+  font-weight: 650;
+  margin: 16px 0;
+}
+.bench-page-heading p {
+  max-width: 68ch;
+  font-size: 16px;
+  color: var(--report-muted);
+  line-height: 1.8;
+}
+.attempt-list {
+  border-top: 1px solid var(--report-rule);
+}
+.attempt-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding-block: 24px;
+  border-bottom: 1px solid var(--report-rule);
+}
+.attempt-row:hover,
+.archive-entry:hover {
+  background: #171c1b;
+}
+.attempt-row h2 {
+  font-size: 20px;
+}
+.attempt-row p,
+.attempt-row > span {
+  color: var(--report-muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+.attempt-summary {
+  border-block: 1px solid var(--report-rule);
+  padding-block: 24px;
+}
+.attempt-summary h2 {
+  margin-bottom: 12px;
+}
+.attempt-summary > p {
+  line-height: 1.8;
+  color: var(--report-muted);
+  margin-bottom: 20px;
+}
+.attempt-summary > a {
+  display: inline-block;
+  margin-top: 20px;
+}
+.task-attempt {
+  padding-block: 28px;
+  border-bottom: 1px solid var(--report-rule);
+}
+.task-attempt h3 {
+  font-size: 20px;
+}
+.suite-hash {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  display: block;
+  margin-block: 10px;
+}
+.archive-entry {
+  display: block;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--report-rule);
+}
+.archive-entry p {
+  color: var(--report-muted);
+  max-width: 70ch;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-block: 14px;
+}
+.bench-shell {
+  caret-color: var(--report-accent);
+  scrollbar-color: var(--report-rule) #151919;
+  font-variant-numeric: tabular-nums;
+}
+.bench-shell :focus-visible {
+  outline: 2px solid var(--report-accent);
+  outline-offset: 5px;
+}
+.bench-shell ::selection {
+  background: var(--report-accent);
+  color: #13211c;
+}
+@media (max-width: 700px) {
+  .bench-shell {
+    width: calc(100% - 36px);
+  }
+  .bench-nav {
+    min-height: 104px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-block: 16px;
+  }
+  .bench-nav nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .bench-wordmark {
+    font-size: 20px;
+  }
+  .bench-intro {
+    padding-block: 44px 32px;
+  }
+  .bench-intro > p {
+    font-size: 16px;
+  }
+  .baseline {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .bench-section-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bench-shell h2 {
+    font-size: 22px;
+  }
+  .task-selector {
+    gap: 12px;
+  }
+  .task-selector button {
+    min-height: 64px;
+    padding-bottom: 12px;
+  }
+  .task-selector button > span:first-child {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+  .task-description {
+    display: none;
+  }
+  .case-control {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .case-control select {
+    width: 100%;
+  }
+  .case-columns,
+  .method-grid {
+    grid-template-columns: 1fr;
+  }
+  .expected-answer {
+    padding: 18px;
+  }
+  .expected-answer p {
+    font-size: 18px;
+  }
+  .history-note {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .bench-footer {
+    flex-direction: column;
+  }
+  .attempt-row {
+    grid-template-columns: 1fr auto;
+  }
+  .attempt-row > span:nth-child(2) {
+    grid-row: 2;
+  }
+  .attempt-row > span:last-child {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .bench-page-heading {
+    padding-block: 40px 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

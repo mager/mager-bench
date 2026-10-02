@@ -3,21 +3,26 @@
 `/bench` in `.opencode/commands/bench.md` is the canonical workflow.
 `.claude/skills/run-bench/SKILL.md` mirrors it; if they disagree, `/bench` wins.
 
-## Active version: 1.1
+## Active version: 1.2
 
-- Use `bench_v1_1.py` for the active Counterexample Lab. Read
-  `docs/mager-bench-1.1.md` and `counterexample_lab/prompt.md` first.
-- Dry-run first; subjects still use the local ChatGPT subscription exclusively.
-  There are zero LLM judge calls: a deterministic oracle and eight mutants score
-  submitted test traces. Save every attempt under `runs/v1.1/`.
-- FizzBuzz, binary search, and refactor are archived from the active suite;
-  `benchmark-suites.json` records the suite membership. Keep historical prompts
-  and scores intact. `bench.py` remains the frozen thirteen-task reproduction
-  entrypoint, including those archived tasks.
-- Never merge 1.1 mutation scores into `results.json` or use the legacy merge
-  script for them. Empty/malformed/provider failures remain unscored artifacts.
-  Publish no 1.1 ranking until repeated calibration runs are complete.
-- The next substantive contract, fault-corpus, budget, or scoring change is 1.2.
+- Read `docs/mager-bench-1.2.md`. Use `bench_v1_2.py` for three complex everyday
+  JavaScript tasks with 36 deterministic checks and zero model judge calls.
+- **Always run evals at the lowest supported reasoning effort.** Speed is the
+  purpose of this benchmark. The active runner selects and records the minimum
+  from the Codex catalog; do not override it upwards. For frozen reproduction
+  scripts, preserve original code and pass the lowest supported effort explicitly.
+- Dry-run first. Use the local ChatGPT subscription only. Save every attempt
+  under `runs/v1.2/`. No API fallback, automatic retry, or model substitution.
+- GPT-6 Sol's October 2 preflight and first v1.2 attempt were rejected by the
+  ChatGPT-signed-in CLI. Keep those failures unscored. Do not infer availability
+  from catalog metadata or substitute GPT-5.6 Sol under its name.
+- Export with `.venv/bin/python web/scripts/sync-everyday-data.py`. Never merge
+  1.2 into `results.json`. Keep artifacts and generated web data in the same commit.
+- v1.1 is frozen. Preserve `bench_v1_1.py`, `providers.py`, and all
+  `counterexample_lab/` contract/scoring files so historical fingerprints verify.
+  Original thirteen-task prompts, scores, and APIs remain archived too.
+- A substantive contract, test corpus, budget, or scoring change after 1.2
+  publishes requires a new version.
 
 ## Legacy thirteen-task run policy
 

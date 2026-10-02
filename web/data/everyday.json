@@ -1,0 +1,1206 @@
+{
+  "version": "1.2",
+  "suiteHash": "476008a7e08dc0604c5c139afc995d6583d76c21a60e67feb0bd7962b8090bcc",
+  "tasks": [
+    {
+      "id": "split-bill",
+      "title": "Split a bill",
+      "description": "Settle shared expenses with weighted shares, refunds, and awkward pennies.",
+      "example": "A $10 bill split three ways leaves one extra cent. Who gets it?",
+      "contract": "Input: {people: string[], expenses: {paidBy: string, cents: integer, shares: {person: string, weight: positive integer}[]}[]}. People are unique and ordered. All names occur in people. Each expense has unique share recipients, at least one. cents can be negative (a refund) or zero. For each expense, allocate abs(cents) proportional to the weights: floor each exact share, then distribute remaining cents by descending fractional remainder, ties by people order (not shares order). Apply the sign of cents after allocation. Each person's balance = amount paid minus allocated shares; positive means they receive money. Return {balances: integer[], transfers: {from: string, to: string, cents: positive integer}[]}. balances follows people order including zeros. Settle debtors and creditors in people order: transfer min(debt, credit), advance whichever reaches zero, until settled. Do not optimize transaction count or sort by amount.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {people: string[], expenses: {paidBy: string, cents: integer, shares: {person: string, weight: positive integer}[]}[]}. People are unique and ordered. All names occur in people. Each expense has unique share recipients, at least one. cents can be negative (a refund) or zero. For each expense, allocate abs(cents) proportional to the weights: floor each exact share, then distribute remaining cents by descending fractional remainder, ties by people order (not shares order). Apply the sign of cents after allocation. Each person's balance = amount paid minus allocated shares; positive means they receive money. Return {balances: integer[], transfers: {from: string, to: string, cents: positive integer}[]}. balances follows people order including zeros. Settle debtors and creditors in people order: transfer min(debt, credit), advance whichever reaches zero, until settled. Do not optimize transaction count or sort by amount.",
+      "cases": [
+        {
+          "label": "Dinner for two",
+          "input": {
+            "people": [
+              "Ada",
+              "Bo"
+            ],
+            "expenses": [
+              {
+                "paidBy": "Ada",
+                "cents": 4200,
+                "shares": [
+                  {
+                    "person": "Ada",
+                    "weight": 1
+                  },
+                  {
+                    "person": "Bo",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              2100,
+              -2100
+            ],
+            "transfers": [
+              {
+                "to": "Ada",
+                "cents": 2100,
+                "from": "Bo"
+              }
+            ]
+          }
+        },
+        {
+          "label": "An extra penny",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 1000,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              666,
+              -333,
+              -333
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 333,
+                "from": "B"
+              },
+              {
+                "to": "A",
+                "cents": 333,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Weighted shares",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "B",
+                "cents": 1000,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 2
+                  },
+                  {
+                    "person": "C",
+                    "weight": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              -167,
+              667,
+              -500
+            ],
+            "transfers": [
+              {
+                "to": "B",
+                "cents": 167,
+                "from": "A"
+              },
+              {
+                "to": "B",
+                "cents": 500,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Tie uses people order",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "C",
+                "cents": 2,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "A",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              -1,
+              -1,
+              2
+            ],
+            "transfers": [
+              {
+                "to": "C",
+                "cents": 1,
+                "from": "A"
+              },
+              {
+                "to": "C",
+                "cents": 1,
+                "from": "B"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Payer does not participate",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 501,
+                "shares": [
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              501,
+              -251,
+              -250
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 251,
+                "from": "B"
+              },
+              {
+                "to": "A",
+                "cents": 250,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Partial refund",
+          "input": {
+            "people": [
+              "A",
+              "B"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 1001,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "A",
+                "cents": -201,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              400,
+              -400
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 400,
+                "from": "B"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Refund only",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "B",
+                "cents": -5,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              3,
+              -5,
+              2
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 3,
+                "from": "B"
+              },
+              {
+                "to": "C",
+                "cents": 2,
+                "from": "B"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Multiple creditors",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 80,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "B",
+                "cents": 50,
+                "shares": [
+                  {
+                    "person": "D",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              80,
+              50,
+              -80,
+              -50
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 80,
+                "from": "C"
+              },
+              {
+                "to": "B",
+                "cents": 50,
+                "from": "D"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Debtor crosses creditors",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 70,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "B",
+                "cents": 30,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              70,
+              30,
+              -100
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 70,
+                "from": "C"
+              },
+              {
+                "to": "B",
+                "cents": 30,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Already settled",
+          "input": {
+            "people": [
+              "A",
+              "B"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 20,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "B",
+                "cents": 20,
+                "shares": [
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "A",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              0,
+              0
+            ],
+            "transfers": []
+          }
+        },
+        {
+          "label": "Empty and zero expenses",
+          "input": {
+            "people": [
+              "A",
+              "B"
+            ],
+            "expenses": [
+              {
+                "paidBy": "B",
+                "cents": 0,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              0,
+              0
+            ],
+            "transfers": []
+          }
+        },
+        {
+          "label": "Largest remainder wins",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "C",
+                "cents": 10,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 2
+                  },
+                  {
+                    "person": "C",
+                    "weight": 4
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              -1,
+              -3,
+              4
+            ],
+            "transfers": [
+              {
+                "to": "C",
+                "cents": 1,
+                "from": "A"
+              },
+              {
+                "to": "C",
+                "cents": 3,
+                "from": "B"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "clean-csv",
+      "title": "Clean a contact CSV",
+      "description": "Parse quoted records, merge duplicate contacts, and report rejected rows.",
+      "example": "Two rows use the same email, but one has a newer name and different tags.",
+      "contract": "Input: {csv: string}. Parse a valid CSV (comma delimiter; LF or CRLF record separator; double-quoted fields may contain commas, line breaks, and escaped double quotes). Preserve embedded line breaks exactly. A trailing record separator does not create an extra record; internal empty records count. CSV may start with one Unicode BOM. The first record is the header: trim and lowercase headers; unique headers include name,email,tags in any order, optionally others. For every following record, trim fields. Reject a record if its field count differs from the header, trimmed name is empty, or email is invalid. Email validity is exactly /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ after trimming. Lowercase email. Split tags on semicolon, trim and lowercase each, remove empty tags. Merge by normalized email: keep contacts in first accepted appearance order, use the LAST accepted name, union tags in first appearance order with no duplicates. A rejected duplicate does not change a contact. Return {contacts: {name: string, email: string, tags: string[]}[], rejected: integer}. Count each rejected record once. Empty/header-only CSV yields no contacts and zero rejections.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {csv: string}. Parse a valid CSV (comma delimiter; LF or CRLF record separator; double-quoted fields may contain commas, line breaks, and escaped double quotes). Preserve embedded line breaks exactly. A trailing record separator does not create an extra record; internal empty records count. CSV may start with one Unicode BOM. The first record is the header: trim and lowercase headers; unique headers include name,email,tags in any order, optionally others. For every following record, trim fields. Reject a record if its field count differs from the header, trimmed name is empty, or email is invalid. Email validity is exactly /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ after trimming. Lowercase email. Split tags on semicolon, trim and lowercase each, remove empty tags. Merge by normalized email: keep contacts in first accepted appearance order, use the LAST accepted name, union tags in first appearance order with no duplicates. A rejected duplicate does not change a contact. Return {contacts: {name: string, email: string, tags: string[]}[], rejected: integer}. Count each rejected record once. Empty/header-only CSV yields no contacts and zero rejections.",
+      "cases": [
+        {
+          "label": "Trim and normalize",
+          "input": {
+            "csv": "name,email,tags\n Ada , ADA@X.CO , Work ; friend "
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada",
+                "email": "ada@x.co",
+                "tags": [
+                  "work",
+                  "friend"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Quoted comma",
+          "input": {
+            "csv": "name,email,tags\n\"Bo, Jr.\",bo@x.co,team"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Bo, Jr.",
+                "email": "bo@x.co",
+                "tags": [
+                  "team"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Escaped quotes",
+          "input": {
+            "csv": "name,email,tags\n\"Ada \"\"Ace\"\"\",a@x.co,"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada \"Ace\"",
+                "email": "a@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Embedded CRLF",
+          "input": {
+            "csv": "name,email,tags\r\n\"Ada\r\nLovelace\",a@x.co,x\r\n"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada\r\nLovelace",
+                "email": "a@x.co",
+                "tags": [
+                  "x"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Merge duplicates",
+          "input": {
+            "csv": "name,email,tags\nAda,A@X.CO,one;two\nAda L,a@x.co,two;THREE"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada L",
+                "email": "a@x.co",
+                "tags": [
+                  "one",
+                  "two",
+                  "three"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "BOM and reordered headers",
+          "input": {
+            "csv": "\ufeff Tags , EMAIL , Name ,extra\nx,a@x.co,Ada,ignored"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada",
+                "email": "a@x.co",
+                "tags": [
+                  "x"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Invalid emails",
+          "input": {
+            "csv": "name,email,tags\nA,a@x,\nB,b b@x.co,\nC,c@@x.co,\nD,d@x.co,"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "D",
+                "email": "d@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 3
+          }
+        },
+        {
+          "label": "Wrong number of fields",
+          "input": {
+            "csv": "name,email,tags\nA,a@x.co\nB,b@x.co,x,extra\nC,c@x.co,"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "C",
+                "email": "c@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 2
+          }
+        },
+        {
+          "label": "Internal blank record",
+          "input": {
+            "csv": "name,email,tags\n\nA,a@x.co,\n"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "A",
+                "email": "a@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 1
+          }
+        },
+        {
+          "label": "Rejected duplicate stays rejected",
+          "input": {
+            "csv": "name,email,tags\nA,a@x.co,one\n ,a@x.co,two"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "A",
+                "email": "a@x.co",
+                "tags": [
+                  "one"
+                ]
+              }
+            ],
+            "rejected": 1
+          }
+        },
+        {
+          "label": "First appearance order",
+          "input": {
+            "csv": "name,email,tags\nB,b@x.co,;One;one;;\nA,a@x.co,two\nBee,B@X.CO,three"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Bee",
+                "email": "b@x.co",
+                "tags": [
+                  "one",
+                  "three"
+                ]
+              },
+              {
+                "name": "A",
+                "email": "a@x.co",
+                "tags": [
+                  "two"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Header only",
+          "input": {
+            "csv": "name,email,tags\n"
+          },
+          "expected": {
+            "contacts": [],
+            "rejected": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "meeting-time",
+      "title": "Find a meeting time",
+      "description": "Align time zones, split workdays, busy periods, and recovery buffers.",
+      "example": "One person works UTC+2. Another has a 15-minute buffer after every call.",
+      "contract": "Input: {window: [start,end], duration: positive integer, step: positive integer, people: {offset: integer, work: [start,end][], busy: [start,end][], buffer: nonnegative integer}[]}. All times are integer minutes on an absolute two-day axis, not clock strings. window uses UTC minutes, 0 <= start < end <= 2880. Every interval is half-open [start,end), with start < end. Per-person work and busy times are LOCAL minutes; convert to UTC by subtracting offset (which can be negative). Intervals may cross midnight, overlap, be unsorted, or fall outside window. Merge overlapping OR touching work intervals; a meeting must fit completely inside their union for every person. Expand each busy interval by that person's buffer on both ends, after conversion. Touching a busy boundary is allowed; overlapping is not. Candidate starts are window[0] + k*step for nonnegative integers k. Return the earliest {start: UTCminute, end: UTCminute} whose entire duration fits window and every person's work and avoids every expanded busy interval; return null if none. Empty people imposes only the window/grid; a person with no work prevents any meeting.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {window: [start,end], duration: positive integer, step: positive integer, people: {offset: integer, work: [start,end][], busy: [start,end][], buffer: nonnegative integer}[]}. All times are integer minutes on an absolute two-day axis, not clock strings. window uses UTC minutes, 0 <= start < end <= 2880. Every interval is half-open [start,end), with start < end. Per-person work and busy times are LOCAL minutes; convert to UTC by subtracting offset (which can be negative). Intervals may cross midnight, overlap, be unsorted, or fall outside window. Merge overlapping OR touching work intervals; a meeting must fit completely inside their union for every person. Expand each busy interval by that person's buffer on both ends, after conversion. Touching a busy boundary is allowed; overlapping is not. Candidate starts are window[0] + k*step for nonnegative integers k. Return the earliest {start: UTCminute, end: UTCminute} whose entire duration fits window and every person's work and avoids every expanded busy interval; return null if none. Empty people imposes only the window/grid; a person with no work prevents any meeting.",
+      "cases": [
+        {
+          "label": "Open morning",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 540,
+            "end": 570
+          }
+        },
+        {
+          "label": "Different time zones",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    660,
+                    1140
+                  ]
+                ],
+                "busy": [],
+                "offset": 120,
+                "buffer": 0
+              },
+              {
+                "work": [
+                  [
+                    300,
+                    780
+                  ]
+                ],
+                "busy": [],
+                "offset": -300,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 600,
+            "end": 630
+          }
+        },
+        {
+          "label": "Buffer after a call",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [
+                  [
+                    540,
+                    600
+                  ]
+                ],
+                "offset": 0,
+                "buffer": 15
+              }
+            ]
+          },
+          "expected": {
+            "start": 615,
+            "end": 645
+          }
+        },
+        {
+          "label": "Busy boundary is allowed",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [
+                  [
+                    570,
+                    600
+                  ]
+                ],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 540,
+            "end": 570
+          }
+        },
+        {
+          "label": "Unsorted overlapping busy periods",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [
+                  [
+                    585,
+                    630
+                  ],
+                  [
+                    540,
+                    600
+                  ]
+                ],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 630,
+            "end": 660
+          }
+        },
+        {
+          "label": "Touching work periods merge",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 50,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    560,
+                    590
+                  ],
+                  [
+                    540,
+                    560
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 540,
+            "end": 590
+          }
+        },
+        {
+          "label": "Split workday gap",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    560
+                  ],
+                  [
+                    600,
+                    660
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 600,
+            "end": 630
+          }
+        },
+        {
+          "label": "Grid anchored to window",
+          "input": {
+            "window": [
+              547,
+              700
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    550,
+                    900
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 562,
+            "end": 592
+          }
+        },
+        {
+          "label": "No common opening",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    570
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              },
+              {
+                "work": [
+                  [
+                    570,
+                    600
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": null
+        },
+        {
+          "label": "Across midnight",
+          "input": {
+            "window": [
+              1380,
+              1600
+            ],
+            "duration": 60,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    1380,
+                    1560
+                  ]
+                ],
+                "busy": [
+                  [
+                    1430,
+                    1460
+                  ]
+                ],
+                "offset": 60,
+                "buffer": 10
+              }
+            ]
+          },
+          "expected": {
+            "start": 1410,
+            "end": 1470
+          }
+        },
+        {
+          "label": "Nobody to constrain it",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": []
+          },
+          "expected": {
+            "start": 540,
+            "end": 570
+          }
+        },
+        {
+          "label": "Missing working hours",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": null
+        }
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "benchmark_version": "1.2",
+      "model": "codex-cli/gpt-6-sol",
+      "generated_at": "2026-10-02T23:14:12.625563+00:00",
+      "suite_sha256": "476008a7e08dc0604c5c139afc995d6583d76c21a60e67feb0bd7962b8090bcc",
+      "source": "subscription",
+      "reasoning_effort": "low",
+      "supported_efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max",
+        "ultra"
+      ],
+      "effort_policy": "lowest supported in local Codex catalog",
+      "output_token_target": 3072,
+      "call_timeout_seconds": 90,
+      "status": "failed",
+      "score": null,
+      "tasks": [
+        {
+          "id": "split-bill",
+          "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {people: string[], expenses: {paidBy: string, cents: integer, shares: {person: string, weight: positive integer}[]}[]}. People are unique and ordered. All names occur in people. Each expense has unique share recipients, at least one. cents can be negative (a refund) or zero. For each expense, allocate abs(cents) proportional to the weights: floor each exact share, then distribute remaining cents by descending fractional remainder, ties by people order (not shares order). Apply the sign of cents after allocation. Each person's balance = amount paid minus allocated shares; positive means they receive money. Return {balances: integer[], transfers: {from: string, to: string, cents: positive integer}[]}. balances follows people order including zeros. Settle debtors and creditors in people order: transfer min(debt, credit), advance whichever reaches zero, until settled. Do not optimize transaction count or sort by amount.",
+          "status": "failed",
+          "response": "",
+          "score": null,
+          "error": "Codex CLI gpt-6-sol: ERROR: {\"type\":\"error\",\"status\":400,\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The 'gpt-6-sol' model is not supported when using Codex with a ChatGPT account.\"}}",
+          "subject_elapsed_ms": 2997
+        }
+      ],
+      "error": "Codex CLI gpt-6-sol: ERROR: {\"type\":\"error\",\"status\":400,\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The 'gpt-6-sol' model is not supported when using Codex with a ChatGPT account.\"}}",
+      "elapsed_ms": 3104,
+      "id": "2026-10-02-gpt-6-sol-r1",
+      "artifact": "runs/v1.2/2026-10-02-gpt-6-sol-r1.json"
+    }
+  ]
+}

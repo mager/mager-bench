@@ -3,6 +3,8 @@ import { Barlow_Condensed, Manrope, IBM_Plex_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
+import "./v12.css";
+import { ArchiveNotice } from "@/components/archive-notice";
 
 const sport = Barlow_Condensed({
   weight: ["600", "700", "800"],
@@ -22,9 +24,9 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "mager-bench | Who’s got next?",
+  title: "mager-bench 1.2 | A quick test of useful code",
   description:
-    "A pickup game for coding models. Compare each model across thirteen coding challenges and Counterexample Lab, with every score and response open for inspection.",
+    "Three everyday coding tasks, 36 deterministic checks, and the lowest supported reasoning effort. Inspect every prompt, expected output, and saved attempt.",
   metadataBase: new URL("https://bench.mager.co"),
 };
 
@@ -46,6 +48,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <SiteHeader />
+        <ArchiveNotice />
         <main id="main" className="flex-1">
           {children}
         </main>

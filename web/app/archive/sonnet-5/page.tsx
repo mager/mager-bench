@@ -1,4 +1,3 @@
-import { ArchiveNotice } from "@/components/archive-notice";
 import type { Metadata } from "next";
 import Link from "next/link";
 import archiveData from "@/data/sonnet-5-board.json";
@@ -29,7 +28,7 @@ const archive = archiveData as {
 
 export default function SonnetArchive() {
   return (
-    <><ArchiveNotice /><div className="px-4 py-10 sm:px-8 md:py-16">
+    <><div className="px-4 py-10 sm:px-8 md:py-16">
       <div className="mx-auto flex max-w-4xl flex-col gap-9">
         <header className="border-b border-amber-faint pb-6">
           <Link href="/archive" className="text-xs text-fg-dim hover:text-amber-bright">← all historical boards</Link>

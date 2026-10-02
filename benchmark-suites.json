@@ -1,11 +1,26 @@
 {
-  "current_version": "1.1",
+  "current_version": "1.2",
   "suites": {
-    "1.1": {
+    "1.2": {
       "status": "active",
+      "entrypoint": "bench_v1_2.py",
+      "challenges": [
+        "split-bill",
+        "clean-csv",
+        "meeting-time"
+      ]
+    },
+    "1.1": {
+      "status": "frozen",
       "entrypoint": "bench_v1_1.py",
-      "challenges": ["counterexample-ledger"],
-      "retired_challenges": ["fizzbuzz", "binary-search", "refactor"]
+      "challenges": [
+        "counterexample-ledger"
+      ],
+      "retired_challenges": [
+        "fizzbuzz",
+        "binary-search",
+        "refactor"
+      ]
     },
     "legacy-13": {
       "status": "frozen",

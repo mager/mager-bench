@@ -1,0 +1,34 @@
+{
+  "benchmark_version": "1.2",
+  "model": "codex-cli/gpt-6-sol",
+  "generated_at": "2026-10-02T23:14:12.625563+00:00",
+  "suite_sha256": "476008a7e08dc0604c5c139afc995d6583d76c21a60e67feb0bd7962b8090bcc",
+  "source": "subscription",
+  "reasoning_effort": "low",
+  "supported_efforts": [
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra"
+  ],
+  "effort_policy": "lowest supported in local Codex catalog",
+  "output_token_target": 3072,
+  "call_timeout_seconds": 90,
+  "status": "failed",
+  "score": null,
+  "tasks": [
+    {
+      "id": "split-bill",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {people: string[], expenses: {paidBy: string, cents: integer, shares: {person: string, weight: positive integer}[]}[]}. People are unique and ordered. All names occur in people. Each expense has unique share recipients, at least one. cents can be negative (a refund) or zero. For each expense, allocate abs(cents) proportional to the weights: floor each exact share, then distribute remaining cents by descending fractional remainder, ties by people order (not shares order). Apply the sign of cents after allocation. Each person's balance = amount paid minus allocated shares; positive means they receive money. Return {balances: integer[], transfers: {from: string, to: string, cents: positive integer}[]}. balances follows people order including zeros. Settle debtors and creditors in people order: transfer min(debt, credit), advance whichever reaches zero, until settled. Do not optimize transaction count or sort by amount.",
+      "status": "failed",
+      "response": "",
+      "score": null,
+      "error": "Codex CLI gpt-6-sol: ERROR: {\"type\":\"error\",\"status\":400,\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The 'gpt-6-sol' model is not supported when using Codex with a ChatGPT account.\"}}",
+      "subject_elapsed_ms": 2997
+    }
+  ],
+  "error": "Codex CLI gpt-6-sol: ERROR: {\"type\":\"error\",\"status\":400,\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The 'gpt-6-sol' model is not supported when using Codex with a ChatGPT account.\"}}",
+  "elapsed_ms": 3104
+}

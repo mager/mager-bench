@@ -1,57 +1,39 @@
 ---
-description: Run mager-bench 1.1 through the local ChatGPT subscription
+description: Run the fast mager-bench 1.2 suite through the local ChatGPT subscription
 ---
 
-# /bench — run mager-bench 1.1
+# /bench — mager-bench 1.2
 
-The active suite is Counterexample Lab. Read `docs/mager-bench-1.1.md` and
-`counterexample_lab/prompt.md`. The model supplies regression traces; a
-deterministic grader measures how many of eight ledger faults they expose.
-There are no LLM judge calls. Use the local ChatGPT subscription exclusively.
+Read `docs/mager-bench-1.2.md`. Three complex everyday programs, 36 exact checks,
+zero model judges. Always use the lowest supported reasoning effort. The runner
+selects it automatically from the local Codex catalog and records the choice.
+No higher-effort override, retries, substitute models, or API fallback.
 
-```bash
-cd ~/Code/mager-bench
+```sh
 codex login status
-.venv/bin/python bench_v1_1.py --model <codex-cli/model-id> --dry-run
-.venv/bin/python -c "from providers import get_provider; print(get_provider('<codex-cli/model-id>').complete('Say OK'))"
-.venv/bin/python bench_v1_1.py --model <codex-cli/model-id> \
-  --reasoning-effort low --output runs/v1.1/YYYY-MM-DD-<model>-r1.json
-```
-
-Save each independent attempt with a new filename. Inspect status, raw response,
-suite hash, reasoning effort, trace validity, and exposed faults. An empty or
-malformed response or provider error is an unscored failed call, never a zero.
-Preserve failed attempts when rerunning. Calibration requires repeated samples
-with matching effort, output targets, and suite hashes. The first six attempts
-are published as preliminary calibration, without ranking the models.
-
-For additional subjects (`codex-cli/gpt-5.6-terra`, `codex-cli/gpt-5.6-luna`,
-and `codex-cli/gpt-5.5`), use `subscription_models_v1_1.py` with the same
-arguments. It registers catalogue metadata and calls the frozen
-`bench_v1_1.main`; it does not change the provider or scoring implementation.
-Import and call `register_models()` from that module before a `get_provider`
-smoke test. See `runs/v1.1/2026-10-01-calibration.md` for source hashes and
-reproduction commands. A model appearing in the local catalogue does not prove
-subscription availability: retain failed smoke checks under `runs/v1.1/preflight/`.
-
-Commit new run artifacts with their frozen test source and generated web data.
-Never run the legacy merge script on 1.1 artifacts. To publish compatible runs:
-
-```bash
-.venv/bin/python web/scripts/sync-counterexample-data.py
+.venv/bin/python bench_v1_2.py --model codex-cli/<model-id> --dry-run
+.venv/bin/python bench_v1_2.py --model codex-cli/<model-id> \
+  --output runs/v1.2/YYYY-MM-DD-<model>-r1.json
+.venv/bin/python web/scripts/sync-everyday-data.py
+.venv/bin/python -m unittest discover -s tests
+npm --prefix web run lint
+npm --prefix web run build
 cd web
-npm run lint
-npm run build
-vercel --prod
+vercel --prod --yes
 ```
 
-The exporter regrades each completed response and rejects mismatched suite
-hashes, prompts, or settings. Commit and push the source artifacts, exported
-`web/data/counterexample.json`, and any presentation changes together.
-The homepage and `/api/v1.1/results` use the new data. `results.json`,
-`/api/results`, and `/api/summary` retain the legacy scoring contract; the old
-subscription board lives at `/archive/subscription`. FizzBuzz, binary search,
-and refactor are retired from the active suite; historical evidence stays intact.
+Inspect every artifact before publishing. Provider failures and empty outputs
+are unscored; never turn them into zero. The exporter regrades successful code
+and checks prompts, settings, and source fingerprints. Commit source, saved
+runs, and generated `web/data/everyday.json` together, then push.
+
+GPT-6 Sol was rejected by the subscription CLI on October 2, 2026. Its failed
+first attempt is preserved under `runs/v1.2/`. Do not silently replace it.
+
+The active data API is `/api/v1.2/results`. Counterexample Lab is frozen at
+`/archive/v1.1`; its original runner, hashes, artifacts, and APIs remain intact.
+The original thirteen-task subscription board is at `/archive/subscription`.
+Never run the legacy merge script on v1.1 or v1.2 artifacts.
 
 ## Reproduce or publish the legacy thirteen-task board
 
