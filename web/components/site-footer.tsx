@@ -7,7 +7,7 @@ export function SiteFooter() {
       </p>
       <nav aria-label="Footer">
         <Link href="/#method">How it works</Link>
-        <a href="/api/v1.2/results">Download data</a>
+        <a href="/api/v1.3/results">Download data</a>
       </nav>
     </footer>
   );

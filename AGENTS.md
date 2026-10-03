@@ -3,25 +3,29 @@
 `/bench` in `.opencode/commands/bench.md` is the canonical workflow.
 `.claude/skills/run-bench/SKILL.md` mirrors it; if they disagree, `/bench` wins.
 
-## Active version: 1.2
+## Active version: 1.3
 
-- Read `docs/mager-bench-1.2.md`. Use `bench_v1_2.py` for three complex everyday
-  JavaScript tasks with 36 deterministic checks and zero model judge calls.
+- Read `docs/mager-bench-1.3.md`. Use `bench_v1_3.py` for two algorithmic and
+  three everyday JavaScript tasks with 60 deterministic checks and zero model judge calls.
 - **Always run evals at the lowest supported reasoning effort.** Speed is the
   purpose of this benchmark. The active runner selects and records the minimum
   from the Codex catalog; do not override it upwards. For frozen reproduction
   scripts, preserve original code and pass the lowest supported effort explicitly.
 - Dry-run first. Use the local ChatGPT subscription only. Save every attempt
-  under `runs/v1.2/`. No API fallback, automatic retry, or model substitution.
+  under `runs/v1.3/`. No API fallback, automatic retry, or model substitution.
 - GPT-6 Sol's October 2 preflight and first v1.2 attempt were rejected by the
   ChatGPT-signed-in CLI. Keep those failures unscored. Do not infer availability
   from catalog metadata or substitute GPT-5.6 Sol under its name.
-- Export with `.venv/bin/python web/scripts/sync-everyday-data.py`. Never merge
-  1.2 into `results.json`. Keep artifacts and generated web data in the same commit.
+- Export with `.venv/bin/python web/scripts/sync-everyday-v1.3-data.py`. Never merge
+  1.3 into `results.json`. Keep artifacts and generated web data in the same commit.
+- Five calls share 270 seconds of generation waiting; each call is capped at
+  90 seconds. Preserve this fast-run budget.
+- v1.2 is frozen too: preserve `bench_v1_2.py`, `everyday_v1_2/`, its dependency
+  manifest, data exporter, web JSON and saved artifacts.
 - v1.1 is frozen. Preserve `bench_v1_1.py`, `providers.py`, and all
   `counterexample_lab/` contract/scoring files so historical fingerprints verify.
   Original thirteen-task prompts, scores, and APIs remain archived too.
-- A substantive contract, test corpus, budget, or scoring change after 1.2
+- A substantive contract, test corpus, budget, or scoring change after 1.3
   publishes requires a new version.
 
 ## Legacy thirteen-task run policy

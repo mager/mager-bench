@@ -1,4 +1,5 @@
-import data from "@/data/everyday.json";
+import data from "@/data/everyday-v1.3.json";
+import archivedData from "@/data/everyday.json";
 export type Case = {
   label: string;
   input: unknown;
@@ -26,6 +27,7 @@ export type TaskRun = {
   score: { passed: number; total: number; cases: Case[] } | null;
 };
 export type Run = {
+  benchmark_version: string;
   id: string;
   model: string;
   generated_at: string;
@@ -44,6 +46,8 @@ export const everyday = data as unknown as {
   tasks: Task[];
   runs: Run[];
 };
+export const archivedEveryday = archivedData as unknown as typeof everyday;
+export const allEverydayRuns = [...archivedEveryday.runs, ...everyday.runs];
 export const source = "https://github.com/mager/mager-bench";
 export const modelName = (model: string) =>
   model

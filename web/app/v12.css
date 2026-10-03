@@ -143,11 +143,15 @@
 }
 .task-selector {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   border-bottom: 1px solid var(--report-rule);
   gap: 24px;
 }
 .task-selector button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
   text-align: left;
   border-bottom: 2px solid transparent;
   padding: 0 0 20px;
@@ -454,6 +458,7 @@
     font-size: 22px;
   }
   .task-selector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
   .task-selector button {

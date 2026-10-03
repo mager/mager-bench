@@ -1,5 +1,5 @@
-import { everyday } from "@/lib/everyday";
+import { archivedEveryday } from "@/lib/everyday";
 export const dynamic = "force-static";
 export function GET() {
-  return Response.json(everyday);
+  return Response.json(archivedEveryday);
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-10-02T23:27:38Z",
-  "title": "Design System: mager-bench 1.2",
+  "title": "Design System: mager-bench 1.3",
   "extensions": {
     "colorMeta": {
       "report-accent": {
@@ -85,7 +85,7 @@
       "kind": "button",
       "refersTo": "text-link",
       "description": "Evidence and in-page links.",
-      "html": "<a class=\"ds-link\" href=\"#tasks\">Explore the three programs</a>",
+      "html": "<a class=\"ds-link\" href=\"#tasks\">Explore the five programs</a>",
       "css": ".ds-link{font-family:var(--font-manrope, Manrope),sans-serif;color:var(--report-accent, #a6e2ce);font-size:14px;text-decoration:underline;text-underline-offset:5px;transition:color .16s ease,background-color .16s ease,border-color .16s ease;}.ds-link:hover{color:var(--fg, oklch(94% 0.009 265))}.ds-link:focus-visible{outline:2px solid var(--report-accent, #a6e2ce);outline-offset:5px;}"
     },
     {
@@ -125,7 +125,7 @@
       "kind": "chip",
       "refersTo": "version-tag",
       "description": "Quiet outlined version identifier beside the wordmark.",
-      "html": "<span class=\"ds-version\">1.2</span>",
+      "html": "<span class=\"ds-version\">1.3</span>",
       "css": ".ds-version{font-family:var(--font-manrope, Manrope),sans-serif;display:inline-block;font-size:12px;color:var(--report-accent, #a6e2ce);border:1px solid var(--report-rule, #343c3c);padding:3px 7px;font-weight:500;letter-spacing:0}"
     },
     {
@@ -141,13 +141,13 @@
       "kind": "custom",
       "refersTo": "disclosure",
       "description": "Native expandable prompt and method detail.",
-      "html": "<details class=\"ds-details\"><summary>Timing, scoring, and limits</summary><p>Three calls run sequentially. Provider failures remain unscored.</p></details>",
+      "html": "<details class=\"ds-details\"><summary>Timing, scoring, and limits</summary><p>Five calls share a 270-second generation waiting budget. Provider failures remain unscored.</p></details>",
       "css": ".ds-details{font-family:var(--font-manrope, Manrope),sans-serif;color:var(--fg, oklch(94% 0.009 265));border-bottom:1px solid var(--report-rule, #343c3c);padding:18px 0;font-size:14px}.ds-details summary{min-height:24px;line-height:1.65;cursor:pointer;transition:color .16s ease,background-color .16s ease,border-color .16s ease;}.ds-details[open] summary{margin-bottom:18px}.ds-details summary:focus-visible{outline:2px solid var(--report-accent, #a6e2ce);outline-offset:5px;}.ds-details p{color:var(--report-muted, #adb5b5);font-size:14px;line-height:1.8;margin:0;max-width:72ch}"
     }
   ],
   "narrative": {
     "northStar": "Software test report",
-    "overview": "A software test report viewed at a desk at night. Dark surfaces, readable Manrope, thin rules, and restrained mint links give exact inputs and results room to be understood. The active system is code-led and uses no shipping raster imagery or approved visual comp.\n\nThis document records the implemented v1.2 system. The shared header and footer use this system; historical benchmark content retains its legacy styles, including Barlow Condensed, sports graphics, and older score colors. Those archival treatments are not defaults for new active screens.",
+    "overview": "A software test report viewed at a desk at night. Dark surfaces, readable Manrope, thin rules, and restrained mint links give exact inputs and results room to be understood. The active system is code-led and uses no shipping raster imagery or approved visual comp.\n\nThis document records the implemented v1.3 system. The shared header and footer use this system; historical benchmark content retains its legacy styles, including Barlow Condensed, sports graphics, and older score colors. Those archival treatments are not defaults for new active screens.",
     "keyCharacteristics": [
       "Readable sentence-case headings and plain task names.",
       "Flat rows and literal code, with clearly labeled expected results.",
@@ -168,7 +168,7 @@
       "Do preserve historical routes and their original presentation without blending benchmark versions."
     ],
     "donts": [
-      "Don't revive the basketball or Counterexample identity on active v1.2 surfaces.",
+      "Don't revive the basketball or Counterexample identity on active v1.3 surfaces.",
       "Don't add promotional slogans, decorative imagery, simulated results, or fictional live statuses.",
       "Don't turn provider failures into zero scores or style a single run as a reliable ranking.",
       "Don't replace the report's flat rows with decorative elevated cards."

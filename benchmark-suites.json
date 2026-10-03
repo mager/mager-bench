@@ -1,8 +1,19 @@
 {
-  "current_version": "1.2",
+  "current_version": "1.3",
   "suites": {
-    "1.2": {
+    "1.3": {
       "status": "active",
+      "entrypoint": "bench_v1_3.py",
+      "challenges": [
+        "build-plan",
+        "job-selection",
+        "split-bill",
+        "clean-csv",
+        "meeting-time"
+      ]
+    },
+    "1.2": {
+      "status": "frozen",
       "entrypoint": "bench_v1_2.py",
       "challenges": [
         "split-bill",

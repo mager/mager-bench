@@ -12,6 +12,14 @@ export default function Archive() {
         </p>
       </header>
       <div className="attempt-list">
+        <Link className="archive-entry" href="/archive/v1.2">
+          <h2>1.2 · Three everyday programs</h2>
+          <p>
+            Weighted bills, contact CSVs, and meeting times. The first GPT-6 Sol
+            attempt failed at the provider and remains unscored.
+          </p>
+          <span className="bench-link">View v1.2 tasks and attempt</span>
+        </Link>
         <Link className="archive-entry" href="/archive/v1.1">
           <h2>1.1 · Counterexample Lab</h2>
           <p>

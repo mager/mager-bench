@@ -7,7 +7,7 @@ export function SiteHeader() {
     <header className="bench-header">
       <div className="bench-shell bench-nav">
         <Link href="/" className="bench-wordmark" aria-label="mager-bench home">
-          mager-bench<span>1.2</span>
+          mager-bench<span>1.3</span>
         </Link>
         <nav aria-label="Main navigation">
           <Link href="/#tasks">The tasks</Link>

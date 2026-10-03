@@ -97,7 +97,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_suite_manifest_preserves_all_legacy_prompts(self):
         manifest = json.loads((runner.ROOT / "benchmark-suites.json").read_text())
-        self.assertEqual(manifest["current_version"], "1.2")
+        self.assertEqual(manifest["current_version"], "1.3")
         self.assertEqual(manifest["suites"]["1.1"]["challenges"], ["counterexample-ledger"])
         self.assertEqual(manifest["suites"]["legacy-13"]["challenges"],
                          [challenge.name for challenge in CHALLENGES])

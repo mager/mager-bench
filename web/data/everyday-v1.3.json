@@ -1,0 +1,3334 @@
+{
+  "version": "1.3",
+  "suiteHash": "2eb7b4a89d3afae046678438c73babbc45dd951a600e109828926bf6b8da7ea1",
+  "tasks": [
+    {
+      "id": "build-plan",
+      "title": "Plan a dependency build",
+      "description": "Resolve a dependency graph, detect cycles, and find the critical path without enumerating every path.",
+      "example": "Two prerequisites run in parallel. The build time follows the longest chain, not the sum of every job.",
+      "contract": "Input: {jobs: {id: string, duration: nonnegative integer, deps: string[]}[], targets: string[]}. There are at most 240 jobs and 1000 dependency entries. IDs are unique strings of 1 to 24 ASCII letters, digits, or underscores. Every dependency and target names an existing job; repeated dependencies or targets have no extra effect. Ignore jobs not needed by a target, including any cycles in that ignored region. Required jobs are the targets and all their transitive dependencies. If the required graph has a cycle, return {error:\"cycle\"}. Otherwise return {order:string[], finish:integer, criticalPath:string[]}. order is the lexicographically smallest valid topological ordering of all required IDs: repeatedly take the smallest currently ready ID, not a whole batch. Jobs may execute with unlimited parallel workers; each starts as soon as all its dependencies finish. finish is the earliest time all targets are finished. criticalPath is a dependency chain starting at a dependency-free job and ending at any target with total duration equal to finish; choose the lexicographically smallest ID sequence among tied chains. Compare sequences element-by-element using ASCII order, with a proper prefix smaller than its extension. Empty targets returns {order:[],finish:0,criticalPath:[]}. Do not enumerate all paths: the case set includes a layered graph with exponentially many dependency paths. Times fit safe integers.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {jobs: {id: string, duration: nonnegative integer, deps: string[]}[], targets: string[]}. There are at most 240 jobs and 1000 dependency entries. IDs are unique strings of 1 to 24 ASCII letters, digits, or underscores. Every dependency and target names an existing job; repeated dependencies or targets have no extra effect. Ignore jobs not needed by a target, including any cycles in that ignored region. Required jobs are the targets and all their transitive dependencies. If the required graph has a cycle, return {error:\"cycle\"}. Otherwise return {order:string[], finish:integer, criticalPath:string[]}. order is the lexicographically smallest valid topological ordering of all required IDs: repeatedly take the smallest currently ready ID, not a whole batch. Jobs may execute with unlimited parallel workers; each starts as soon as all its dependencies finish. finish is the earliest time all targets are finished. criticalPath is a dependency chain starting at a dependency-free job and ending at any target with total duration equal to finish; choose the lexicographically smallest ID sequence among tied chains. Compare sequences element-by-element using ASCII order, with a proper prefix smaller than its extension. Empty targets returns {order:[],finish:0,criticalPath:[]}. Do not enumerate all paths: the case set includes a layered graph with exponentially many dependency paths. Times fit safe integers.",
+      "cases": [
+        {
+          "label": "Parallel prerequisites",
+          "input": {
+            "jobs": [
+              {
+                "id": "compile",
+                "duration": 4,
+                "deps": [
+                  "fetch",
+                  "lint"
+                ]
+              },
+              {
+                "id": "fetch",
+                "duration": 3,
+                "deps": []
+              },
+              {
+                "id": "lint",
+                "duration": 5,
+                "deps": []
+              }
+            ],
+            "targets": [
+              "compile"
+            ]
+          },
+          "expected": {
+            "order": [
+              "fetch",
+              "lint",
+              "compile"
+            ],
+            "finish": 9,
+            "criticalPath": [
+              "lint",
+              "compile"
+            ]
+          }
+        },
+        {
+          "label": "A chain in shuffled order",
+          "input": {
+            "jobs": [
+              {
+                "id": "ship",
+                "duration": 3,
+                "deps": [
+                  "test"
+                ]
+              },
+              {
+                "id": "test",
+                "duration": 4,
+                "deps": [
+                  "build"
+                ]
+              },
+              {
+                "id": "build",
+                "duration": 2,
+                "deps": []
+              }
+            ],
+            "targets": [
+              "ship"
+            ]
+          },
+          "expected": {
+            "order": [
+              "build",
+              "test",
+              "ship"
+            ],
+            "finish": 9,
+            "criticalPath": [
+              "build",
+              "test",
+              "ship"
+            ]
+          }
+        },
+        {
+          "label": "Newly ready IDs take priority",
+          "input": {
+            "jobs": [
+              {
+                "id": "Z",
+                "duration": 2,
+                "deps": []
+              },
+              {
+                "id": "B",
+                "duration": 1,
+                "deps": []
+              },
+              {
+                "id": "A",
+                "duration": 1,
+                "deps": [
+                  "B"
+                ]
+              }
+            ],
+            "targets": [
+              "A",
+              "Z"
+            ]
+          },
+          "expected": {
+            "order": [
+              "B",
+              "A",
+              "Z"
+            ],
+            "finish": 2,
+            "criticalPath": [
+              "B",
+              "A"
+            ]
+          }
+        },
+        {
+          "label": "Shared prerequisite runs once",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "duration": 2,
+                "deps": []
+              },
+              {
+                "id": "B",
+                "duration": 3,
+                "deps": [
+                  "A"
+                ]
+              },
+              {
+                "id": "C",
+                "duration": 5,
+                "deps": [
+                  "A"
+                ]
+              },
+              {
+                "id": "D",
+                "duration": 1,
+                "deps": [
+                  "B",
+                  "C"
+                ]
+              }
+            ],
+            "targets": [
+              "D"
+            ]
+          },
+          "expected": {
+            "order": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "finish": 8,
+            "criticalPath": [
+              "A",
+              "C",
+              "D"
+            ]
+          }
+        },
+        {
+          "label": "Tied critical paths",
+          "input": {
+            "jobs": [
+              {
+                "id": "B",
+                "duration": 3,
+                "deps": []
+              },
+              {
+                "id": "A",
+                "duration": 3,
+                "deps": []
+              },
+              {
+                "id": "C",
+                "duration": 2,
+                "deps": [
+                  "B",
+                  "A"
+                ]
+              }
+            ],
+            "targets": [
+              "C"
+            ]
+          },
+          "expected": {
+            "order": [
+              "A",
+              "B",
+              "C"
+            ],
+            "finish": 5,
+            "criticalPath": [
+              "A",
+              "C"
+            ]
+          }
+        },
+        {
+          "label": "Only requested targets matter",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "duration": 2,
+                "deps": []
+              },
+              {
+                "id": "B",
+                "duration": 3,
+                "deps": [
+                  "A"
+                ]
+              },
+              {
+                "id": "unused",
+                "duration": 9999,
+                "deps": []
+              }
+            ],
+            "targets": [
+              "B"
+            ]
+          },
+          "expected": {
+            "order": [
+              "A",
+              "B"
+            ],
+            "finish": 5,
+            "criticalPath": [
+              "A",
+              "B"
+            ]
+          }
+        },
+        {
+          "label": "Ignore an unrelated cycle",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "duration": 2,
+                "deps": []
+              },
+              {
+                "id": "X",
+                "duration": 1,
+                "deps": [
+                  "Y"
+                ]
+              },
+              {
+                "id": "Y",
+                "duration": 1,
+                "deps": [
+                  "X"
+                ]
+              }
+            ],
+            "targets": [
+              "A"
+            ]
+          },
+          "expected": {
+            "order": [
+              "A"
+            ],
+            "finish": 2,
+            "criticalPath": [
+              "A"
+            ]
+          }
+        },
+        {
+          "label": "A required cycle",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "duration": 1,
+                "deps": [
+                  "B"
+                ]
+              },
+              {
+                "id": "B",
+                "duration": 1,
+                "deps": [
+                  "A"
+                ]
+              }
+            ],
+            "targets": [
+              "A"
+            ]
+          },
+          "expected": {
+            "error": "cycle"
+          }
+        },
+        {
+          "label": "Self dependency",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "duration": 1,
+                "deps": [
+                  "A"
+                ]
+              }
+            ],
+            "targets": [
+              "A"
+            ]
+          },
+          "expected": {
+            "error": "cycle"
+          }
+        },
+        {
+          "label": "Duplicate edges and zero-duration detour",
+          "input": {
+            "jobs": [
+              {
+                "id": "__proto__",
+                "duration": 0,
+                "deps": []
+              },
+              {
+                "id": "constructor",
+                "duration": 0,
+                "deps": [
+                  "__proto__",
+                  "__proto__"
+                ]
+              },
+              {
+                "id": "z",
+                "duration": 0,
+                "deps": [
+                  "__proto__",
+                  "constructor"
+                ]
+              }
+            ],
+            "targets": [
+              "z",
+              "z"
+            ]
+          },
+          "expected": {
+            "order": [
+              "__proto__",
+              "constructor",
+              "z"
+            ],
+            "finish": 0,
+            "criticalPath": [
+              "__proto__",
+              "constructor",
+              "z"
+            ]
+          }
+        },
+        {
+          "label": "No targets",
+          "input": {
+            "jobs": [
+              {
+                "id": "X",
+                "duration": 1,
+                "deps": [
+                  "X"
+                ]
+              }
+            ],
+            "targets": []
+          },
+          "expected": {
+            "order": [],
+            "finish": 0,
+            "criticalPath": []
+          }
+        },
+        {
+          "label": "Forty layers of shared dependencies",
+          "input": {
+            "jobs": [
+              {
+                "id": "39b",
+                "duration": 1,
+                "deps": [
+                  "38a",
+                  "38b"
+                ]
+              },
+              {
+                "id": "39a",
+                "duration": 1,
+                "deps": [
+                  "38a",
+                  "38b"
+                ]
+              },
+              {
+                "id": "38b",
+                "duration": 1,
+                "deps": [
+                  "37a",
+                  "37b"
+                ]
+              },
+              {
+                "id": "38a",
+                "duration": 1,
+                "deps": [
+                  "37a",
+                  "37b"
+                ]
+              },
+              {
+                "id": "37b",
+                "duration": 1,
+                "deps": [
+                  "36a",
+                  "36b"
+                ]
+              },
+              {
+                "id": "37a",
+                "duration": 1,
+                "deps": [
+                  "36a",
+                  "36b"
+                ]
+              },
+              {
+                "id": "36b",
+                "duration": 1,
+                "deps": [
+                  "35a",
+                  "35b"
+                ]
+              },
+              {
+                "id": "36a",
+                "duration": 1,
+                "deps": [
+                  "35a",
+                  "35b"
+                ]
+              },
+              {
+                "id": "35b",
+                "duration": 1,
+                "deps": [
+                  "34a",
+                  "34b"
+                ]
+              },
+              {
+                "id": "35a",
+                "duration": 1,
+                "deps": [
+                  "34a",
+                  "34b"
+                ]
+              },
+              {
+                "id": "34b",
+                "duration": 1,
+                "deps": [
+                  "33a",
+                  "33b"
+                ]
+              },
+              {
+                "id": "34a",
+                "duration": 1,
+                "deps": [
+                  "33a",
+                  "33b"
+                ]
+              },
+              {
+                "id": "33b",
+                "duration": 1,
+                "deps": [
+                  "32a",
+                  "32b"
+                ]
+              },
+              {
+                "id": "33a",
+                "duration": 1,
+                "deps": [
+                  "32a",
+                  "32b"
+                ]
+              },
+              {
+                "id": "32b",
+                "duration": 1,
+                "deps": [
+                  "31a",
+                  "31b"
+                ]
+              },
+              {
+                "id": "32a",
+                "duration": 1,
+                "deps": [
+                  "31a",
+                  "31b"
+                ]
+              },
+              {
+                "id": "31b",
+                "duration": 1,
+                "deps": [
+                  "30a",
+                  "30b"
+                ]
+              },
+              {
+                "id": "31a",
+                "duration": 1,
+                "deps": [
+                  "30a",
+                  "30b"
+                ]
+              },
+              {
+                "id": "30b",
+                "duration": 1,
+                "deps": [
+                  "29a",
+                  "29b"
+                ]
+              },
+              {
+                "id": "30a",
+                "duration": 1,
+                "deps": [
+                  "29a",
+                  "29b"
+                ]
+              },
+              {
+                "id": "29b",
+                "duration": 1,
+                "deps": [
+                  "28a",
+                  "28b"
+                ]
+              },
+              {
+                "id": "29a",
+                "duration": 1,
+                "deps": [
+                  "28a",
+                  "28b"
+                ]
+              },
+              {
+                "id": "28b",
+                "duration": 1,
+                "deps": [
+                  "27a",
+                  "27b"
+                ]
+              },
+              {
+                "id": "28a",
+                "duration": 1,
+                "deps": [
+                  "27a",
+                  "27b"
+                ]
+              },
+              {
+                "id": "27b",
+                "duration": 1,
+                "deps": [
+                  "26a",
+                  "26b"
+                ]
+              },
+              {
+                "id": "27a",
+                "duration": 1,
+                "deps": [
+                  "26a",
+                  "26b"
+                ]
+              },
+              {
+                "id": "26b",
+                "duration": 1,
+                "deps": [
+                  "25a",
+                  "25b"
+                ]
+              },
+              {
+                "id": "26a",
+                "duration": 1,
+                "deps": [
+                  "25a",
+                  "25b"
+                ]
+              },
+              {
+                "id": "25b",
+                "duration": 1,
+                "deps": [
+                  "24a",
+                  "24b"
+                ]
+              },
+              {
+                "id": "25a",
+                "duration": 1,
+                "deps": [
+                  "24a",
+                  "24b"
+                ]
+              },
+              {
+                "id": "24b",
+                "duration": 1,
+                "deps": [
+                  "23a",
+                  "23b"
+                ]
+              },
+              {
+                "id": "24a",
+                "duration": 1,
+                "deps": [
+                  "23a",
+                  "23b"
+                ]
+              },
+              {
+                "id": "23b",
+                "duration": 1,
+                "deps": [
+                  "22a",
+                  "22b"
+                ]
+              },
+              {
+                "id": "23a",
+                "duration": 1,
+                "deps": [
+                  "22a",
+                  "22b"
+                ]
+              },
+              {
+                "id": "22b",
+                "duration": 1,
+                "deps": [
+                  "21a",
+                  "21b"
+                ]
+              },
+              {
+                "id": "22a",
+                "duration": 1,
+                "deps": [
+                  "21a",
+                  "21b"
+                ]
+              },
+              {
+                "id": "21b",
+                "duration": 1,
+                "deps": [
+                  "20a",
+                  "20b"
+                ]
+              },
+              {
+                "id": "21a",
+                "duration": 1,
+                "deps": [
+                  "20a",
+                  "20b"
+                ]
+              },
+              {
+                "id": "20b",
+                "duration": 1,
+                "deps": [
+                  "19a",
+                  "19b"
+                ]
+              },
+              {
+                "id": "20a",
+                "duration": 1,
+                "deps": [
+                  "19a",
+                  "19b"
+                ]
+              },
+              {
+                "id": "19b",
+                "duration": 1,
+                "deps": [
+                  "18a",
+                  "18b"
+                ]
+              },
+              {
+                "id": "19a",
+                "duration": 1,
+                "deps": [
+                  "18a",
+                  "18b"
+                ]
+              },
+              {
+                "id": "18b",
+                "duration": 1,
+                "deps": [
+                  "17a",
+                  "17b"
+                ]
+              },
+              {
+                "id": "18a",
+                "duration": 1,
+                "deps": [
+                  "17a",
+                  "17b"
+                ]
+              },
+              {
+                "id": "17b",
+                "duration": 1,
+                "deps": [
+                  "16a",
+                  "16b"
+                ]
+              },
+              {
+                "id": "17a",
+                "duration": 1,
+                "deps": [
+                  "16a",
+                  "16b"
+                ]
+              },
+              {
+                "id": "16b",
+                "duration": 1,
+                "deps": [
+                  "15a",
+                  "15b"
+                ]
+              },
+              {
+                "id": "16a",
+                "duration": 1,
+                "deps": [
+                  "15a",
+                  "15b"
+                ]
+              },
+              {
+                "id": "15b",
+                "duration": 1,
+                "deps": [
+                  "14a",
+                  "14b"
+                ]
+              },
+              {
+                "id": "15a",
+                "duration": 1,
+                "deps": [
+                  "14a",
+                  "14b"
+                ]
+              },
+              {
+                "id": "14b",
+                "duration": 1,
+                "deps": [
+                  "13a",
+                  "13b"
+                ]
+              },
+              {
+                "id": "14a",
+                "duration": 1,
+                "deps": [
+                  "13a",
+                  "13b"
+                ]
+              },
+              {
+                "id": "13b",
+                "duration": 1,
+                "deps": [
+                  "12a",
+                  "12b"
+                ]
+              },
+              {
+                "id": "13a",
+                "duration": 1,
+                "deps": [
+                  "12a",
+                  "12b"
+                ]
+              },
+              {
+                "id": "12b",
+                "duration": 1,
+                "deps": [
+                  "11a",
+                  "11b"
+                ]
+              },
+              {
+                "id": "12a",
+                "duration": 1,
+                "deps": [
+                  "11a",
+                  "11b"
+                ]
+              },
+              {
+                "id": "11b",
+                "duration": 1,
+                "deps": [
+                  "10a",
+                  "10b"
+                ]
+              },
+              {
+                "id": "11a",
+                "duration": 1,
+                "deps": [
+                  "10a",
+                  "10b"
+                ]
+              },
+              {
+                "id": "10b",
+                "duration": 1,
+                "deps": [
+                  "09a",
+                  "09b"
+                ]
+              },
+              {
+                "id": "10a",
+                "duration": 1,
+                "deps": [
+                  "09a",
+                  "09b"
+                ]
+              },
+              {
+                "id": "09b",
+                "duration": 1,
+                "deps": [
+                  "08a",
+                  "08b"
+                ]
+              },
+              {
+                "id": "09a",
+                "duration": 1,
+                "deps": [
+                  "08a",
+                  "08b"
+                ]
+              },
+              {
+                "id": "08b",
+                "duration": 1,
+                "deps": [
+                  "07a",
+                  "07b"
+                ]
+              },
+              {
+                "id": "08a",
+                "duration": 1,
+                "deps": [
+                  "07a",
+                  "07b"
+                ]
+              },
+              {
+                "id": "07b",
+                "duration": 1,
+                "deps": [
+                  "06a",
+                  "06b"
+                ]
+              },
+              {
+                "id": "07a",
+                "duration": 1,
+                "deps": [
+                  "06a",
+                  "06b"
+                ]
+              },
+              {
+                "id": "06b",
+                "duration": 1,
+                "deps": [
+                  "05a",
+                  "05b"
+                ]
+              },
+              {
+                "id": "06a",
+                "duration": 1,
+                "deps": [
+                  "05a",
+                  "05b"
+                ]
+              },
+              {
+                "id": "05b",
+                "duration": 1,
+                "deps": [
+                  "04a",
+                  "04b"
+                ]
+              },
+              {
+                "id": "05a",
+                "duration": 1,
+                "deps": [
+                  "04a",
+                  "04b"
+                ]
+              },
+              {
+                "id": "04b",
+                "duration": 1,
+                "deps": [
+                  "03a",
+                  "03b"
+                ]
+              },
+              {
+                "id": "04a",
+                "duration": 1,
+                "deps": [
+                  "03a",
+                  "03b"
+                ]
+              },
+              {
+                "id": "03b",
+                "duration": 1,
+                "deps": [
+                  "02a",
+                  "02b"
+                ]
+              },
+              {
+                "id": "03a",
+                "duration": 1,
+                "deps": [
+                  "02a",
+                  "02b"
+                ]
+              },
+              {
+                "id": "02b",
+                "duration": 1,
+                "deps": [
+                  "01a",
+                  "01b"
+                ]
+              },
+              {
+                "id": "02a",
+                "duration": 1,
+                "deps": [
+                  "01a",
+                  "01b"
+                ]
+              },
+              {
+                "id": "01b",
+                "duration": 1,
+                "deps": [
+                  "00a",
+                  "00b"
+                ]
+              },
+              {
+                "id": "01a",
+                "duration": 1,
+                "deps": [
+                  "00a",
+                  "00b"
+                ]
+              },
+              {
+                "id": "00b",
+                "duration": 1,
+                "deps": []
+              },
+              {
+                "id": "00a",
+                "duration": 1,
+                "deps": []
+              }
+            ],
+            "targets": [
+              "39b",
+              "39a"
+            ]
+          },
+          "expected": {
+            "order": [
+              "00a",
+              "00b",
+              "01a",
+              "01b",
+              "02a",
+              "02b",
+              "03a",
+              "03b",
+              "04a",
+              "04b",
+              "05a",
+              "05b",
+              "06a",
+              "06b",
+              "07a",
+              "07b",
+              "08a",
+              "08b",
+              "09a",
+              "09b",
+              "10a",
+              "10b",
+              "11a",
+              "11b",
+              "12a",
+              "12b",
+              "13a",
+              "13b",
+              "14a",
+              "14b",
+              "15a",
+              "15b",
+              "16a",
+              "16b",
+              "17a",
+              "17b",
+              "18a",
+              "18b",
+              "19a",
+              "19b",
+              "20a",
+              "20b",
+              "21a",
+              "21b",
+              "22a",
+              "22b",
+              "23a",
+              "23b",
+              "24a",
+              "24b",
+              "25a",
+              "25b",
+              "26a",
+              "26b",
+              "27a",
+              "27b",
+              "28a",
+              "28b",
+              "29a",
+              "29b",
+              "30a",
+              "30b",
+              "31a",
+              "31b",
+              "32a",
+              "32b",
+              "33a",
+              "33b",
+              "34a",
+              "34b",
+              "35a",
+              "35b",
+              "36a",
+              "36b",
+              "37a",
+              "37b",
+              "38a",
+              "38b",
+              "39a",
+              "39b"
+            ],
+            "finish": 40,
+            "criticalPath": [
+              "00a",
+              "01a",
+              "02a",
+              "03a",
+              "04a",
+              "05a",
+              "06a",
+              "07a",
+              "08a",
+              "09a",
+              "10a",
+              "11a",
+              "12a",
+              "13a",
+              "14a",
+              "15a",
+              "16a",
+              "17a",
+              "18a",
+              "19a",
+              "20a",
+              "21a",
+              "22a",
+              "23a",
+              "24a",
+              "25a",
+              "26a",
+              "27a",
+              "28a",
+              "29a",
+              "30a",
+              "31a",
+              "32a",
+              "33a",
+              "34a",
+              "35a",
+              "36a",
+              "37a",
+              "38a",
+              "39a"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "job-selection",
+      "title": "Choose the best jobs",
+      "description": "Find the most profitable schedule under a budget, with cooldowns and deterministic tie-breaking.",
+      "example": "Taking the highest-paying job can earn less than taking two compatible smaller jobs.",
+      "contract": "Input: {jobs:{id:string,start:integer,end:integer,profit:integer,cost:positive integer}[], budget:nonnegative integer, cooldown:nonnegative integer}. At most 100 jobs; budget <= 80; all times, profits, costs, and cooldown are safe integers of absolute value <= 10000; 0 <= start < end. IDs are unique strings of 1 to 24 ASCII letters, digits, or underscores. Select any subset whose total cost is <= budget and which can be worked by one person: in chronological order, each next.start must be >= previous.end + cooldown. No cooldown is needed before the first or after the last job. Maximize total profit, then minimize total cost, then minimize number of jobs, then choose the lexicographically smallest chronological ID sequence. Compare sequences element-by-element using ASCII order, with a proper prefix smaller than its extension. Returning no jobs is allowed and has profit 0 and cost 0. Return {ids:string[],profit:integer,cost:integer}, with ids in chronological order. Input jobs may be unsorted. Negative and zero profit jobs are valid. Exact optimization is required; greedy selection by profit, earliest finish, or profit/cost is not sufficient. A case with 80 jobs rules out enumerating all subsets under the execution limit.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {jobs:{id:string,start:integer,end:integer,profit:integer,cost:positive integer}[], budget:nonnegative integer, cooldown:nonnegative integer}. At most 100 jobs; budget <= 80; all times, profits, costs, and cooldown are safe integers of absolute value <= 10000; 0 <= start < end. IDs are unique strings of 1 to 24 ASCII letters, digits, or underscores. Select any subset whose total cost is <= budget and which can be worked by one person: in chronological order, each next.start must be >= previous.end + cooldown. No cooldown is needed before the first or after the last job. Maximize total profit, then minimize total cost, then minimize number of jobs, then choose the lexicographically smallest chronological ID sequence. Compare sequences element-by-element using ASCII order, with a proper prefix smaller than its extension. Returning no jobs is allowed and has profit 0 and cost 0. Return {ids:string[],profit:integer,cost:integer}, with ids in chronological order. Input jobs may be unsorted. Negative and zero profit jobs are valid. Exact optimization is required; greedy selection by profit, earliest finish, or profit/cost is not sufficient. A case with 80 jobs rules out enumerating all subsets under the execution limit.",
+      "cases": [
+        {
+          "label": "Two smaller jobs beat one big job",
+          "input": {
+            "jobs": [
+              {
+                "id": "big",
+                "start": 0,
+                "end": 10,
+                "profit": 10,
+                "cost": 1
+              },
+              {
+                "id": "early",
+                "start": 0,
+                "end": 5,
+                "profit": 6,
+                "cost": 1
+              },
+              {
+                "id": "late",
+                "start": 5,
+                "end": 10,
+                "profit": 6,
+                "cost": 1
+              }
+            ],
+            "budget": 2,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "early",
+              "late"
+            ],
+            "profit": 12,
+            "cost": 2
+          }
+        },
+        {
+          "label": "Budget changes the winner",
+          "input": {
+            "jobs": [
+              {
+                "id": "big",
+                "start": 0,
+                "end": 10,
+                "profit": 10,
+                "cost": 1
+              },
+              {
+                "id": "early",
+                "start": 0,
+                "end": 5,
+                "profit": 6,
+                "cost": 1
+              },
+              {
+                "id": "late",
+                "start": 5,
+                "end": 10,
+                "profit": 6,
+                "cost": 1
+              }
+            ],
+            "budget": 1,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "big"
+            ],
+            "profit": 10,
+            "cost": 1
+          }
+        },
+        {
+          "label": "Profit per dollar is a trap",
+          "input": {
+            "jobs": [
+              {
+                "id": "cheap",
+                "start": 0,
+                "end": 10,
+                "profit": 6,
+                "cost": 1
+              },
+              {
+                "id": "best",
+                "start": 0,
+                "end": 10,
+                "profit": 10,
+                "cost": 2
+              }
+            ],
+            "budget": 2,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "best"
+            ],
+            "profit": 10,
+            "cost": 2
+          }
+        },
+        {
+          "label": "Cooldown prevents a close pairing",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "start": 0,
+                "end": 5,
+                "profit": 7,
+                "cost": 1
+              },
+              {
+                "id": "B",
+                "start": 5,
+                "end": 10,
+                "profit": 8,
+                "cost": 1
+              },
+              {
+                "id": "C",
+                "start": 6,
+                "end": 10,
+                "profit": 6,
+                "cost": 1
+              }
+            ],
+            "budget": 2,
+            "cooldown": 1
+          },
+          "expected": {
+            "ids": [
+              "A",
+              "C"
+            ],
+            "profit": 13,
+            "cost": 2
+          }
+        },
+        {
+          "label": "Cooldown boundary is allowed",
+          "input": {
+            "jobs": [
+              {
+                "id": "B",
+                "start": 7,
+                "end": 10,
+                "profit": 6,
+                "cost": 1
+              },
+              {
+                "id": "A",
+                "start": 0,
+                "end": 5,
+                "profit": 7,
+                "cost": 1
+              }
+            ],
+            "budget": 2,
+            "cooldown": 2
+          },
+          "expected": {
+            "ids": [
+              "A",
+              "B"
+            ],
+            "profit": 13,
+            "cost": 2
+          }
+        },
+        {
+          "label": "Equal profit prefers lower cost",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "start": 0,
+                "end": 10,
+                "profit": 10,
+                "cost": 2
+              },
+              {
+                "id": "B",
+                "start": 0,
+                "end": 10,
+                "profit": 10,
+                "cost": 1
+              }
+            ],
+            "budget": 2,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "B"
+            ],
+            "profit": 10,
+            "cost": 1
+          }
+        },
+        {
+          "label": "Then prefer fewer jobs",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "start": 0,
+                "end": 5,
+                "profit": 5,
+                "cost": 1
+              },
+              {
+                "id": "B",
+                "start": 5,
+                "end": 10,
+                "profit": 5,
+                "cost": 1
+              },
+              {
+                "id": "Z",
+                "start": 0,
+                "end": 10,
+                "profit": 10,
+                "cost": 2
+              }
+            ],
+            "budget": 2,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "Z"
+            ],
+            "profit": 10,
+            "cost": 2
+          }
+        },
+        {
+          "label": "Then compare the whole ID sequence",
+          "input": {
+            "jobs": [
+              {
+                "id": "z",
+                "start": 0,
+                "end": 2,
+                "profit": 5,
+                "cost": 1
+              },
+              {
+                "id": "a",
+                "start": 2,
+                "end": 4,
+                "profit": 5,
+                "cost": 1
+              },
+              {
+                "id": "m",
+                "start": 0,
+                "end": 1,
+                "profit": 5,
+                "cost": 1
+              },
+              {
+                "id": "b",
+                "start": 1,
+                "end": 4,
+                "profit": 5,
+                "cost": 1
+              }
+            ],
+            "budget": 2,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "m",
+              "a"
+            ],
+            "profit": 10,
+            "cost": 2
+          }
+        },
+        {
+          "label": "Do not buy zero or negative profit",
+          "input": {
+            "jobs": [
+              {
+                "id": "loss",
+                "start": 0,
+                "end": 1,
+                "profit": -5,
+                "cost": 1
+              },
+              {
+                "id": "zero",
+                "start": 1,
+                "end": 2,
+                "profit": 0,
+                "cost": 1
+              },
+              {
+                "id": "gain",
+                "start": 2,
+                "end": 3,
+                "profit": 4,
+                "cost": 1
+              }
+            ],
+            "budget": 3,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "gain"
+            ],
+            "profit": 4,
+            "cost": 1
+          }
+        },
+        {
+          "label": "No budget",
+          "input": {
+            "jobs": [
+              {
+                "id": "A",
+                "start": 0,
+                "end": 1,
+                "profit": 10,
+                "cost": 1
+              }
+            ],
+            "budget": 0,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [],
+            "profit": 0,
+            "cost": 0
+          }
+        },
+        {
+          "label": "No jobs",
+          "input": {
+            "jobs": [],
+            "budget": 80,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [],
+            "profit": 0,
+            "cost": 0
+          }
+        },
+        {
+          "label": "Eighty jobs; exact budgeted optimum",
+          "input": {
+            "jobs": [
+              {
+                "id": "j079",
+                "start": 158,
+                "end": 159,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j078",
+                "start": 156,
+                "end": 157,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j077",
+                "start": 154,
+                "end": 155,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j076",
+                "start": 152,
+                "end": 153,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j075",
+                "start": 150,
+                "end": 151,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j074",
+                "start": 148,
+                "end": 149,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j073",
+                "start": 146,
+                "end": 147,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j072",
+                "start": 144,
+                "end": 145,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j071",
+                "start": 142,
+                "end": 143,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j070",
+                "start": 140,
+                "end": 141,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j069",
+                "start": 138,
+                "end": 139,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j068",
+                "start": 136,
+                "end": 137,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j067",
+                "start": 134,
+                "end": 135,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j066",
+                "start": 132,
+                "end": 133,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j065",
+                "start": 130,
+                "end": 131,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j064",
+                "start": 128,
+                "end": 129,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j063",
+                "start": 126,
+                "end": 127,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j062",
+                "start": 124,
+                "end": 125,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j061",
+                "start": 122,
+                "end": 123,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j060",
+                "start": 120,
+                "end": 121,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j059",
+                "start": 118,
+                "end": 119,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j058",
+                "start": 116,
+                "end": 117,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j057",
+                "start": 114,
+                "end": 115,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j056",
+                "start": 112,
+                "end": 113,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j055",
+                "start": 110,
+                "end": 111,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j054",
+                "start": 108,
+                "end": 109,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j053",
+                "start": 106,
+                "end": 107,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j052",
+                "start": 104,
+                "end": 105,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j051",
+                "start": 102,
+                "end": 103,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j050",
+                "start": 100,
+                "end": 101,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j049",
+                "start": 98,
+                "end": 99,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j048",
+                "start": 96,
+                "end": 97,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j047",
+                "start": 94,
+                "end": 95,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j046",
+                "start": 92,
+                "end": 93,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j045",
+                "start": 90,
+                "end": 91,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j044",
+                "start": 88,
+                "end": 89,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j043",
+                "start": 86,
+                "end": 87,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j042",
+                "start": 84,
+                "end": 85,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j041",
+                "start": 82,
+                "end": 83,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j040",
+                "start": 80,
+                "end": 81,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j039",
+                "start": 78,
+                "end": 79,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j038",
+                "start": 76,
+                "end": 77,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j037",
+                "start": 74,
+                "end": 75,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j036",
+                "start": 72,
+                "end": 73,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j035",
+                "start": 70,
+                "end": 71,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j034",
+                "start": 68,
+                "end": 69,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j033",
+                "start": 66,
+                "end": 67,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j032",
+                "start": 64,
+                "end": 65,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j031",
+                "start": 62,
+                "end": 63,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j030",
+                "start": 60,
+                "end": 61,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j029",
+                "start": 58,
+                "end": 59,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j028",
+                "start": 56,
+                "end": 57,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j027",
+                "start": 54,
+                "end": 55,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j026",
+                "start": 52,
+                "end": 53,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j025",
+                "start": 50,
+                "end": 51,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j024",
+                "start": 48,
+                "end": 49,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j023",
+                "start": 46,
+                "end": 47,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j022",
+                "start": 44,
+                "end": 45,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j021",
+                "start": 42,
+                "end": 43,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j020",
+                "start": 40,
+                "end": 41,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j019",
+                "start": 38,
+                "end": 39,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j018",
+                "start": 36,
+                "end": 37,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j017",
+                "start": 34,
+                "end": 35,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j016",
+                "start": 32,
+                "end": 33,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j015",
+                "start": 30,
+                "end": 31,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j014",
+                "start": 28,
+                "end": 29,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j013",
+                "start": 26,
+                "end": 27,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j012",
+                "start": 24,
+                "end": 25,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j011",
+                "start": 22,
+                "end": 23,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j010",
+                "start": 20,
+                "end": 21,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j009",
+                "start": 18,
+                "end": 19,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j008",
+                "start": 16,
+                "end": 17,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j007",
+                "start": 14,
+                "end": 15,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j006",
+                "start": 12,
+                "end": 13,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j005",
+                "start": 10,
+                "end": 11,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j004",
+                "start": 8,
+                "end": 9,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j003",
+                "start": 6,
+                "end": 7,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j002",
+                "start": 4,
+                "end": 5,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j001",
+                "start": 2,
+                "end": 3,
+                "profit": 1,
+                "cost": 1
+              },
+              {
+                "id": "j000",
+                "start": 0,
+                "end": 1,
+                "profit": 1,
+                "cost": 1
+              }
+            ],
+            "budget": 40,
+            "cooldown": 0
+          },
+          "expected": {
+            "ids": [
+              "j000",
+              "j001",
+              "j002",
+              "j003",
+              "j004",
+              "j005",
+              "j006",
+              "j007",
+              "j008",
+              "j009",
+              "j010",
+              "j011",
+              "j012",
+              "j013",
+              "j014",
+              "j015",
+              "j016",
+              "j017",
+              "j018",
+              "j019",
+              "j020",
+              "j021",
+              "j022",
+              "j023",
+              "j024",
+              "j025",
+              "j026",
+              "j027",
+              "j028",
+              "j029",
+              "j030",
+              "j031",
+              "j032",
+              "j033",
+              "j034",
+              "j035",
+              "j036",
+              "j037",
+              "j038",
+              "j039"
+            ],
+            "profit": 40,
+            "cost": 40
+          }
+        }
+      ]
+    },
+    {
+      "id": "split-bill",
+      "title": "Split a bill",
+      "description": "Settle shared expenses with weighted shares, refunds, and awkward pennies.",
+      "example": "A $10 bill split three ways leaves one extra cent. Who gets it?",
+      "contract": "Input: {people: string[], expenses: {paidBy: string, cents: integer, shares: {person: string, weight: positive integer}[]}[]}. People are unique and ordered. All names occur in people. Each expense has unique share recipients, at least one. cents can be negative (a refund) or zero. For each expense, allocate abs(cents) proportional to the weights: floor each exact share, then distribute remaining cents by descending fractional remainder, ties by people order (not shares order). Apply the sign of cents after allocation. Each person's balance = amount paid minus allocated shares; positive means they receive money. Return {balances: integer[], transfers: {from: string, to: string, cents: positive integer}[]}. balances follows people order including zeros. Settle debtors and creditors in people order: transfer min(debt, credit), advance whichever reaches zero, until settled. Do not optimize transaction count or sort by amount.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {people: string[], expenses: {paidBy: string, cents: integer, shares: {person: string, weight: positive integer}[]}[]}. People are unique and ordered. All names occur in people. Each expense has unique share recipients, at least one. cents can be negative (a refund) or zero. For each expense, allocate abs(cents) proportional to the weights: floor each exact share, then distribute remaining cents by descending fractional remainder, ties by people order (not shares order). Apply the sign of cents after allocation. Each person's balance = amount paid minus allocated shares; positive means they receive money. Return {balances: integer[], transfers: {from: string, to: string, cents: positive integer}[]}. balances follows people order including zeros. Settle debtors and creditors in people order: transfer min(debt, credit), advance whichever reaches zero, until settled. Do not optimize transaction count or sort by amount.",
+      "cases": [
+        {
+          "label": "Dinner for two",
+          "input": {
+            "people": [
+              "Ada",
+              "Bo"
+            ],
+            "expenses": [
+              {
+                "paidBy": "Ada",
+                "cents": 4200,
+                "shares": [
+                  {
+                    "person": "Ada",
+                    "weight": 1
+                  },
+                  {
+                    "person": "Bo",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              2100,
+              -2100
+            ],
+            "transfers": [
+              {
+                "to": "Ada",
+                "cents": 2100,
+                "from": "Bo"
+              }
+            ]
+          }
+        },
+        {
+          "label": "An extra penny",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 1000,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              666,
+              -333,
+              -333
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 333,
+                "from": "B"
+              },
+              {
+                "to": "A",
+                "cents": 333,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Weighted shares",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "B",
+                "cents": 1000,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 2
+                  },
+                  {
+                    "person": "C",
+                    "weight": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              -167,
+              667,
+              -500
+            ],
+            "transfers": [
+              {
+                "to": "B",
+                "cents": 167,
+                "from": "A"
+              },
+              {
+                "to": "B",
+                "cents": 500,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Tie uses people order",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "C",
+                "cents": 2,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "A",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              -1,
+              -1,
+              2
+            ],
+            "transfers": [
+              {
+                "to": "C",
+                "cents": 1,
+                "from": "A"
+              },
+              {
+                "to": "C",
+                "cents": 1,
+                "from": "B"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Payer does not participate",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 501,
+                "shares": [
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              501,
+              -251,
+              -250
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 251,
+                "from": "B"
+              },
+              {
+                "to": "A",
+                "cents": 250,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Partial refund",
+          "input": {
+            "people": [
+              "A",
+              "B"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 1001,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "A",
+                "cents": -201,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              400,
+              -400
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 400,
+                "from": "B"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Refund only",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "B",
+                "cents": -5,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              3,
+              -5,
+              2
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 3,
+                "from": "B"
+              },
+              {
+                "to": "C",
+                "cents": 2,
+                "from": "B"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Multiple creditors",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 80,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "B",
+                "cents": 50,
+                "shares": [
+                  {
+                    "person": "D",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              80,
+              50,
+              -80,
+              -50
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 80,
+                "from": "C"
+              },
+              {
+                "to": "B",
+                "cents": 50,
+                "from": "D"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Debtor crosses creditors",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 70,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "B",
+                "cents": 30,
+                "shares": [
+                  {
+                    "person": "C",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              70,
+              30,
+              -100
+            ],
+            "transfers": [
+              {
+                "to": "A",
+                "cents": 70,
+                "from": "C"
+              },
+              {
+                "to": "B",
+                "cents": 30,
+                "from": "C"
+              }
+            ]
+          }
+        },
+        {
+          "label": "Already settled",
+          "input": {
+            "people": [
+              "A",
+              "B"
+            ],
+            "expenses": [
+              {
+                "paidBy": "A",
+                "cents": 20,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 1
+                  }
+                ]
+              },
+              {
+                "paidBy": "B",
+                "cents": 20,
+                "shares": [
+                  {
+                    "person": "B",
+                    "weight": 1
+                  },
+                  {
+                    "person": "A",
+                    "weight": 1
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              0,
+              0
+            ],
+            "transfers": []
+          }
+        },
+        {
+          "label": "Empty and zero expenses",
+          "input": {
+            "people": [
+              "A",
+              "B"
+            ],
+            "expenses": [
+              {
+                "paidBy": "B",
+                "cents": 0,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              0,
+              0
+            ],
+            "transfers": []
+          }
+        },
+        {
+          "label": "Largest remainder wins",
+          "input": {
+            "people": [
+              "A",
+              "B",
+              "C"
+            ],
+            "expenses": [
+              {
+                "paidBy": "C",
+                "cents": 10,
+                "shares": [
+                  {
+                    "person": "A",
+                    "weight": 1
+                  },
+                  {
+                    "person": "B",
+                    "weight": 2
+                  },
+                  {
+                    "person": "C",
+                    "weight": 4
+                  }
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "balances": [
+              -1,
+              -3,
+              4
+            ],
+            "transfers": [
+              {
+                "to": "C",
+                "cents": 1,
+                "from": "A"
+              },
+              {
+                "to": "C",
+                "cents": 3,
+                "from": "B"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "clean-csv",
+      "title": "Clean a contact CSV",
+      "description": "Parse quoted records, merge duplicate contacts, and report rejected rows.",
+      "example": "Two rows use the same email, but one has a newer name and different tags.",
+      "contract": "Input: {csv: string}. Parse a valid CSV (comma delimiter; LF or CRLF record separator; double-quoted fields may contain commas, line breaks, and escaped double quotes). Preserve embedded line breaks exactly. A trailing record separator does not create an extra record; internal empty records count. CSV may start with one Unicode BOM. The first record is the header: trim and lowercase headers; unique headers include name,email,tags in any order, optionally others. For every following record, trim fields. Reject a record if its field count differs from the header, trimmed name is empty, or email is invalid. Email validity is exactly /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ after trimming. Lowercase email. Split tags on semicolon, trim and lowercase each, remove empty tags. Merge by normalized email: keep contacts in first accepted appearance order, use the LAST accepted name, union tags in first appearance order with no duplicates. A rejected duplicate does not change a contact. Return {contacts: {name: string, email: string, tags: string[]}[], rejected: integer}. Count each rejected record once. Empty/header-only CSV yields no contacts and zero rejections.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {csv: string}. Parse a valid CSV (comma delimiter; LF or CRLF record separator; double-quoted fields may contain commas, line breaks, and escaped double quotes). Preserve embedded line breaks exactly. A trailing record separator does not create an extra record; internal empty records count. CSV may start with one Unicode BOM. The first record is the header: trim and lowercase headers; unique headers include name,email,tags in any order, optionally others. For every following record, trim fields. Reject a record if its field count differs from the header, trimmed name is empty, or email is invalid. Email validity is exactly /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ after trimming. Lowercase email. Split tags on semicolon, trim and lowercase each, remove empty tags. Merge by normalized email: keep contacts in first accepted appearance order, use the LAST accepted name, union tags in first appearance order with no duplicates. A rejected duplicate does not change a contact. Return {contacts: {name: string, email: string, tags: string[]}[], rejected: integer}. Count each rejected record once. Empty/header-only CSV yields no contacts and zero rejections.",
+      "cases": [
+        {
+          "label": "Trim and normalize",
+          "input": {
+            "csv": "name,email,tags\n Ada , ADA@X.CO , Work ; friend "
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada",
+                "email": "ada@x.co",
+                "tags": [
+                  "work",
+                  "friend"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Quoted comma",
+          "input": {
+            "csv": "name,email,tags\n\"Bo, Jr.\",bo@x.co,team"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Bo, Jr.",
+                "email": "bo@x.co",
+                "tags": [
+                  "team"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Escaped quotes",
+          "input": {
+            "csv": "name,email,tags\n\"Ada \"\"Ace\"\"\",a@x.co,"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada \"Ace\"",
+                "email": "a@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Embedded CRLF",
+          "input": {
+            "csv": "name,email,tags\r\n\"Ada\r\nLovelace\",a@x.co,x\r\n"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada\r\nLovelace",
+                "email": "a@x.co",
+                "tags": [
+                  "x"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Merge duplicates",
+          "input": {
+            "csv": "name,email,tags\nAda,A@X.CO,one;two\nAda L,a@x.co,two;THREE"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada L",
+                "email": "a@x.co",
+                "tags": [
+                  "one",
+                  "two",
+                  "three"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "BOM and reordered headers",
+          "input": {
+            "csv": "\ufeff Tags , EMAIL , Name ,extra\nx,a@x.co,Ada,ignored"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Ada",
+                "email": "a@x.co",
+                "tags": [
+                  "x"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Invalid emails",
+          "input": {
+            "csv": "name,email,tags\nA,a@x,\nB,b b@x.co,\nC,c@@x.co,\nD,d@x.co,"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "D",
+                "email": "d@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 3
+          }
+        },
+        {
+          "label": "Wrong number of fields",
+          "input": {
+            "csv": "name,email,tags\nA,a@x.co\nB,b@x.co,x,extra\nC,c@x.co,"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "C",
+                "email": "c@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 2
+          }
+        },
+        {
+          "label": "Internal blank record",
+          "input": {
+            "csv": "name,email,tags\n\nA,a@x.co,\n"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "A",
+                "email": "a@x.co",
+                "tags": []
+              }
+            ],
+            "rejected": 1
+          }
+        },
+        {
+          "label": "Rejected duplicate stays rejected",
+          "input": {
+            "csv": "name,email,tags\nA,a@x.co,one\n ,a@x.co,two"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "A",
+                "email": "a@x.co",
+                "tags": [
+                  "one"
+                ]
+              }
+            ],
+            "rejected": 1
+          }
+        },
+        {
+          "label": "First appearance order",
+          "input": {
+            "csv": "name,email,tags\nB,b@x.co,;One;one;;\nA,a@x.co,two\nBee,B@X.CO,three"
+          },
+          "expected": {
+            "contacts": [
+              {
+                "name": "Bee",
+                "email": "b@x.co",
+                "tags": [
+                  "one",
+                  "three"
+                ]
+              },
+              {
+                "name": "A",
+                "email": "a@x.co",
+                "tags": [
+                  "two"
+                ]
+              }
+            ],
+            "rejected": 0
+          }
+        },
+        {
+          "label": "Header only",
+          "input": {
+            "csv": "name,email,tags\n"
+          },
+          "expected": {
+            "contacts": [],
+            "rejected": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "meeting-time",
+      "title": "Find a meeting time",
+      "description": "Align time zones, split workdays, busy periods, and recovery buffers.",
+      "example": "One person works UTC+2. Another has a 15-minute buffer after every call.",
+      "contract": "Input: {window: [start,end], duration: positive integer, step: positive integer, people: {offset: integer, work: [start,end][], busy: [start,end][], buffer: nonnegative integer}[]}. All times are integer minutes on an absolute two-day axis, not clock strings. window uses UTC minutes, 0 <= start < end <= 2880. Every interval is half-open [start,end), with start < end. Per-person work and busy times are LOCAL minutes; convert to UTC by subtracting offset (which can be negative). Intervals may cross midnight, overlap, be unsorted, or fall outside window. Merge overlapping OR touching work intervals; a meeting must fit completely inside their union for every person. Expand each busy interval by that person's buffer on both ends, after conversion. Touching a busy boundary is allowed; overlapping is not. Candidate starts are window[0] + k*step for nonnegative integers k. Return the earliest {start: UTCminute, end: UTCminute} whose entire duration fits window and every person's work and avoids every expanded busy interval; return null if none. Empty people imposes only the window/grid; a person with no work prevents any meeting.",
+      "prompt": "Write a synchronous JavaScript function solve(input). Return only JavaScript, without Markdown or exports. Standard ECMAScript only: no filesystem, network, packages, Node globals, timers, or async. Inputs are valid under the contract. Return a JSON-serializable value. Do not mutate built-ins. Each case runs in a fresh QuickJS context with 16 MiB memory and a 100 ms CPU limit. All arithmetic inputs and results fit safe integers. We compare JSON structurally, ignoring object key order but preserving array order. Implement the full contract, not just an example.\n\nInput: {window: [start,end], duration: positive integer, step: positive integer, people: {offset: integer, work: [start,end][], busy: [start,end][], buffer: nonnegative integer}[]}. All times are integer minutes on an absolute two-day axis, not clock strings. window uses UTC minutes, 0 <= start < end <= 2880. Every interval is half-open [start,end), with start < end. Per-person work and busy times are LOCAL minutes; convert to UTC by subtracting offset (which can be negative). Intervals may cross midnight, overlap, be unsorted, or fall outside window. Merge overlapping OR touching work intervals; a meeting must fit completely inside their union for every person. Expand each busy interval by that person's buffer on both ends, after conversion. Touching a busy boundary is allowed; overlapping is not. Candidate starts are window[0] + k*step for nonnegative integers k. Return the earliest {start: UTCminute, end: UTCminute} whose entire duration fits window and every person's work and avoids every expanded busy interval; return null if none. Empty people imposes only the window/grid; a person with no work prevents any meeting.",
+      "cases": [
+        {
+          "label": "Open morning",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 540,
+            "end": 570
+          }
+        },
+        {
+          "label": "Different time zones",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    660,
+                    1140
+                  ]
+                ],
+                "busy": [],
+                "offset": 120,
+                "buffer": 0
+              },
+              {
+                "work": [
+                  [
+                    300,
+                    780
+                  ]
+                ],
+                "busy": [],
+                "offset": -300,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 600,
+            "end": 630
+          }
+        },
+        {
+          "label": "Buffer after a call",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [
+                  [
+                    540,
+                    600
+                  ]
+                ],
+                "offset": 0,
+                "buffer": 15
+              }
+            ]
+          },
+          "expected": {
+            "start": 615,
+            "end": 645
+          }
+        },
+        {
+          "label": "Busy boundary is allowed",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [
+                  [
+                    570,
+                    600
+                  ]
+                ],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 540,
+            "end": 570
+          }
+        },
+        {
+          "label": "Unsorted overlapping busy periods",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    1020
+                  ]
+                ],
+                "busy": [
+                  [
+                    585,
+                    630
+                  ],
+                  [
+                    540,
+                    600
+                  ]
+                ],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 630,
+            "end": 660
+          }
+        },
+        {
+          "label": "Touching work periods merge",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 50,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    560,
+                    590
+                  ],
+                  [
+                    540,
+                    560
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 540,
+            "end": 590
+          }
+        },
+        {
+          "label": "Split workday gap",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    560
+                  ],
+                  [
+                    600,
+                    660
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 600,
+            "end": 630
+          }
+        },
+        {
+          "label": "Grid anchored to window",
+          "input": {
+            "window": [
+              547,
+              700
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    550,
+                    900
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": {
+            "start": 562,
+            "end": 592
+          }
+        },
+        {
+          "label": "No common opening",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    540,
+                    570
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              },
+              {
+                "work": [
+                  [
+                    570,
+                    600
+                  ]
+                ],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": null
+        },
+        {
+          "label": "Across midnight",
+          "input": {
+            "window": [
+              1380,
+              1600
+            ],
+            "duration": 60,
+            "step": 15,
+            "people": [
+              {
+                "work": [
+                  [
+                    1380,
+                    1560
+                  ]
+                ],
+                "busy": [
+                  [
+                    1430,
+                    1460
+                  ]
+                ],
+                "offset": 60,
+                "buffer": 10
+              }
+            ]
+          },
+          "expected": {
+            "start": 1410,
+            "end": 1470
+          }
+        },
+        {
+          "label": "Nobody to constrain it",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": []
+          },
+          "expected": {
+            "start": 540,
+            "end": 570
+          }
+        },
+        {
+          "label": "Missing working hours",
+          "input": {
+            "window": [
+              540,
+              1020
+            ],
+            "duration": 30,
+            "step": 15,
+            "people": [
+              {
+                "work": [],
+                "busy": [],
+                "offset": 0,
+                "buffer": 0
+              }
+            ]
+          },
+          "expected": null
+        }
+      ]
+    }
+  ],
+  "runs": []
+}

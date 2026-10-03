@@ -22,6 +22,30 @@ function describe(id: string, input: unknown, fallback: string): string {
 }
 
 function readable(id: string, output: unknown): string {
+  if (id === "build-plan") {
+    const result = output as {
+      error?: string;
+      order: string[];
+      finish: number;
+      criticalPath: string[];
+    };
+    if (result.error)
+      return "A required dependency cycle makes this build impossible.";
+    if (!result.order.length)
+      return "No targets requested. Nothing needs to run.";
+    const path = result.criticalPath;
+    return `Finish in ${result.finish} time units. Critical path: ${path.length > 8 ? `${path.slice(0, 3).join(" → ")} → … → ${path.at(-1)} (${path.length} jobs)` : path.join(" → ")}.`;
+  }
+  if (id === "job-selection") {
+    const result = output as { ids: string[]; profit: number; cost: number };
+    if (!result.ids.length)
+      return "Choose no jobs. Profit and cost are both zero.";
+    const names =
+      result.ids.length > 8
+        ? `${result.ids.length} jobs (see the exact list below)`
+        : result.ids.join(", ");
+    return `Choose ${names}. Total profit: ${result.profit}. Total cost: ${result.cost}.`;
+  }
   if (id === "split-bill") {
     const result = output as {
       transfers: { from: string; to: string; cents: number }[];

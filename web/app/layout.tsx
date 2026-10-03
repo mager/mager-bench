@@ -24,9 +24,9 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "mager-bench 1.2 | A quick test of useful code",
+  title: "mager-bench 1.3 | A quick test of useful code",
   description:
-    "Three everyday coding tasks, 36 deterministic checks, and the lowest supported reasoning effort. Inspect every prompt, expected output, and saved attempt.",
+    "Five practical and algorithmic coding tasks, 60 deterministic checks, and the lowest supported reasoning effort. Inspect every prompt, expected output, and saved attempt.",
   metadataBase: new URL("https://bench.mager.co"),
 };
 

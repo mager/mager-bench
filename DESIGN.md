@@ -1,5 +1,5 @@
 ---
-name: mager-bench 1.2
+name: mager-bench 1.3
 description: A clear, fast report for complex everyday coding tasks.
 colors:
   bg: "oklch(13% 0.006 270)"
@@ -90,7 +90,7 @@ components:
     padding: "18px 0"
 ---
 
-# Design System: mager-bench 1.2
+# Design System: mager-bench 1.3
 
 ## Overview
 
@@ -98,7 +98,7 @@ components:
 
 A software test report viewed at a desk at night. Dark surfaces, readable Manrope, thin rules, and restrained mint links give exact inputs and results room to be understood. The active system is code-led and uses no shipping raster imagery or approved visual comp.
 
-This document records the implemented v1.2 system. The shared header and footer use this system; historical benchmark content retains its legacy styles, including Barlow Condensed, sports graphics, and older score colors. Those archival treatments are not defaults for new active screens.
+This document records the implemented v1.3 system. The shared header and footer use this system; historical benchmark content retains its legacy styles, including Barlow Condensed, sports graphics, and older score colors. Those archival treatments are not defaults for new active screens.
 
 **Key Characteristics:**
 
@@ -137,13 +137,13 @@ At the phone breakpoint, intro copy becomes (16px), section headings become (22p
 
 ## Layout
 
-The active shell is centered at `min(1080px, calc(100% - 64px))`. Wide rows and horizontal rules organize the report; source and expected output sit in equal columns with a (24px) gap. The three task buttons remain a three-column group. Method notes use three columns with (32px) gaps.
+The active shell is centered at `min(1080px, calc(100% - 64px))`. Wide rows and horizontal rules organize the report; source and expected output sit in equal columns with a (24px) gap. The five task buttons use auto-fitting columns of at least 180px; on phones they wrap into two columns. Method notes use three columns with (32px) gaps.
 
 At (700px) and below, the shell uses (18px) side gutters. Navigation wraps into a second row; model availability, code columns, and method notes stack. Task descriptions hide while their labels stay visible. The case selector becomes full width. Attempt rows move to two columns with metadata on the next row. Long code scrolls inside its own panel, with a maximum height of (440px); prompt disclosures wrap and have no maximum height.
 
 ## Elevation & Depth
 
-Active v1.2 uses no shadows. Depth comes from flat surface fills, thin rules, and spacing. Expected results have a tinted field; code and controls have distinct dark surfaces. Hover changes color or background without moving elements.
+Active v1.3 uses no shadows. Depth comes from flat surface fills, thin rules, and spacing. Expected results have a tinted field; code and controls have distinct dark surfaces. Hover changes color or background without moving elements.
 
 Inherited transitions animate color, background color, and border color over (0.16s ease). The page inherits smooth anchor scrolling and switches to automatic scrolling when reduced motion is requested. No new animation grammar is introduced.
 
@@ -185,7 +185,7 @@ Native details/summary elements reveal exact prompts and method notes. Summary h
 
 ### Don't:
 
-- Don't revive the basketball or Counterexample identity on active v1.2 surfaces.
+- Don't revive the basketball or Counterexample identity on active v1.3 surfaces.
 - Don't add promotional slogans, decorative imagery, simulated results, or fictional live statuses.
 - Don't turn provider failures into zero scores or style a single run as a reliable ranking.
 - Don't replace the report's flat rows with decorative elevated cards.

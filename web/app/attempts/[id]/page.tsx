@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { everyday, modelName, date, source } from "@/lib/everyday";
+import {
+  everyday,
+  archivedEveryday,
+  allEverydayRuns,
+  modelName,
+  date,
+  source,
+} from "@/lib/everyday";
 export function generateStaticParams() {
-  return everyday.runs.map((r) => ({ id: r.id }));
+  return allEverydayRuns.map((r) => ({ id: r.id }));
 }
 export default async function Attempt({
   params,
@@ -10,13 +17,17 @@ export default async function Attempt({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params,
-    run = everyday.runs.find((r) => r.id === id);
+    run = allEverydayRuns.find((r) => r.id === id);
   if (!run) notFound();
+  const suite = run.benchmark_version === "1.3" ? everyday : archivedEveryday;
   return (
     <div className="bench-shell">
       <header className="bench-page-heading">
-        <Link className="bench-link" href="/runs">
-          All v1.2 attempts
+        <Link
+          className="bench-link"
+          href={suite.version === "1.3" ? "/runs" : "/archive/v1.2"}
+        >
+          Version {suite.version} attempts
         </Link>
         <h1>{modelName(run.model)}</h1>
         <p>
@@ -33,8 +44,8 @@ export default async function Attempt({
         {run.error && (
           <>
             <p>
-              The provider failed before this benchmark could finish. No overall
-              score was assigned.
+              This benchmark attempt did not finish. No overall score was
+              assigned.
             </p>
             <pre className="prose-code">{run.error}</pre>
           </>
@@ -45,7 +56,7 @@ export default async function Attempt({
       </section>
       <section className="everyday-section">
         <h2>Programs</h2>
-        {everyday.tasks.map((task) => {
+        {suite.tasks.map((task) => {
           const t = run.tasks.find((t) => t.id === task.id);
           return (
             <article className="task-attempt" key={task.id}>
@@ -93,8 +104,8 @@ export default async function Attempt({
         <p>Suite SHA-256</p>
         <code className="suite-hash">{run.suite_sha256}</code>
         <p>
-          Three calls maximum, 90 seconds per call, 3,072-token prompted target.
-          Lowest supported effort. No retries.
+          {suite.tasks.length} calls maximum, 90 seconds per call, 3,072-token
+          prompted target. Lowest supported effort. No retries.
         </p>
       </details>
     </div>
