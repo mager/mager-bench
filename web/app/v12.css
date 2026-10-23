@@ -518,3 +518,98 @@
     scroll-behavior: auto;
   }
 }
+
+/* Compact active overview; archived reports retain their layout. */
+.bench-compact .bench-intro {
+  padding-block: 40px 24px;
+  max-width: none;
+}
+.bench-compact .bench-intro h1 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+.bench-compact .bench-intro > p {
+  margin-bottom: 0;
+}
+.current-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 16px;
+  border-block: 1px solid var(--report-rule);
+  font-size: 1rem;
+}
+.current-result p {
+  color: var(--report-muted);
+}
+.current-result strong {
+  color: var(--fg);
+}
+.current-result a {
+  flex-shrink: 0;
+}
+.bench-compact .everyday-section {
+  padding-top: 32px;
+}
+.task-row {
+  border-bottom: 1px solid var(--report-rule);
+}
+.task-row > summary {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding-block: 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.task-row > summary::-webkit-details-marker {
+  display: none;
+}
+.task-row > summary::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border: solid currentColor;
+  border-width: 0 1px 1px 0;
+  transform: rotate(-45deg);
+}
+.task-row[open] > summary::before {
+  transform: rotate(45deg);
+}
+.task-row-title {
+  font-size: 1rem;
+  font-weight: 650;
+}
+.task-row > summary:hover,
+.task-row[open] > summary {
+  color: var(--report-accent);
+}
+.task-example {
+  padding-bottom: 24px;
+}
+.task-example .example-heading {
+  padding-top: 0;
+}
+.task-example .case-control {
+  margin-top: 8px;
+}
+.task-example .bench-details:last-child {
+  border-bottom: 0;
+}
+@media (max-width: 700px) {
+  .bench-compact .bench-intro h1 {
+    font-size: 2rem;
+  }
+  .current-result {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .task-row > summary {
+    grid-template-columns: 12px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 4px;
+    padding-block: 16px;
+  }
+}

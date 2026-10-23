@@ -24,7 +24,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "mager-bench 1.3 | A quick test of useful code",
+  title: "mager-bench 1.3 | JavaScript benchmark",
   description:
     "Five practical and algorithmic coding tasks, 60 deterministic checks, and the lowest supported reasoning effort. Inspect every prompt, expected output, and saved attempt.",
   metadataBase: new URL("https://bench.mager.co"),

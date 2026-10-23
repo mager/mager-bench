@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { Task } from "@/lib/everyday";
 
 function describe(id: string, input: unknown, fallback: string): string {
@@ -70,45 +70,77 @@ function readable(id: string, output: unknown): string {
   return `Meet from ${clock(result.start)} to ${clock(result.end)} UTC.`;
 }
 
-export function EverydayExplorer({ tasks }: { tasks: Task[] }) {
+export function EverydayExplorer({
+  tasks,
+  compact = false,
+}: {
+  tasks: Task[];
+  compact?: boolean;
+}) {
+  const caseId = useId();
   const [selected, setSelected] = useState(0);
   const [caseIndex, setCaseIndex] = useState(0);
   const task = tasks[selected],
     example = task.cases[caseIndex];
+  const caseColumns = (
+    <div className="case-columns">
+      <div>
+        <h4>Input</h4>
+        <pre tabIndex={0} aria-label="Test input">
+          {JSON.stringify(example.input, null, 2)}
+        </pre>
+      </div>
+      <div>
+        <h4>Exact expected output</h4>
+        <pre tabIndex={0} aria-label="Expected output">
+          {JSON.stringify(example.expected, null, 2)}
+        </pre>
+      </div>
+    </div>
+  );
   return (
     <section
-      className="everyday-section"
-      id="tasks"
-      aria-labelledby="tasks-heading"
+      className={compact ? "task-example" : "everyday-section"}
+      id={compact ? undefined : "tasks"}
+      aria-labelledby={compact ? undefined : "tasks-heading"}
+      aria-label={compact ? task.title : undefined}
     >
-      <div className="bench-section-title">
-        <h2 id="tasks-heading">What we ask it to build</h2>
-        <span>12 checks per program</span>
-      </div>
-      <div className="task-selector" role="group" aria-label="Choose a program">
-        {tasks.map((t, i) => (
-          <button
-            type="button"
-            key={t.id}
-            aria-pressed={selected === i}
-            onClick={() => {
-              setSelected(i);
-              setCaseIndex(0);
-            }}
-          >
-            <span>{t.title}</span>
-            <span className="task-description">{t.description}</span>
-          </button>
-        ))}
-      </div>
-      <div className="example-heading">
-        <h3>{task.title}</h3>
-        <p>{describe(task.id, example.input, task.description)}</p>
-      </div>
+      {!compact && (
+        <>
+          <div className="bench-section-title">
+            <h2 id="tasks-heading">What we ask it to build</h2>
+            <span>12 checks per program</span>
+          </div>
+          <div className="task-selector" role="group" aria-label="Choose a program">
+            {tasks.map((t, i) => (
+              <button
+                type="button"
+                key={t.id}
+                aria-pressed={selected === i}
+                onClick={() => {
+                  setSelected(i);
+                  setCaseIndex(0);
+                }}
+              >
+                <span>{t.title}</span>
+                <span className="task-description">{t.description}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      {(!compact || task.id === "split-bill") && (
+        <div className="example-heading">
+          {!compact && <h3>{task.title}</h3>}
+          <p>{describe(task.id, example.input, task.description)}</p>
+        </div>
+      )}
       <div className="case-control">
-        <label htmlFor="case">Explore a test case</label>
+        <label htmlFor={caseId}>
+          {compact ? "Test case" : "Explore a test case"}
+        </label>
         <select
-          id="case"
+          id={caseId}
           value={caseIndex}
           onChange={(e) => setCaseIndex(Number(e.target.value))}
         >
@@ -120,29 +152,25 @@ export function EverydayExplorer({ tasks }: { tasks: Task[] }) {
         </select>
       </div>
       <div className="expected-answer" aria-live="polite">
-        <span>Expected result</span>
+        <span>
+          {compact ? "Expected answer · published test data" : "Expected result"}
+        </span>
         <p>{readable(task.id, example.expected)}</p>
       </div>
-      <div className="case-columns">
-        <div>
-          <h4>Input</h4>
-          <pre tabIndex={0} aria-label="Test input">
-            {JSON.stringify(example.input, null, 2)}
-          </pre>
-        </div>
-        <div>
-          <h4>Exact expected output</h4>
-          <pre tabIndex={0} aria-label="Expected output">
-            {JSON.stringify(example.expected, null, 2)}
-          </pre>
-        </div>
-      </div>
-      <p className="quiet">
-        These are the published test cases, not a model’s answers. Saved
-        attempts show what the model actually returned.
-      </p>
+      {compact ? (
+        <details className="bench-details">
+          <summary>Input and expected JSON</summary>
+          {caseColumns}
+        </details>
+      ) : caseColumns}
+      {!compact && (
+        <p className="quiet">
+          These are the published test cases, not a model’s answers. Saved
+          attempts show what the model actually returned.
+        </p>
+      )}
       <details className="bench-details">
-        <summary>Read the exact prompt</summary>
+        <summary>{compact ? "Exact prompt" : "Read the exact prompt"}</summary>
         <pre className="prose-code">{task.prompt}</pre>
       </details>
     </section>

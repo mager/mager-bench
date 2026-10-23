@@ -2,147 +2,79 @@ import { Arrow } from "@/components/arrow";
 import Link from "next/link";
 import { EverydayExplorer } from "@/components/everyday-explorer";
 import { everyday, modelName, source } from "@/lib/everyday";
+
+const taskNames: Record<string, string> = {
+  "build-plan": "Build dependencies",
+  "job-selection": "Schedule jobs",
+  "split-bill": "Split a bill",
+  "clean-csv": "Clean a CSV",
+  "meeting-time": "Find a meeting time",
+};
+
 export default function Home() {
   const latest = everyday.runs.at(-1);
   return (
-    <div className="bench-shell">
+    <div className="bench-shell bench-compact">
       <header className="bench-intro">
-        <h1>A quick test of useful code.</h1>
-        <p>
-          Two algorithmic problems and three everyday programs. Each model gets
-          one attempt at its lowest reasoning effort. We check whether the code
-          works.
-        </p>
-        <a className="bench-link" href="#tasks">
-          Explore the five programs <Arrow />
-        </a>
+        <h1>JavaScript benchmark</h1>
+        <p>Five problems for AI models, with 60 tests to check their code.</p>
       </header>
-      <section className="baseline" aria-labelledby="baseline-heading">
-        <div>
-          <h2 id="baseline-heading">
-            {latest ? modelName(latest.model) : "Five tasks, 60 checks"}
-          </h2>
-          <p>
-            {latest?.score
-              ? `${latest.score.passed} of ${latest.score.total} checks passed`
-              : "No v1.3 model results yet"}
-          </p>
-        </div>
-        <div className="baseline-note">
-          <span
-            className={`result-status ${latest?.score ? "is-complete" : ""}`}
-          >
-            {latest
-              ? latest.score
-                ? "Completed"
-                : "Unscored"
-              : "Ready to benchmark"}
-          </span>
-          <p>
-            {latest?.score
-              ? `Saved at ${latest.reasoning_effort} effort. Open the attempt to inspect every result.`
-              : latest
-                ? "The attempt did not finish. Its failure is saved without an overall score."
-                : "The graph and optimization tasks pass reference checks. Model calibration is still pending."}
-          </p>
-        </div>
-        <Link
-          className="bench-link"
-          href={latest ? `/attempts/${latest.id}` : "/runs"}
-        >
-          View attempts <Arrow diagonal />
+      <section className="current-result" aria-label="Latest result">
+        <p>
+          {latest ? (
+            <>
+              <strong>{modelName(latest.model)}</strong>
+              {latest.score
+                ? ` · ${latest.score.passed}/${latest.score.total} checks passed`
+                : " · Incomplete, unscored"}
+            </>
+          ) : "No runs yet."}
+        </p>
+        <Link className="bench-link" href={latest ? `/attempts/${latest.id}` : "/runs"}>
+          View runs <Arrow />
         </Link>
       </section>
-      <EverydayExplorer tasks={everyday.tasks} />
-      <section
-        className="everyday-section"
-        aria-labelledby="difficulty-heading"
-      >
-        <h2 id="difficulty-heading">Where shortcuts fail</h2>
-        <div className="method-copy">
-          <p>
-            A dependency graph with 40 layers has over a trillion possible
-            paths. The program must reuse computed results. Enumerating every
-            path exceeds the time limit.
-          </p>
-          <p>
-            In the scheduling task, one job pays 10, but two compatible jobs pay
-            12 together. The full problem also has a spending budget and
-            cooldown periods. Picking the biggest job first gives the wrong
-            answer.
-          </p>
-          <p>
-            The 80-job case makes exhaustive subset search impractical. These
-            cases test algorithm choice as well as edge cases; how models
-            perform is still unmeasured.
-          </p>
+      <section className="everyday-section" id="tasks" aria-label="Tasks">
+        <div className="task-list">
+          {everyday.tasks.map((task) => (
+            <details className="task-row" key={task.id} name="benchmark-task">
+              <summary>
+                <span className="task-row-title">{taskNames[task.id] ?? task.title}</span>
+              </summary>
+              <EverydayExplorer tasks={[task]} compact />
+            </details>
+          ))}
         </div>
       </section>
-      <section className="everyday-section" id="method">
-        <div className="bench-section-title">
-          <h2>Built to finish quickly</h2>
-        </div>
-        <dl className="method-grid">
-          <div>
-            <dt>Five short answers</dt>
-            <dd>
-              One JavaScript program per task. No retries or model judges.
-            </dd>
-          </div>
-          <div>
-            <dt>Lowest effort</dt>
-            <dd>
-              The runner selects the lowest supported setting. For GPT-6 Sol,
-              that’s low.
-            </dd>
-          </div>
-          <div>
-            <dt>60 exact checks</dt>
-            <dd>
-              A check passes when the returned value matches its expected
-              output.
-            </dd>
-          </div>
-        </dl>
+      <section className="everyday-section" id="method" aria-label="Method">
         <details className="bench-details">
-          <summary>Timing, scoring, and limits</summary>
+          <summary>How it works</summary>
           <div className="method-copy">
             <p>
-              Each generation call has a 90-second deadline and a prompted
-              target of 3,072 output tokens. Five calls share the same total
-              budget, for at most 270 seconds of generation waiting. We stop at
-              the first provider failure.
+              Each model gets one try per problem at its lowest supported reasoning
+              setting. Each answer runs against 12 tests and earns one point per
+              pass. No AI grades the answers.
             </p>
             <p>
-              Programs run in fresh QuickJS contexts with no filesystem or
-              network bindings, 16 MiB memory, and a 100 ms CPU limit per case.
-              Incorrect values and code errors fail checks. Missing answers and
-              provider failures are unscored.
+              Models have up to 90 seconds per answer and 270 seconds in total.
+              The prompt asks for no more than 3,072 tokens per answer.
             </p>
             <p>
-              These 60 public cases are a small, inspectable sample of
-              JavaScript correctness. A single attempt does not establish a
-              model ranking. Timings include the local Codex harness and are not
-              pure model latency.
+              Code runs in QuickJS with 16 MiB of memory and 100 ms of CPU time
+              per test, without files or network access. Wrong answers and code
+              errors fail tests. A missing answer or failed model call means no
+              overall score.
             </p>
-            <a
-              className="bench-link"
-              href={`${source}/blob/main/docs/mager-bench-1.3.md`}
-            >
-              Full protocol on GitHub
+            <p>
+              These public tests cover a small set of problems. One run is not
+              enough to rank models. Times include the local runner.
+            </p>
+            <a className="bench-link" href={`${source}/blob/main/docs/mager-bench-1.3.md`}>
+              Full test rules
             </a>
           </div>
         </details>
       </section>
-      <aside className="history-note">
-        <p>
-          Looking for the older scores? Versions 1.2, 1.1, and the original
-          thirteen-task benchmark are preserved in the archive.
-        </p>
-        <Link className="bench-link" href="/archive">
-          Browse the archive
-        </Link>
-      </aside>
     </div>
   );
 }

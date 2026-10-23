@@ -6,23 +6,20 @@ export default function Runs() {
   return (
     <div className="bench-shell">
       <header className="bench-page-heading">
-        <h1>Saved attempts</h1>
+        <h1>Runs</h1>
         <p>
-          Every v1.3 attempt, including failed calls. A missing answer never
-          becomes a zero.
+          Only finished runs get a score.
         </p>
       </header>
       <div className="attempt-list">
         {!everyday.runs.length && (
           <div className="archive-entry">
-            <h2>No v1.3 attempts yet</h2>
+            <h2>No runs yet</h2>
             <p>
-              The new tasks are validated with author-written reference
-              programs, not model responses. GPT-6 Sol’s last subscription
-              attempt was rejected on v1.2 and remains in the archive.
+              You can still browse the problems and their tests.
             </p>
-            <Link className="bench-link" href="/archive/v1.2">
-              View v1.2 and its saved attempt
+            <Link className="bench-link" href="/#tasks">
+              See the tests
             </Link>
           </div>
         )}
@@ -49,7 +46,7 @@ export default function Runs() {
       </div>
       <p className="history-note">
         <Link className="bench-link" href="/archive">
-          View earlier benchmark versions
+          Earlier versions
         </Link>
       </p>
     </div>
