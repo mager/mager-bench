@@ -613,3 +613,75 @@
     padding-block: 16px;
   }
 }
+
+/* V2 extends the compact report with task contracts and saved code. */
+.v2-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-block: 16px;
+  color: var(--report-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.v2-task-body {
+  padding: 0 0 24px 32px;
+}
+.v2-task-body > p {
+  color: var(--report-muted);
+  margin-bottom: 16px;
+}
+.v2-task-body > a {
+  display: inline-block;
+  margin-top: 16px;
+}
+.bench-shell pre {
+  max-width: 100%;
+  overflow: auto;
+}
+.bench-shell .v2-contract {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.v2-preflights {
+  margin-top: 32px;
+}
+.v2-failure {
+  padding: 20px;
+  color: var(--status-unavailable);
+  border: 1px solid var(--report-rule);
+  overflow-wrap: anywhere;
+}
+.v2-failure pre {
+  white-space: pre-wrap;
+}
+.v2-check {
+  margin-block: 20px;
+}
+.v2-check h3 {
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+}
+.v2-method {
+  max-width: 800px;
+}
+.v2-method section {
+  margin-bottom: 32px;
+}
+.v2-method h2 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+.v2-method p {
+  color: var(--report-muted);
+  margin-block: 12px;
+  line-height: 1.8;
+}
+@media (max-width: 700px) {
+  .v2-task-body {
+    padding-left: 24px;
+  }
+  .v2-facts {
+    gap: 8px 16px;
+  }
+}

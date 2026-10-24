@@ -12,6 +12,11 @@ export default function Archive() {
         </p>
       </header>
       <div className="attempt-list">
+        <Link className="archive-entry" href="/archive/v1.3">
+          <h2>1.3 · Five JavaScript problems</h2>
+          <p>60 fixed checks. Original tasks, rules, and data.</p>
+          <span className="bench-link">View v1.3</span>
+        </Link>
         <Link className="archive-entry" href="/archive/v1.2">
           <h2>1.2 · Three everyday programs</h2>
           <p>

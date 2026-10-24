@@ -1,5 +1,5 @@
 ---
-name: mager-bench 1.3
+name: mager-bench 2.0
 description: A clear, fast report for complex everyday coding tasks.
 colors:
   bg: "oklch(13% 0.006 270)"
@@ -90,7 +90,7 @@ components:
     padding: "18px 0"
 ---
 
-# Design System: mager-bench 1.3
+# Design System: mager-bench 2.0
 
 ## Overview
 
@@ -189,3 +189,11 @@ Native details/summary elements reveal exact prompts and method notes. Summary h
 - Don't add promotional slogans, decorative imagery, simulated results, or fictional live statuses.
 - Don't turn provider failures into zero scores or style a single run as a reliable ranking.
 - Don't replace the report's flat rows with decorative elevated cards.
+
+## V2 extension
+
+V2 retains this visual system. The home page uses three native disclosure rows,
+a compact result row, and a short line of numeric limits. Each task opens two
+work orders. Run pages use nested disclosures for code changes, submitted code,
+failed cases, and session data. Full methodology has a separate route. Historic
+explorers retain their original case controls. No new visual world or assets.

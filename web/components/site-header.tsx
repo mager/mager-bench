@@ -7,13 +7,17 @@ export function SiteHeader() {
     <header className="bench-header">
       <div className="bench-shell bench-nav">
         <Link href="/" className="bench-wordmark" aria-label="mager-bench home">
-          mager-bench<span>1.3</span>
+          mager-bench<span>2.0</span>
         </Link>
         <nav aria-label="Main navigation">
-          <Link href="/#tasks">The tasks</Link>
+          <Link href="/#tasks">Tasks</Link>
           <Link
             href="/runs"
-            aria-current={path === "/runs" ? "page" : undefined}
+            aria-current={
+              path === "/runs" || path.startsWith("/v2/runs/")
+                ? "page"
+                : undefined
+            }
           >
             Runs
           </Link>

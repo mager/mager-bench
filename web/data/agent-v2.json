@@ -1,0 +1,549 @@
+{
+  "version": "2.0",
+  "suite_sha256": "b441f3d4f15b2849578f6b2b2cd9700917f30dc1978fb4f6851ed7077b362bed",
+  "phase_seconds": 120,
+  "budget_seconds": 600,
+  "checks": 192,
+  "levels": {
+    "1": {
+      "entities": 8,
+      "operations": 24
+    },
+    "2": {
+      "entities": 32,
+      "operations": 96
+    },
+    "3": {
+      "entities": 128,
+      "operations": 384
+    }
+  },
+  "tasks": [
+    {
+      "id": "event-ledger",
+      "title": "Repair an event ledger",
+      "summary": "Duplicate events, balance checks, atomic batches.",
+      "phases": [
+        "Repair the ledger. Input: {balances: {account: nonnegative integer},\nevents: [{id, from, to, amount}]}. Accounts and event IDs are nonempty ASCII\nidentifiers. from and to name distinct existing accounts; amount is positive.\nStart each account version at zero. Process events in order. An accepted\ntransfer debits from, credits to, and increments both account versions once.\nReject insufficient funds with no state change. Remember only accepted IDs:\na repeated accepted ID is duplicate, even with a different payload, and changes\nnothing. Rejected IDs may be retried. Return {balances, versions, receipts},\nwhere receipts has one {id, status} per event, status applied/duplicate/rejected.\nInput must not be mutated. Empty input collections are valid.",
+        "Extend the same ledger without breaking transfers. Events may now\nbe batches {id, moves:[{from,to,amount}], expected?:{account:version}}. Transfers\nmay also have expected. Duplicate detection happens first. For a new ID, reject\nif any expected version differs from the current version. Execute moves in\norder on a draft: if any move lacks funds, reject the WHOLE event without balance\nor version changes and do not reserve its ID. On success, increment each touched\naccount's version once per event, even if touched many times or its final balance\nis unchanged. An empty batch is accepted, reserves its ID, and changes no versions.\nUse the same return shape. Existing single transfers retain their behavior."
+      ],
+      "prompts": [
+        "Work in this repository. Implement synchronous CommonJS JavaScript.\nThe entry point is src/index.js, exporting { solve }. solve(input) must return a\nJSON-serializable value. Use only relative .js modules within src/. No packages,\nfilesystem, network, timers, process, eval, or async in submitted source.\nSubmit at most 24 .js files totaling at most 128 KiB.\nYou may inspect files, edit code, add tests, and run node --test. Change src/ and\ntest/ only. Do not change the existing test/smoke.test.js. Each hidden case runs\nin a fresh QuickJS context with 32 MiB memory and 500 ms CPU time. Object key\norder does not matter; array order does. Numbers are safe integers. All inputs\nsatisfy the stated contract. No Internet or external tools are needed.\nFinish by describing the change briefly. The code on disk is the submission.\n\nWORK ORDER 1\nRepair the ledger. Input: {balances: {account: nonnegative integer},\nevents: [{id, from, to, amount}]}. Accounts and event IDs are nonempty ASCII\nidentifiers. from and to name distinct existing accounts; amount is positive.\nStart each account version at zero. Process events in order. An accepted\ntransfer debits from, credits to, and increments both account versions once.\nReject insufficient funds with no state change. Remember only accepted IDs:\na repeated accepted ID is duplicate, even with a different payload, and changes\nnothing. Rejected IDs may be retried. Return {balances, versions, receipts},\nwhere receipts has one {id, status} per event, status applied/duplicate/rejected.\nInput must not be mutated. Empty input collections are valid.",
+        "Work in this repository. Implement synchronous CommonJS JavaScript.\nThe entry point is src/index.js, exporting { solve }. solve(input) must return a\nJSON-serializable value. Use only relative .js modules within src/. No packages,\nfilesystem, network, timers, process, eval, or async in submitted source.\nSubmit at most 24 .js files totaling at most 128 KiB.\nYou may inspect files, edit code, add tests, and run node --test. Change src/ and\ntest/ only. Do not change the existing test/smoke.test.js. Each hidden case runs\nin a fresh QuickJS context with 32 MiB memory and 500 ms CPU time. Object key\norder does not matter; array order does. Numbers are safe integers. All inputs\nsatisfy the stated contract. No Internet or external tools are needed.\nFinish by describing the change briefly. The code on disk is the submission.\n\nWORK ORDER 2\nRepair the ledger. Input: {balances: {account: nonnegative integer},\nevents: [{id, from, to, amount}]}. Accounts and event IDs are nonempty ASCII\nidentifiers. from and to name distinct existing accounts; amount is positive.\nStart each account version at zero. Process events in order. An accepted\ntransfer debits from, credits to, and increments both account versions once.\nReject insufficient funds with no state change. Remember only accepted IDs:\na repeated accepted ID is duplicate, even with a different payload, and changes\nnothing. Rejected IDs may be retried. Return {balances, versions, receipts},\nwhere receipts has one {id, status} per event, status applied/duplicate/rejected.\nInput must not be mutated. Empty input collections are valid.\n\nExtend the same ledger without breaking transfers. Events may now\nbe batches {id, moves:[{from,to,amount}], expected?:{account:version}}. Transfers\nmay also have expected. Duplicate detection happens first. For a new ID, reject\nif any expected version differs from the current version. Execute moves in\norder on a draft: if any move lacks funds, reject the WHOLE event without balance\nor version changes and do not reserve its ID. On success, increment each touched\naccount's version once per event, even if touched many times or its final balance\nis unchanged. An empty batch is accepted, reserves its ID, and changes no versions.\nUse the same return shape. Existing single transfers retain their behavior."
+      ],
+      "starter": {
+        "src/index.js": "module.exports = require(\"./engine.js\");\n",
+        "src/engine.js": "// Current transfer handler. Receipts and versions are part of the public API.\nfunction solve(input) {\n  const balances={...input.balances};\n  const versions=Object.fromEntries(Object.keys(balances).map(k=>[k,0]));\n  const receipts=input.events.map(e=>{\n    if(balances[e.from]<e.amount)return {id:e.id,status:'rejected'};\n    balances[e.from]-=e.amount;balances[e.to]+=e.amount;\n    versions[e.from]++;versions[e.to]++;\n    return {id:e.id,status:'applied'};\n  });\n  return {balances,versions,receipts};\n}\nmodule.exports={solve};\n"
+      }
+    },
+    {
+      "id": "build-cache",
+      "title": "Fix an incremental build",
+      "summary": "Cache invalidation, dependency changes, cycles.",
+      "phases": [
+        "Repair a build cache. Input: {nodes:[{id,deps:[id],revision:integer}],\nrequests:[{changes:[{id,revision}],targets:[id]}]}. IDs are unique ASCII\nidentifiers; references exist. Only nodes reachable backward from targets are\nrequired. deps may repeat. Begin with an empty cache. Apply changes in order\nbefore each build. Build the required subgraph in the lexicographically smallest\ntopological order (smallest currently ready ID each step). A node is cached only\nif its last successful build used the same revision, same distinct dependencies,\nand same last successful build of each dependency. Otherwise rebuild it. A\nrebuilt dependency forces its consumers to rebuild. Store only each node's last\nsuccessful build, not all historical revisions. Ignore unrelated changes.\nReturn one {built:[ids],cached:[ids]} per request; both lists follow build order.\nEmpty targets returns empty lists. No nodes are added or removed. Phase-one\ninputs are DAGs. Avoid enumerating paths through shared dependencies.",
+        "Extend the build system. A change can now set revision, deps, or\nboth. Dependency order and duplicate entries do not affect cache identity.\nCycles can exist. If the REQUIRED subgraph contains a cycle, return\n{error:'cycle',built:[],cached:[]} for that request and do not update any build\ncache. Definitions from changes still persist, so a later request can fix the\ncycle. Ignore unrelated cycles. All previous behavior remains required. A\nchanged dependency set invalidates that node even when revisions are equal."
+      ],
+      "prompts": [
+        "Work in this repository. Implement synchronous CommonJS JavaScript.\nThe entry point is src/index.js, exporting { solve }. solve(input) must return a\nJSON-serializable value. Use only relative .js modules within src/. No packages,\nfilesystem, network, timers, process, eval, or async in submitted source.\nSubmit at most 24 .js files totaling at most 128 KiB.\nYou may inspect files, edit code, add tests, and run node --test. Change src/ and\ntest/ only. Do not change the existing test/smoke.test.js. Each hidden case runs\nin a fresh QuickJS context with 32 MiB memory and 500 ms CPU time. Object key\norder does not matter; array order does. Numbers are safe integers. All inputs\nsatisfy the stated contract. No Internet or external tools are needed.\nFinish by describing the change briefly. The code on disk is the submission.\n\nWORK ORDER 1\nRepair a build cache. Input: {nodes:[{id,deps:[id],revision:integer}],\nrequests:[{changes:[{id,revision}],targets:[id]}]}. IDs are unique ASCII\nidentifiers; references exist. Only nodes reachable backward from targets are\nrequired. deps may repeat. Begin with an empty cache. Apply changes in order\nbefore each build. Build the required subgraph in the lexicographically smallest\ntopological order (smallest currently ready ID each step). A node is cached only\nif its last successful build used the same revision, same distinct dependencies,\nand same last successful build of each dependency. Otherwise rebuild it. A\nrebuilt dependency forces its consumers to rebuild. Store only each node's last\nsuccessful build, not all historical revisions. Ignore unrelated changes.\nReturn one {built:[ids],cached:[ids]} per request; both lists follow build order.\nEmpty targets returns empty lists. No nodes are added or removed. Phase-one\ninputs are DAGs. Avoid enumerating paths through shared dependencies.",
+        "Work in this repository. Implement synchronous CommonJS JavaScript.\nThe entry point is src/index.js, exporting { solve }. solve(input) must return a\nJSON-serializable value. Use only relative .js modules within src/. No packages,\nfilesystem, network, timers, process, eval, or async in submitted source.\nSubmit at most 24 .js files totaling at most 128 KiB.\nYou may inspect files, edit code, add tests, and run node --test. Change src/ and\ntest/ only. Do not change the existing test/smoke.test.js. Each hidden case runs\nin a fresh QuickJS context with 32 MiB memory and 500 ms CPU time. Object key\norder does not matter; array order does. Numbers are safe integers. All inputs\nsatisfy the stated contract. No Internet or external tools are needed.\nFinish by describing the change briefly. The code on disk is the submission.\n\nWORK ORDER 2\nRepair a build cache. Input: {nodes:[{id,deps:[id],revision:integer}],\nrequests:[{changes:[{id,revision}],targets:[id]}]}. IDs are unique ASCII\nidentifiers; references exist. Only nodes reachable backward from targets are\nrequired. deps may repeat. Begin with an empty cache. Apply changes in order\nbefore each build. Build the required subgraph in the lexicographically smallest\ntopological order (smallest currently ready ID each step). A node is cached only\nif its last successful build used the same revision, same distinct dependencies,\nand same last successful build of each dependency. Otherwise rebuild it. A\nrebuilt dependency forces its consumers to rebuild. Store only each node's last\nsuccessful build, not all historical revisions. Ignore unrelated changes.\nReturn one {built:[ids],cached:[ids]} per request; both lists follow build order.\nEmpty targets returns empty lists. No nodes are added or removed. Phase-one\ninputs are DAGs. Avoid enumerating paths through shared dependencies.\n\nExtend the build system. A change can now set revision, deps, or\nboth. Dependency order and duplicate entries do not affect cache identity.\nCycles can exist. If the REQUIRED subgraph contains a cycle, return\n{error:'cycle',built:[],cached:[]} for that request and do not update any build\ncache. Definitions from changes still persist, so a later request can fix the\ncycle. Ignore unrelated cycles. All previous behavior remains required. A\nchanged dependency set invalidates that node even when revisions are equal."
+      ],
+      "starter": {
+        "src/index.js": "module.exports = require(\"./engine.js\");\n",
+        "src/engine.js": "// Cache currently keys only on a node's own revision.\nfunction solve(input) {\n  const nodes=new Map(input.nodes.map(n=>[n.id,{...n}])), cache=new Map();\n  return input.requests.map(r=>{\n    r.changes.forEach(c=>Object.assign(nodes.get(c.id),c));\n    const needed=new Set();\n    function visit(id){if(needed.has(id))return;needed.add(id);nodes.get(id).deps.forEach(visit);}\n    r.targets.forEach(visit);\n    const built=[],cached=[];\n    for(const id of [...needed].sort()){\n      const n=nodes.get(id);\n      if(cache.get(id)===n.revision)cached.push(id);\n      else {cache.set(id,n.revision);built.push(id);}\n    }\n    return {built,cached};\n  });\n}\nmodule.exports={solve};\n"
+      }
+    },
+    {
+      "id": "access-policy",
+      "title": "Extend a permission engine",
+      "summary": "Tenant isolation, deny rules, inherited roles.",
+      "phases": [
+        "Repair access decisions. Input: {roles:[{id,parents:[],rules:[\n{effect:'allow'|'deny',tenant,resource,action}]}], users:[{id,roles:[id]}],\nqueries:[{user,tenant,resource,action,time:integer}]}. IDs are unique ASCII\nidentifiers. All assigned roles exist, but a query user may not exist. Return\nan array of 'allow'/'deny', one per query. A rule matches only if tenant is EXACT\nand resource and action each equal the query or are the whole-string wildcard\n'*'. No substring or prefix matching. Any matching deny overrides ALL matching\nallows. Otherwise allow iff at least one allow matches. Unknown users and no\nmatching rules deny. Role assignment order and duplicates do not matter.\nPhase one has no inheritance or expiry. Do not mutate input.",
+        "Extend the engine. Roles may inherit parents (all IDs exist,\nduplicates allowed). Collect all rules transitively, sharing ancestors safely.\nIf ANY cycle is reachable from a user's assigned roles, deny every query for\nthat user, even when a direct allow matches. Ignore unrelated cycles. Rules\ncan have until:integer: they match only when query.time < until. Missing until\nmeans no expiry. Expired deny rules do not override active allows. Tenants\nstill match exactly, including a literal '*' tenant. All phase-one rules remain\nrequired. Avoid enumerating paths in shared inheritance graphs."
+      ],
+      "prompts": [
+        "Work in this repository. Implement synchronous CommonJS JavaScript.\nThe entry point is src/index.js, exporting { solve }. solve(input) must return a\nJSON-serializable value. Use only relative .js modules within src/. No packages,\nfilesystem, network, timers, process, eval, or async in submitted source.\nSubmit at most 24 .js files totaling at most 128 KiB.\nYou may inspect files, edit code, add tests, and run node --test. Change src/ and\ntest/ only. Do not change the existing test/smoke.test.js. Each hidden case runs\nin a fresh QuickJS context with 32 MiB memory and 500 ms CPU time. Object key\norder does not matter; array order does. Numbers are safe integers. All inputs\nsatisfy the stated contract. No Internet or external tools are needed.\nFinish by describing the change briefly. The code on disk is the submission.\n\nWORK ORDER 1\nRepair access decisions. Input: {roles:[{id,parents:[],rules:[\n{effect:'allow'|'deny',tenant,resource,action}]}], users:[{id,roles:[id]}],\nqueries:[{user,tenant,resource,action,time:integer}]}. IDs are unique ASCII\nidentifiers. All assigned roles exist, but a query user may not exist. Return\nan array of 'allow'/'deny', one per query. A rule matches only if tenant is EXACT\nand resource and action each equal the query or are the whole-string wildcard\n'*'. No substring or prefix matching. Any matching deny overrides ALL matching\nallows. Otherwise allow iff at least one allow matches. Unknown users and no\nmatching rules deny. Role assignment order and duplicates do not matter.\nPhase one has no inheritance or expiry. Do not mutate input.",
+        "Work in this repository. Implement synchronous CommonJS JavaScript.\nThe entry point is src/index.js, exporting { solve }. solve(input) must return a\nJSON-serializable value. Use only relative .js modules within src/. No packages,\nfilesystem, network, timers, process, eval, or async in submitted source.\nSubmit at most 24 .js files totaling at most 128 KiB.\nYou may inspect files, edit code, add tests, and run node --test. Change src/ and\ntest/ only. Do not change the existing test/smoke.test.js. Each hidden case runs\nin a fresh QuickJS context with 32 MiB memory and 500 ms CPU time. Object key\norder does not matter; array order does. Numbers are safe integers. All inputs\nsatisfy the stated contract. No Internet or external tools are needed.\nFinish by describing the change briefly. The code on disk is the submission.\n\nWORK ORDER 2\nRepair access decisions. Input: {roles:[{id,parents:[],rules:[\n{effect:'allow'|'deny',tenant,resource,action}]}], users:[{id,roles:[id]}],\nqueries:[{user,tenant,resource,action,time:integer}]}. IDs are unique ASCII\nidentifiers. All assigned roles exist, but a query user may not exist. Return\nan array of 'allow'/'deny', one per query. A rule matches only if tenant is EXACT\nand resource and action each equal the query or are the whole-string wildcard\n'*'. No substring or prefix matching. Any matching deny overrides ALL matching\nallows. Otherwise allow iff at least one allow matches. Unknown users and no\nmatching rules deny. Role assignment order and duplicates do not matter.\nPhase one has no inheritance or expiry. Do not mutate input.\n\nExtend the engine. Roles may inherit parents (all IDs exist,\nduplicates allowed). Collect all rules transitively, sharing ancestors safely.\nIf ANY cycle is reachable from a user's assigned roles, deny every query for\nthat user, even when a direct allow matches. Ignore unrelated cycles. Rules\ncan have until:integer: they match only when query.time < until. Missing until\nmeans no expiry. Expired deny rules do not override active allows. Tenants\nstill match exactly, including a literal '*' tenant. All phase-one rules remain\nrequired. Avoid enumerating paths in shared inheritance graphs."
+      ],
+      "starter": {
+        "src/index.js": "module.exports = require(\"./engine.js\");\n",
+        "src/engine.js": "// Rules are currently evaluated in assignment order.\nfunction solve(input) {\n  return input.queries.map(q=>{\n    const user=input.users.find(u=>u.id===q.user);if(!user)return 'deny';\n    for(const id of user.roles){\n      const role=input.roles.find(r=>r.id===id);\n      for(const r of role.rules){\n        if(r.tenant===q.tenant && (r.resource==='*'||r.resource===q.resource) &&\n          (r.action==='*'||r.action===q.action))return r.effect;\n      }\n    }\n    return 'deny';\n  });\n}\nmodule.exports={solve};\n"
+      }
+    }
+  ],
+  "runs": [
+    {
+      "kind": "evaluation",
+      "model": "codex-cli/gpt-6-astra",
+      "reasoning_effort": "low",
+      "seed": 42,
+      "level": 1,
+      "suite_sha256": "b441f3d4f15b2849578f6b2b2cd9700917f30dc1978fb4f6851ed7077b362bed",
+      "generated_at": "2026-10-24T22:15:22.326045+00:00",
+      "status": "completed",
+      "score": {
+        "passed": 192,
+        "total": 192,
+        "tasks_passed": 3,
+        "tasks_total": 3
+      },
+      "elapsed_ms": 235343,
+      "generation_ms": 235134,
+      "runtime": {
+        "codex": "codex-cli 0.154.0",
+        "node": "v22.13.1",
+        "python": "3.13.7",
+        "quickjs": "1.19.4",
+        "system": "Darwin",
+        "machine": "arm64"
+      },
+      "error": null,
+      "id": "2026-10-24-gpt-6-astra-seed42-level1-r1",
+      "raw_url": "/evidence/v2/2026-10-24-gpt-6-astra-seed42-level1-r1.json",
+      "tasks": [
+        {
+          "id": "event-ledger",
+          "phases": [
+            {
+              "phase": 1,
+              "status": "completed",
+              "error": null,
+              "elapsed_ms": 27211,
+              "usage": {
+                "input_tokens": 56847,
+                "cached_input_tokens": 44288,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 1570,
+                "reasoning_output_tokens": 14
+              },
+              "command_count": 4,
+              "diff": "--- a/src/engine.js\n+++ b/src/engine.js\n@@ -2,10 +2,13 @@\n function solve(input) {\n   const balances={...input.balances};\n   const versions=Object.fromEntries(Object.keys(balances).map(k=>[k,0]));\n+  const acceptedIds=new Set();\n   const receipts=input.events.map(e=>{\n+    if(acceptedIds.has(e.id))return {id:e.id,status:'duplicate'};\n     if(balances[e.from]<e.amount)return {id:e.id,status:'rejected'};\n     balances[e.from]-=e.amount;balances[e.to]+=e.amount;\n     versions[e.from]++;versions[e.to]++;\n+    acceptedIds.add(e.id);\n     return {id:e.id,status:'applied'};\n   });\n   return {balances,versions,receipts};\n",
+              "sources": {
+                "src/index.js": "module.exports = require(\"./engine.js\");\n",
+                "src/engine.js": "// Current transfer handler. Receipts and versions are part of the public API.\nfunction solve(input) {\n  const balances={...input.balances};\n  const versions=Object.fromEntries(Object.keys(balances).map(k=>[k,0]));\n  const acceptedIds=new Set();\n  const receipts=input.events.map(e=>{\n    if(acceptedIds.has(e.id))return {id:e.id,status:'duplicate'};\n    if(balances[e.from]<e.amount)return {id:e.id,status:'rejected'};\n    balances[e.from]-=e.amount;balances[e.to]+=e.amount;\n    versions[e.from]++;versions[e.to]++;\n    acceptedIds.add(e.id);\n    return {id:e.id,status:'applied'};\n  });\n  return {balances,versions,receipts};\n}\nmodule.exports={solve};\n"
+              },
+              "response": "Fixed the ledger to track accepted IDs. Duplicate events make no changes. Rejected IDs can be retried.\n\nAdded tests for duplicates, retries, unchanged input, empty collections, and special account names. All 6 tests passed with `node --test`.\n\n### Next Steps\n\nNo further changes are required.",
+              "integrity_errors": [],
+              "score": {
+                "passed": 32,
+                "total": 32,
+                "groups": {
+                  "contract": {
+                    "passed": 8,
+                    "total": 8
+                  },
+                  "generated": {
+                    "passed": 24,
+                    "total": 24
+                  }
+                },
+                "failures": []
+              }
+            },
+            {
+              "phase": 2,
+              "status": "completed",
+              "error": null,
+              "elapsed_ms": 32847,
+              "usage": {
+                "input_tokens": 73594,
+                "cached_input_tokens": 59392,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 2082,
+                "reasoning_output_tokens": 0
+              },
+              "command_count": 4,
+              "diff": "--- a/src/engine.js\n+++ b/src/engine.js\n@@ -1,13 +1,29 @@\n-// Current transfer handler. Receipts and versions are part of the public API.\n function solve(input) {\n   const balances={...input.balances};\n   const versions=Object.fromEntries(Object.keys(balances).map(k=>[k,0]));\n   const acceptedIds=new Set();\n   const receipts=input.events.map(e=>{\n     if(acceptedIds.has(e.id))return {id:e.id,status:'duplicate'};\n-    if(balances[e.from]<e.amount)return {id:e.id,status:'rejected'};\n-    balances[e.from]-=e.amount;balances[e.to]+=e.amount;\n-    versions[e.from]++;versions[e.to]++;\n+    for (const account of Object.keys(e.expected || {})) {\n+      if (e.expected[account] !== versions[account]) {\n+        return {id:e.id,status:'rejected'};\n+      }\n+    }\n+\n+    // Keep only touched accounts in the draft. Failed moves never change state.\n+    const draft = new Map();\n+    const moves = e.moves === undefined ? [e] : e.moves;\n+    for (const move of moves) {\n+      const fromBalance = draft.has(move.from) ? draft.get(move.from) : balances[move.from];\n+      if (fromBalance < move.amount) return {id:e.id,status:'rejected'};\n+      const toBalance = draft.has(move.to) ? draft.get(move.to) : balances[move.to];\n+      draft.set(move.from, fromBalance - move.amount);\n+      draft.set(move.to, toBalance + move.amount);\n+    }\n+    for (const [account, balance] of draft) {\n+      balances[account] = balance;\n+      versions[account]++;\n+    }\n     acceptedIds.add(e.id);\n     return {id:e.id,status:'applied'};\n   });\n",
+              "sources": {
+                "src/index.js": "module.exports = require(\"./engine.js\");\n",
+                "src/engine.js": "function solve(input) {\n  const balances={...input.balances};\n  const versions=Object.fromEntries(Object.keys(balances).map(k=>[k,0]));\n  const acceptedIds=new Set();\n  const receipts=input.events.map(e=>{\n    if(acceptedIds.has(e.id))return {id:e.id,status:'duplicate'};\n    for (const account of Object.keys(e.expected || {})) {\n      if (e.expected[account] !== versions[account]) {\n        return {id:e.id,status:'rejected'};\n      }\n    }\n\n    // Keep only touched accounts in the draft. Failed moves never change state.\n    const draft = new Map();\n    const moves = e.moves === undefined ? [e] : e.moves;\n    for (const move of moves) {\n      const fromBalance = draft.has(move.from) ? draft.get(move.from) : balances[move.from];\n      if (fromBalance < move.amount) return {id:e.id,status:'rejected'};\n      const toBalance = draft.has(move.to) ? draft.get(move.to) : balances[move.to];\n      draft.set(move.from, fromBalance - move.amount);\n      draft.set(move.to, toBalance + move.amount);\n    }\n    for (const [account, balance] of draft) {\n      balances[account] = balance;\n      versions[account]++;\n    }\n    acceptedIds.add(e.id);\n    return {id:e.id,status:'applied'};\n  });\n  return {balances,versions,receipts};\n}\nmodule.exports={solve};\n"
+              },
+              "response": "Implemented batch transfers and expected-version checks. Failed batches leave balances and versions unchanged. Existing transfer behavior is preserved.\n\nAdded tests. `node --test` passed all 11 tests. The smoke test file is unchanged.\n\n### Next Steps\n\nNo further changes are required.",
+              "integrity_errors": [],
+              "score": {
+                "passed": 32,
+                "total": 32,
+                "groups": {
+                  "contract": {
+                    "passed": 8,
+                    "total": 8
+                  },
+                  "generated": {
+                    "passed": 16,
+                    "total": 16
+                  },
+                  "regression": {
+                    "passed": 8,
+                    "total": 8
+                  }
+                },
+                "failures": []
+              }
+            }
+          ]
+        },
+        {
+          "id": "build-cache",
+          "phases": [
+            {
+              "phase": 1,
+              "status": "completed",
+              "error": null,
+              "elapsed_ms": 40857,
+              "usage": {
+                "input_tokens": 59625,
+                "cached_input_tokens": 46592,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 2329,
+                "reasoning_output_tokens": 77
+              },
+              "command_count": 5,
+              "diff": "--- a/src/engine.js\n+++ b/src/engine.js\n@@ -1,18 +1,97 @@\n-// Cache currently keys only on a node's own revision.\n+// A min-heap selects the smallest ID among the nodes currently ready.\n+function push(heap, node) {\n+  let i = heap.length;\n+  heap.push(node);\n+  while (i > 0) {\n+    const parent = (i - 1) >> 1;\n+    if (heap[parent].id < node.id) break;\n+    heap[i] = heap[parent];\n+    i = parent;\n+  }\n+  heap[i] = node;\n+}\n+\n+function pop(heap) {\n+  const first = heap[0];\n+  const last = heap.pop();\n+  if (heap.length) {\n+    let i = 0;\n+    while (i * 2 + 1 < heap.length) {\n+      let child = i * 2 + 1;\n+      if (child + 1 < heap.length && heap[child + 1].id < heap[child].id) child++;\n+      if (last.id < heap[child].id) break;\n+      heap[i] = heap[child];\n+      i = child;\n+    }\n+    heap[i] = last;\n+  }\n+  return first;\n+}\n+\n function solve(input) {\n-  const nodes=new Map(input.nodes.map(n=>[n.id,{...n}])), cache=new Map();\n-  return input.requests.map(r=>{\n-    r.changes.forEach(c=>Object.assign(nodes.get(c.id),c));\n-    const needed=new Set();\n-    function visit(id){if(needed.has(id))return;needed.add(id);nodes.get(id).deps.forEach(visit);}\n-    r.targets.forEach(visit);\n-    const built=[],cached=[];\n-    for(const id of [...needed].sort()){\n-      const n=nodes.get(id);\n-      if(cache.get(id)===n.revision)cached.push(id);\n-      else {cache.set(id,n.revision);built.push(id);}\n+  const nodes = new Map(input.nodes.map(node => [node.id, {\n+    id: node.id,\n+    revision: node.revision,\n+    deps: [],\n+    consumers: [],\n+    generation: 0,\n+    builtRevision: undefined,\n+    dependencyBuilds: [],\n+    remaining: 0\n+  }]));\n+  // Dependencies cannot change in this contract. Normalize them once.\n+  for (const source of input.nodes) {\n+    const node = nodes.get(source.id);\n+    node.deps = [...new Set(source.deps)].map(id => nodes.get(id));\n+    for (const dependency of node.deps) dependency.consumers.push(node);\n+  }\n+\n+  return input.requests.map(request => {\n+    for (const change of request.changes) nodes.get(change.id).revision = change.revision;\n+    const needed = new Set();\n+    const stack = [];\n+    for (const id of request.targets) {\n+      const node = nodes.get(id);\n+      if (!needed.has(node)) {\n+        needed.add(node);\n+        stack.push(node);\n+      }\n     }\n-    return {built,cached};\n+    while (stack.length) {\n+      const node = stack.pop();\n+      for (const dependency of node.deps) {\n+        if (!needed.has(dependency)) {\n+          needed.add(dependency);\n+          stack.push(dependency);\n+        }\n+      }\n+    }\n+\n+    const ready = [];\n+    for (const node of needed) {\n+      node.remaining = node.deps.length;\n+      if (!node.remaining) push(ready, node);\n+    }\n+    const built = [];\n+    const cached = [];\n+    while (ready.length) {\n+      const node = pop(ready);\n+      const valid = node.generation !== 0 && node.builtRevision === node.revision &&\n+        node.deps.every((dependency, i) => dependency.generation === node.dependencyBuilds[i]);\n+      if (valid) {\n+        cached.push(node.id);\n+      } else {\n+        node.generation++;\n+        node.builtRevision = node.revision;\n+        node.dependencyBuilds = node.deps.map(dependency => dependency.generation);\n+        built.push(node.id);\n+      }\n+      for (const consumer of node.consumers) {\n+        if (needed.has(consumer) && --consumer.remaining === 0) push(ready, consumer);\n+      }\n+    }\n+    return { built, cached };\n   });\n }\n-module.exports={solve};\n+\n+module.exports = { solve };\n",
+              "sources": {
+                "src/index.js": "module.exports = require(\"./engine.js\");\n",
+                "src/engine.js": "// A min-heap selects the smallest ID among the nodes currently ready.\nfunction push(heap, node) {\n  let i = heap.length;\n  heap.push(node);\n  while (i > 0) {\n    const parent = (i - 1) >> 1;\n    if (heap[parent].id < node.id) break;\n    heap[i] = heap[parent];\n    i = parent;\n  }\n  heap[i] = node;\n}\n\nfunction pop(heap) {\n  const first = heap[0];\n  const last = heap.pop();\n  if (heap.length) {\n    let i = 0;\n    while (i * 2 + 1 < heap.length) {\n      let child = i * 2 + 1;\n      if (child + 1 < heap.length && heap[child + 1].id < heap[child].id) child++;\n      if (last.id < heap[child].id) break;\n      heap[i] = heap[child];\n      i = child;\n    }\n    heap[i] = last;\n  }\n  return first;\n}\n\nfunction solve(input) {\n  const nodes = new Map(input.nodes.map(node => [node.id, {\n    id: node.id,\n    revision: node.revision,\n    deps: [],\n    consumers: [],\n    generation: 0,\n    builtRevision: undefined,\n    dependencyBuilds: [],\n    remaining: 0\n  }]));\n  // Dependencies cannot change in this contract. Normalize them once.\n  for (const source of input.nodes) {\n    const node = nodes.get(source.id);\n    node.deps = [...new Set(source.deps)].map(id => nodes.get(id));\n    for (const dependency of node.deps) dependency.consumers.push(node);\n  }\n\n  return input.requests.map(request => {\n    for (const change of request.changes) nodes.get(change.id).revision = change.revision;\n    const needed = new Set();\n    const stack = [];\n    for (const id of request.targets) {\n      const node = nodes.get(id);\n      if (!needed.has(node)) {\n        needed.add(node);\n        stack.push(node);\n      }\n    }\n    while (stack.length) {\n      const node = stack.pop();\n      for (const dependency of node.deps) {\n        if (!needed.has(dependency)) {\n          needed.add(dependency);\n          stack.push(dependency);\n        }\n      }\n    }\n\n    const ready = [];\n    for (const node of needed) {\n      node.remaining = node.deps.length;\n      if (!node.remaining) push(ready, node);\n    }\n    const built = [];\n    const cached = [];\n    while (ready.length) {\n      const node = pop(ready);\n      const valid = node.generation !== 0 && node.builtRevision === node.revision &&\n        node.deps.every((dependency, i) => dependency.generation === node.dependencyBuilds[i]);\n      if (valid) {\n        cached.push(node.id);\n      } else {\n        node.generation++;\n        node.builtRevision = node.revision;\n        node.dependencyBuilds = node.deps.map(dependency => dependency.generation);\n        built.push(node.id);\n      }\n      for (const consumer of node.consumers) {\n        if (needed.has(consumer) && --consumer.remaining === 0) push(ready, consumer);\n      }\n    }\n    return { built, cached };\n  });\n}\n\nmodule.exports = { solve };\n"
+              },
+              "response": "Completed the work order.\n\n- Corrected build order and cache invalidation.\n- Added support for repeated and shared dependencies.\n- Added tests, including a 12,000-node graph.\n- Kept the existing smoke tests unchanged.\n\n`node --test`: All 7 tests passed.\n\n### Next Steps\nThe code is ready for review.",
+              "integrity_errors": [],
+              "score": {
+                "passed": 32,
+                "total": 32,
+                "groups": {
+                  "contract": {
+                    "passed": 8,
+                    "total": 8
+                  },
+                  "generated": {
+                    "passed": 24,
+                    "total": 24
+                  }
+                },
+                "failures": []
+              }
+            },
+            {
+              "phase": 2,
+              "status": "completed",
+              "error": null,
+              "elapsed_ms": 36904,
+              "usage": {
+                "input_tokens": 75857,
+                "cached_input_tokens": 61056,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 1905,
+                "reasoning_output_tokens": 21
+              },
+              "command_count": 4,
+              "diff": "--- a/src/engine.js\n+++ b/src/engine.js\n@@ -33,21 +33,29 @@\n     id: node.id,\n     revision: node.revision,\n     deps: [],\n-    consumers: [],\n+    consumers: new Set(),\n     generation: 0,\n     builtRevision: undefined,\n+    builtDeps: [],\n     dependencyBuilds: [],\n     remaining: 0\n   }]));\n-  // Dependencies cannot change in this contract. Normalize them once.\n+  // Canonical dependency order makes set identity independent of input order.\n+  function setDependencies(node, ids) {\n+    for (const dependency of node.deps) dependency.consumers.delete(node);\n+    node.deps = [...new Set(ids)].sort().map(id => nodes.get(id));\n+    for (const dependency of node.deps) dependency.consumers.add(node);\n+  }\n   for (const source of input.nodes) {\n-    const node = nodes.get(source.id);\n-    node.deps = [...new Set(source.deps)].map(id => nodes.get(id));\n-    for (const dependency of node.deps) dependency.consumers.push(node);\n+    setDependencies(nodes.get(source.id), source.deps);\n   }\n \n   return input.requests.map(request => {\n-    for (const change of request.changes) nodes.get(change.id).revision = change.revision;\n+    for (const change of request.changes) {\n+      const node = nodes.get(change.id);\n+      if (change.revision !== undefined) node.revision = change.revision;\n+      if (change.deps !== undefined) setDependencies(node, change.deps);\n+    }\n     const needed = new Set();\n     const stack = [];\n     for (const id of request.targets) {\n@@ -72,22 +80,32 @@\n       node.remaining = node.deps.length;\n       if (!node.remaining) push(ready, node);\n     }\n+    // Check the entire required graph before changing any successful build.\n+    const order = [];\n+    while (ready.length) {\n+      const node = pop(ready);\n+      order.push(node);\n+      for (const consumer of node.consumers) {\n+        if (needed.has(consumer) && --consumer.remaining === 0) push(ready, consumer);\n+      }\n+    }\n+    if (order.length !== needed.size) return { error: 'cycle', built: [], cached: [] };\n+\n     const built = [];\n     const cached = [];\n-    while (ready.length) {\n-      const node = pop(ready);\n+    for (const node of order) {\n       const valid = node.generation !== 0 && node.builtRevision === node.revision &&\n-        node.deps.every((dependency, i) => dependency.generation === node.dependencyBuilds[i]);\n+        node.deps.length === node.builtDeps.length &&\n+        node.deps.every((dependency, i) => dependency === node.builtDeps[i] &&\n+          dependency.generation === node.dependencyBuilds[i]);\n       if (valid) {\n         cached.push(node.id);\n       } else {\n         node.generation++;\n         node.builtRevision = node.revision;\n+        node.builtDeps = node.deps;\n         node.dependencyBuilds = node.deps.map(dependency => dependency.generation);\n         built.push(node.id);\n-      }\n-      for (const consumer of node.consumers) {\n-        if (needed.has(consumer) && --consumer.remaining === 0) push(ready, consumer);\n       }\n     }\n     return { built, cached };\n",
+              "sources": {
+                "src/index.js": "module.exports = require(\"./engine.js\");\n",
+                "src/engine.js": "// A min-heap selects the smallest ID among the nodes currently ready.\nfunction push(heap, node) {\n  let i = heap.length;\n  heap.push(node);\n  while (i > 0) {\n    const parent = (i - 1) >> 1;\n    if (heap[parent].id < node.id) break;\n    heap[i] = heap[parent];\n    i = parent;\n  }\n  heap[i] = node;\n}\n\nfunction pop(heap) {\n  const first = heap[0];\n  const last = heap.pop();\n  if (heap.length) {\n    let i = 0;\n    while (i * 2 + 1 < heap.length) {\n      let child = i * 2 + 1;\n      if (child + 1 < heap.length && heap[child + 1].id < heap[child].id) child++;\n      if (last.id < heap[child].id) break;\n      heap[i] = heap[child];\n      i = child;\n    }\n    heap[i] = last;\n  }\n  return first;\n}\n\nfunction solve(input) {\n  const nodes = new Map(input.nodes.map(node => [node.id, {\n    id: node.id,\n    revision: node.revision,\n    deps: [],\n    consumers: new Set(),\n    generation: 0,\n    builtRevision: undefined,\n    builtDeps: [],\n    dependencyBuilds: [],\n    remaining: 0\n  }]));\n  // Canonical dependency order makes set identity independent of input order.\n  function setDependencies(node, ids) {\n    for (const dependency of node.deps) dependency.consumers.delete(node);\n    node.deps = [...new Set(ids)].sort().map(id => nodes.get(id));\n    for (const dependency of node.deps) dependency.consumers.add(node);\n  }\n  for (const source of input.nodes) {\n    setDependencies(nodes.get(source.id), source.deps);\n  }\n\n  return input.requests.map(request => {\n    for (const change of request.changes) {\n      const node = nodes.get(change.id);\n      if (change.revision !== undefined) node.revision = change.revision;\n      if (change.deps !== undefined) setDependencies(node, change.deps);\n    }\n    const needed = new Set();\n    const stack = [];\n    for (const id of request.targets) {\n      const node = nodes.get(id);\n      if (!needed.has(node)) {\n        needed.add(node);\n        stack.push(node);\n      }\n    }\n    while (stack.length) {\n      const node = stack.pop();\n      for (const dependency of node.deps) {\n        if (!needed.has(dependency)) {\n          needed.add(dependency);\n          stack.push(dependency);\n        }\n      }\n    }\n\n    const ready = [];\n    for (const node of needed) {\n      node.remaining = node.deps.length;\n      if (!node.remaining) push(ready, node);\n    }\n    // Check the entire required graph before changing any successful build.\n    const order = [];\n    while (ready.length) {\n      const node = pop(ready);\n      order.push(node);\n      for (const consumer of node.consumers) {\n        if (needed.has(consumer) && --consumer.remaining === 0) push(ready, consumer);\n      }\n    }\n    if (order.length !== needed.size) return { error: 'cycle', built: [], cached: [] };\n\n    const built = [];\n    const cached = [];\n    for (const node of order) {\n      const valid = node.generation !== 0 && node.builtRevision === node.revision &&\n        node.deps.length === node.builtDeps.length &&\n        node.deps.every((dependency, i) => dependency === node.builtDeps[i] &&\n          dependency.generation === node.dependencyBuilds[i]);\n      if (valid) {\n        cached.push(node.id);\n      } else {\n        node.generation++;\n        node.builtRevision = node.revision;\n        node.builtDeps = node.deps;\n        node.dependencyBuilds = node.deps.map(dependency => dependency.generation);\n        built.push(node.id);\n      }\n    }\n    return { built, cached };\n  });\n}\n\nmodule.exports = { solve };\n"
+              },
+              "response": "Completed the work order.\n\n- Added dependency changes and correct cache checks.\n- Added cycle detection. Failed builds leave the cache unchanged.\n- Added tests. Left the smoke tests unchanged.\n\nRan `node --test`: all 10 tests passed.\n\n### Next Steps\n\nNo further changes are required.",
+              "integrity_errors": [],
+              "score": {
+                "passed": 32,
+                "total": 32,
+                "groups": {
+                  "contract": {
+                    "passed": 8,
+                    "total": 8
+                  },
+                  "generated": {
+                    "passed": 16,
+                    "total": 16
+                  },
+                  "regression": {
+                    "passed": 8,
+                    "total": 8
+                  }
+                },
+                "failures": []
+              }
+            }
+          ]
+        },
+        {
+          "id": "access-policy",
+          "phases": [
+            {
+              "phase": 1,
+              "status": "completed",
+              "error": null,
+              "elapsed_ms": 60550,
+              "usage": {
+                "input_tokens": 91313,
+                "cached_input_tokens": 77696,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 4611,
+                "reasoning_output_tokens": 40
+              },
+              "command_count": 5,
+              "diff": "--- a/src/engine.js\n+++ b/src/engine.js\n@@ -1,15 +1,22 @@\n-// Rules are currently evaluated in assignment order.\n function solve(input) {\n-  return input.queries.map(q=>{\n-    const user=input.users.find(u=>u.id===q.user);if(!user)return 'deny';\n-    for(const id of user.roles){\n-      const role=input.roles.find(r=>r.id===id);\n-      for(const r of role.rules){\n-        if(r.tenant===q.tenant && (r.resource==='*'||r.resource===q.resource) &&\n-          (r.action==='*'||r.action===q.action))return r.effect;\n+  const roles = new Map(input.roles.map(role => [role.id, role]));\n+  const users = new Map(input.users.map(user => [user.id, new Set(user.roles)]));\n+  return input.queries.map(query => {\n+    const assigned = users.get(query.user);\n+    if (!assigned) return 'deny';\n+    let allowed = false;\n+    for (const id of assigned) {\n+      for (const rule of roles.get(id).rules) {\n+        if (rule.tenant === query.tenant &&\n+            (rule.resource === '*' || rule.resource === query.resource) &&\n+            (rule.action === '*' || rule.action === query.action)) {\n+          // Denies take priority over allows in all assigned roles.\n+          if (rule.effect === 'deny') return 'deny';\n+          allowed = true;\n+        }\n       }\n     }\n-    return 'deny';\n+    return allowed ? 'allow' : 'deny';\n   });\n }\n-module.exports={solve};\n+module.exports = { solve };\n",
+              "sources": {
+                "src/index.js": "module.exports = require(\"./engine.js\");\n",
+                "src/engine.js": "function solve(input) {\n  const roles = new Map(input.roles.map(role => [role.id, role]));\n  const users = new Map(input.users.map(user => [user.id, new Set(user.roles)]));\n  return input.queries.map(query => {\n    const assigned = users.get(query.user);\n    if (!assigned) return 'deny';\n    let allowed = false;\n    for (const id of assigned) {\n      for (const rule of roles.get(id).rules) {\n        if (rule.tenant === query.tenant &&\n            (rule.resource === '*' || rule.resource === query.resource) &&\n            (rule.action === '*' || rule.action === query.action)) {\n          // Denies take priority over allows in all assigned roles.\n          if (rule.effect === 'deny') return 'deny';\n          allowed = true;\n        }\n      }\n    }\n    return allowed ? 'allow' : 'deny';\n  });\n}\nmodule.exports = { solve };\n"
+              },
+              "response": "Completed the work order. Matching deny rules now override all matching allow rules. Role order and duplicates do not affect decisions. Input remains unchanged.\n\nAdded five tests. Left `test/smoke.test.js` unchanged.\n\nRan `node --test`: all 7 tests passed.\n\n### Next Steps\n\nThe code is ready for review.",
+              "integrity_errors": [],
+              "score": {
+                "passed": 32,
+                "total": 32,
+                "groups": {
+                  "contract": {
+                    "passed": 8,
+                    "total": 8
+                  },
+                  "generated": {
+                    "passed": 24,
+                    "total": 24
+                  }
+                },
+                "failures": []
+              }
+            },
+            {
+              "phase": 2,
+              "status": "completed",
+              "error": null,
+              "elapsed_ms": 36765,
+              "usage": {
+                "input_tokens": 60885,
+                "cached_input_tokens": 46592,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 2195,
+                "reasoning_output_tokens": 97
+              },
+              "command_count": 4,
+              "diff": "--- a/src/engine.js\n+++ b/src/engine.js\n@@ -1,22 +1,61 @@\n+// Visit each reachable role once. An active parent identifies a cycle.\n+function collectRules(assigned, roles) {\n+  const state = new Map();\n+  const rules = [];\n+  for (const id of assigned) {\n+    if (state.has(id)) continue;\n+    state.set(id, 1);\n+    const stack = [{ role: roles.get(id), next: 0 }];\n+    while (stack.length) {\n+      const frame = stack[stack.length - 1];\n+      if (frame.next < frame.role.parents.length) {\n+        const parent = frame.role.parents[frame.next++];\n+        if (state.get(parent) === 1) return null;\n+        if (state.get(parent) === 2) continue;\n+        state.set(parent, 1);\n+        stack.push({ role: roles.get(parent), next: 0 });\n+      } else {\n+        for (const rule of frame.role.rules) rules.push(rule);\n+        state.set(frame.role.id, 2);\n+        stack.pop();\n+      }\n+    }\n+  }\n+  return rules;\n+}\n+\n function solve(input) {\n   const roles = new Map(input.roles.map(role => [role.id, role]));\n-  const users = new Map(input.users.map(user => [user.id, new Set(user.roles)]));\n-  return input.queries.map(query => {\n-    const assigned = users.get(query.user);\n-    if (!assigned) return 'deny';\n-    let allowed = false;\n-    for (const id of assigned) {\n-      for (const rule of roles.get(id).rules) {\n+  const users = new Map(input.users.map(user => [user.id, user.roles]));\n+  const queriesByUser = new Map();\n+  const results = input.queries.map(() => 'deny');\n+  input.queries.forEach((query, index) => {\n+    if (!queriesByUser.has(query.user)) queriesByUser.set(query.user, []);\n+    queriesByUser.get(query.user).push(index);\n+  });\n+\n+  // Process one user at a time so rule collections do not accumulate in memory.\n+  for (const [user, indices] of queriesByUser) {\n+    const assigned = users.get(user);\n+    if (!assigned) continue;\n+    const rules = collectRules(assigned, roles);\n+    if (rules === null) continue;\n+    for (const index of indices) {\n+      const query = input.queries[index];\n+      for (const rule of rules) {\n         if (rule.tenant === query.tenant &&\n             (rule.resource === '*' || rule.resource === query.resource) &&\n-            (rule.action === '*' || rule.action === query.action)) {\n-          // Denies take priority over allows in all assigned roles.\n-          if (rule.effect === 'deny') return 'deny';\n-          allowed = true;\n+            (rule.action === '*' || rule.action === query.action) &&\n+            (rule.until === undefined || query.time < rule.until)) {\n+          if (rule.effect === 'deny') {\n+            results[index] = 'deny';\n+            break;\n+          }\n+          results[index] = 'allow';\n         }\n       }\n     }\n-    return allowed ? 'allow' : 'deny';\n-  });\n+  }\n+  return results;\n }\n module.exports = { solve };\n",
+              "sources": {
+                "src/index.js": "module.exports = require(\"./engine.js\");\n",
+                "src/engine.js": "// Visit each reachable role once. An active parent identifies a cycle.\nfunction collectRules(assigned, roles) {\n  const state = new Map();\n  const rules = [];\n  for (const id of assigned) {\n    if (state.has(id)) continue;\n    state.set(id, 1);\n    const stack = [{ role: roles.get(id), next: 0 }];\n    while (stack.length) {\n      const frame = stack[stack.length - 1];\n      if (frame.next < frame.role.parents.length) {\n        const parent = frame.role.parents[frame.next++];\n        if (state.get(parent) === 1) return null;\n        if (state.get(parent) === 2) continue;\n        state.set(parent, 1);\n        stack.push({ role: roles.get(parent), next: 0 });\n      } else {\n        for (const rule of frame.role.rules) rules.push(rule);\n        state.set(frame.role.id, 2);\n        stack.pop();\n      }\n    }\n  }\n  return rules;\n}\n\nfunction solve(input) {\n  const roles = new Map(input.roles.map(role => [role.id, role]));\n  const users = new Map(input.users.map(user => [user.id, user.roles]));\n  const queriesByUser = new Map();\n  const results = input.queries.map(() => 'deny');\n  input.queries.forEach((query, index) => {\n    if (!queriesByUser.has(query.user)) queriesByUser.set(query.user, []);\n    queriesByUser.get(query.user).push(index);\n  });\n\n  // Process one user at a time so rule collections do not accumulate in memory.\n  for (const [user, indices] of queriesByUser) {\n    const assigned = users.get(user);\n    if (!assigned) continue;\n    const rules = collectRules(assigned, roles);\n    if (rules === null) continue;\n    for (const index of indices) {\n      const query = input.queries[index];\n      for (const rule of rules) {\n        if (rule.tenant === query.tenant &&\n            (rule.resource === '*' || rule.resource === query.resource) &&\n            (rule.action === '*' || rule.action === query.action) &&\n            (rule.until === undefined || query.time < rule.until)) {\n          if (rule.effect === 'deny') {\n            results[index] = 'deny';\n            break;\n          }\n          results[index] = 'allow';\n        }\n      }\n    }\n  }\n  return results;\n}\nmodule.exports = { solve };\n"
+              },
+              "response": "Completed the work order.\n\n- Added inherited rules, reachable cycle checks, and rule expiry.\n- Kept deny priority and exact matching.\n- Added tests for shared ancestors and deep inheritance.\n- Left `test/smoke.test.js` unchanged.\n\nRan `node --test`: all 13 tests passed.\n\n### Next Steps\n\nThe code is ready for review. No further changes are required.",
+              "integrity_errors": [],
+              "score": {
+                "passed": 32,
+                "total": 32,
+                "groups": {
+                  "contract": {
+                    "passed": 8,
+                    "total": 8
+                  },
+                  "generated": {
+                    "passed": 16,
+                    "total": 16
+                  },
+                  "regression": {
+                    "passed": 8,
+                    "total": 8
+                  }
+                },
+                "failures": []
+              }
+            }
+          ]
+        }
+      ],
+      "probe": null
+    },
+    {
+      "kind": "preflight",
+      "model": "codex-cli/gpt-6-astra",
+      "reasoning_effort": "low",
+      "seed": 42,
+      "level": 1,
+      "suite_sha256": "b441f3d4f15b2849578f6b2b2cd9700917f30dc1978fb4f6851ed7077b362bed",
+      "generated_at": "2026-10-24T22:15:06.123047+00:00",
+      "status": "completed",
+      "score": null,
+      "elapsed_ms": 10707,
+      "generation_ms": 10651,
+      "runtime": {
+        "codex": "codex-cli 0.154.0",
+        "node": "v22.13.1",
+        "python": "3.13.7",
+        "quickjs": "1.19.4",
+        "system": "Darwin",
+        "machine": "arm64"
+      },
+      "error": null,
+      "id": "2026-10-24-gpt-6-astra-preflight-r2",
+      "raw_url": "/evidence/v2/2026-10-24-gpt-6-astra-preflight-r2.json",
+      "tasks": [],
+      "probe": {
+        "status": "completed",
+        "error": null,
+        "elapsed_ms": 10651,
+        "events": [
+          {
+            "type": "thread.started",
+            "thread_id": "01a16ffb-5ad9-75f0-8571-98bee860d412"
+          },
+          {
+            "type": "turn.started"
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_0",
+              "type": "agent_message",
+              "text": "I will read the work order, make the required changes, and run the tests.\n"
+            }
+          },
+          {
+            "type": "item.started",
+            "item": {
+              "id": "item_1",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc \"pwd; rg --files -g 'WORK_ORDER.md' -g 'AGENTS.md' -g 'package.json' -g '*lock*'\"",
+              "aggregated_output": "",
+              "exit_code": null,
+              "status": "in_progress"
+            }
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_1",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc \"pwd; rg --files -g 'WORK_ORDER.md' -g 'AGENTS.md' -g 'package.json' -g '*lock*'\"",
+              "aggregated_output": "/private/var/folders/pp/77czjxmj3sx8l286xyl74nr80000gn/T/mager-v2-smoke-n0i8ro2g/repo\nWORK_ORDER.md\n",
+              "exit_code": 0,
+              "status": "completed"
+            }
+          },
+          {
+            "type": "item.started",
+            "item": {
+              "id": "item_2",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc 'cat WORK_ORDER.md'",
+              "aggregated_output": "",
+              "exit_code": null,
+              "status": "in_progress"
+            }
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_2",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc 'cat WORK_ORDER.md'",
+              "aggregated_output": "Create probe.txt containing exactly OK. Read it with a shell command. Reply OK. Do not access other paths.",
+              "exit_code": 0,
+              "status": "completed"
+            }
+          },
+          {
+            "type": "item.started",
+            "item": {
+              "id": "item_3",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc 'printf OK > probe.txt\ncat probe.txt'",
+              "aggregated_output": "",
+              "exit_code": null,
+              "status": "in_progress"
+            }
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_3",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc 'printf OK > probe.txt\ncat probe.txt'",
+              "aggregated_output": "OK",
+              "exit_code": 0,
+              "status": "completed"
+            }
+          },
+          {
+            "type": "item.started",
+            "item": {
+              "id": "item_4",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc 'test \"$(cat probe.txt)\" = OK && test \"$(wc -c < probe.txt | tr -d '\"' ')\\\" = 2\"",
+              "aggregated_output": "",
+              "exit_code": null,
+              "status": "in_progress"
+            }
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_4",
+              "type": "command_execution",
+              "command": "/bin/zsh -lc 'test \"$(cat probe.txt)\" = OK && test \"$(wc -c < probe.txt | tr -d '\"' ')\\\" = 2\"",
+              "aggregated_output": "",
+              "exit_code": 0,
+              "status": "completed"
+            }
+          },
+          {
+            "type": "item.completed",
+            "item": {
+              "id": "item_5",
+              "type": "agent_message",
+              "text": "OK. Created and read `probe.txt`. Tests passed: the file contains exactly `OK` (2 bytes).\n\n### Next Steps\n\nNo further action is needed."
+            }
+          },
+          {
+            "type": "turn.completed",
+            "usage": {
+              "input_tokens": 42350,
+              "cached_input_tokens": 30976,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 243,
+              "reasoning_output_tokens": 12
+            }
+          }
+        ],
+        "stderr": "",
+        "response": "OK. Created and read `probe.txt`. Tests passed: the file contains exactly `OK` (2 bytes).\n\n### Next Steps\n\nNo further action is needed.",
+        "usage": {
+          "input_tokens": 42350,
+          "cached_input_tokens": 30976,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 243,
+          "reasoning_output_tokens": 12
+        },
+        "command_count": 4
+      }
+    },
+    {
+      "kind": "preflight",
+      "model": "codex-cli/gpt-6-astra",
+      "reasoning_effort": "low",
+      "seed": 42,
+      "level": 1,
+      "suite_sha256": "d62be84ca76c13f41cf63fecd0e12e6d35fe91c9ae2416f92a886f71d48ed4df",
+      "generated_at": "2026-10-24T22:14:32.922941+00:00",
+      "status": "failed",
+      "score": null,
+      "elapsed_ms": 190,
+      "generation_ms": 41,
+      "runtime": {
+        "codex": "codex-cli 0.154.0",
+        "node": "v22.13.1",
+        "python": "3.13.7",
+        "quickjs": "1.19.4",
+        "system": "Darwin",
+        "machine": "arm64"
+      },
+      "error": "Codex call failed or did not complete",
+      "id": "2026-10-24-gpt-6-astra-preflight",
+      "raw_url": "/evidence/v2/2026-10-24-gpt-6-astra-preflight.json",
+      "tasks": [],
+      "probe": {
+        "status": "failed",
+        "error": "Codex call failed or did not complete",
+        "elapsed_ms": 41,
+        "events": [],
+        "stderr": "Error loading config.toml: model_providers contains reserved built-in provider IDs: `openai`. Built-in providers cannot be overridden. Rename your custom provider (for example, `openai-custom`).\nin `model_providers`\n\n",
+        "response": "",
+        "usage": {},
+        "command_count": 0
+      }
+    }
+  ]
+}

@@ -15,7 +15,7 @@ export function ArchiveNotice() {
       <strong>Historical benchmark.</strong> These results retain their original
       scoring rules.{" "}
       <Link className="bench-link" href="/">
-        View the active v1.3 suite
+        View the active v2.0 suite
       </Link>
       .
     </aside>

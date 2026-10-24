@@ -1,0 +1,45 @@
+{
+  "benchmark_version": "2.0",
+  "kind": "preflight",
+  "source": "chatgpt-subscription",
+  "model": "codex-cli/gpt-6-astra",
+  "reasoning_effort": "low",
+  "supported_efforts": [
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra"
+  ],
+  "seed": 42,
+  "level": 1,
+  "suite_sha256": "d62be84ca76c13f41cf63fecd0e12e6d35fe91c9ae2416f92a886f71d48ed4df",
+  "generated_at": "2026-10-24T22:14:32.922941+00:00",
+  "phase_seconds": 120,
+  "budget_seconds": 600,
+  "status": "failed",
+  "score": null,
+  "tasks": [],
+  "runtime": {
+    "codex": "codex-cli 0.154.0",
+    "node": "v22.13.1",
+    "python": "3.13.7",
+    "quickjs": "1.19.4",
+    "system": "Darwin",
+    "machine": "arm64"
+  },
+  "probe": {
+    "status": "failed",
+    "error": "Codex call failed or did not complete",
+    "elapsed_ms": 41,
+    "events": [],
+    "stderr": "Error loading config.toml: model_providers contains reserved built-in provider IDs: `openai`. Built-in providers cannot be overridden. Rename your custom provider (for example, `openai-custom`).\nin `model_providers`\n\n",
+    "response": "",
+    "usage": {},
+    "command_count": 0
+  },
+  "error": "Codex call failed or did not complete",
+  "elapsed_ms": 190,
+  "generation_ms": 41
+}

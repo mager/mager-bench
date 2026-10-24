@@ -1,49 +1,52 @@
-import { Arrow } from "@/components/arrow";
 import Link from "next/link";
-import { everyday, modelName, date } from "@/lib/everyday";
-export const metadata = { title: "Runs | mager-bench 1.3" };
+import { Arrow } from "@/components/arrow";
+import {
+  agentBench,
+  evaluations,
+  modelName,
+  resultLabel,
+  duration,
+} from "@/lib/agent-v2";
+export const metadata = { title: "Runs | mager-bench 2.0" };
+function RunList({ runs }: { runs: typeof agentBench.runs }) {
+  return (
+    <div className="attempt-list">
+      {runs.map((run) => (
+        <Link className="attempt-row" href={`/v2/runs/${run.id}`} key={run.id}>
+          <div>
+            <h2>{modelName(run.model)}</h2>
+            <p>
+              {run.generated_at.slice(0, 10)} · {run.reasoning_effort} ·{" "}
+              {duration(run.generation_ms)}
+              {run.kind === "evaluation" &&
+                ` · seed ${run.seed} · level ${run.level}`}
+            </p>
+          </div>
+          <span>{resultLabel(run)}</span>
+          <Arrow diagonal />
+        </Link>
+      ))}
+    </div>
+  );
+}
 export default function Runs() {
   return (
     <div className="bench-shell">
       <header className="bench-page-heading">
         <h1>Runs</h1>
-        <p>
-          Only finished runs get a score.
-        </p>
+        <p>Saved code. Test results. Time used.</p>
       </header>
-      <div className="attempt-list">
-        {!everyday.runs.length && (
-          <div className="archive-entry">
-            <h2>No runs yet</h2>
-            <p>
-              You can still browse the problems and their tests.
-            </p>
-            <Link className="bench-link" href="/#tasks">
-              See the tests
-            </Link>
-          </div>
-        )}
-        {everyday.runs.map((run) => (
-          <Link
-            className="attempt-row"
-            href={`/attempts/${run.id}`}
-            key={run.id}
-          >
-            <div>
-              <h2>{modelName(run.model)}</h2>
-              <p>
-                {date(run.generated_at)} · {run.reasoning_effort} effort
-              </p>
-            </div>
-            <span>
-              {run.score
-                ? `${run.score.passed} / ${run.score.total} checks`
-                : "Unscored · provider failure"}
-            </span>
-            <Arrow diagonal />
-          </Link>
-        ))}
-      </div>
+      {evaluations.length ? (
+        <RunList runs={evaluations} />
+      ) : (
+        <p className="quiet">No evaluations yet.</p>
+      )}
+      <details className="bench-details v2-preflights">
+        <summary>
+          CLI checks · {agentBench.runs.length - evaluations.length}
+        </summary>
+        <RunList runs={agentBench.runs.filter((r) => r.kind === "preflight")} />
+      </details>
       <p className="history-note">
         <Link className="bench-link" href="/archive">
           Earlier versions

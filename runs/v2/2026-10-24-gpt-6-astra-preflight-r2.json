@@ -1,0 +1,172 @@
+{
+  "benchmark_version": "2.0",
+  "kind": "preflight",
+  "source": "chatgpt-subscription",
+  "model": "codex-cli/gpt-6-astra",
+  "reasoning_effort": "low",
+  "supported_efforts": [
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+    "ultra"
+  ],
+  "seed": 42,
+  "level": 1,
+  "suite_sha256": "b441f3d4f15b2849578f6b2b2cd9700917f30dc1978fb4f6851ed7077b362bed",
+  "generated_at": "2026-10-24T22:15:06.123047+00:00",
+  "phase_seconds": 120,
+  "budget_seconds": 600,
+  "status": "completed",
+  "score": null,
+  "tasks": [],
+  "runtime": {
+    "codex": "codex-cli 0.154.0",
+    "node": "v22.13.1",
+    "python": "3.13.7",
+    "quickjs": "1.19.4",
+    "system": "Darwin",
+    "machine": "arm64"
+  },
+  "probe": {
+    "status": "completed",
+    "error": null,
+    "elapsed_ms": 10651,
+    "events": [
+      {
+        "type": "thread.started",
+        "thread_id": "01a16ffb-5ad9-75f0-8571-98bee860d412"
+      },
+      {
+        "type": "turn.started"
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_0",
+          "type": "agent_message",
+          "text": "I will read the work order, make the required changes, and run the tests.\n"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"pwd; rg --files -g 'WORK_ORDER.md' -g 'AGENTS.md' -g 'package.json' -g '*lock*'\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_1",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc \"pwd; rg --files -g 'WORK_ORDER.md' -g 'AGENTS.md' -g 'package.json' -g '*lock*'\"",
+          "aggregated_output": "/private/var/folders/pp/77czjxmj3sx8l286xyl74nr80000gn/T/mager-v2-smoke-n0i8ro2g/repo\nWORK_ORDER.md\n",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat WORK_ORDER.md'",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_2",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'cat WORK_ORDER.md'",
+          "aggregated_output": "Create probe.txt containing exactly OK. Read it with a shell command. Reply OK. Do not access other paths.",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_3",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'printf OK > probe.txt\ncat probe.txt'",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_3",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'printf OK > probe.txt\ncat probe.txt'",
+          "aggregated_output": "OK",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.started",
+        "item": {
+          "id": "item_4",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'test \"$(cat probe.txt)\" = OK && test \"$(wc -c < probe.txt | tr -d '\"' ')\\\" = 2\"",
+          "aggregated_output": "",
+          "exit_code": null,
+          "status": "in_progress"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_4",
+          "type": "command_execution",
+          "command": "/bin/zsh -lc 'test \"$(cat probe.txt)\" = OK && test \"$(wc -c < probe.txt | tr -d '\"' ')\\\" = 2\"",
+          "aggregated_output": "",
+          "exit_code": 0,
+          "status": "completed"
+        }
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_5",
+          "type": "agent_message",
+          "text": "OK. Created and read `probe.txt`. Tests passed: the file contains exactly `OK` (2 bytes).\n\n### Next Steps\n\nNo further action is needed."
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 42350,
+          "cached_input_tokens": 30976,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 243,
+          "reasoning_output_tokens": 12
+        }
+      }
+    ],
+    "stderr": "",
+    "response": "OK. Created and read `probe.txt`. Tests passed: the file contains exactly `OK` (2 bytes).\n\n### Next Steps\n\nNo further action is needed.",
+    "usage": {
+      "input_tokens": 42350,
+      "cached_input_tokens": 30976,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 243,
+      "reasoning_output_tokens": 12
+    },
+    "command_count": 4
+  },
+  "elapsed_ms": 10707,
+  "generation_ms": 10651
+}

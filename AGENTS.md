@@ -3,12 +3,30 @@
 `/bench` in `.opencode/commands/bench.md` is the canonical workflow.
 `.claude/skills/run-bench/SKILL.md` mirrors it; if they disagree, `/bench` wins.
 
-## Active version: 1.3
+## Active version: 2.0
+
+- Read `docs/mager-bench-2.0.md`. Use `bench_v2.py` for three repository tasks,
+  two work orders each, and 192 deterministic checks. No model judge.
+- Use the local ChatGPT subscription through Codex CLI. Always use the lowest
+  supported reasoning effort; the runner selects and records it.
+- Dry-run first. Use the unscored file-edit preflight for each new model.
+  Keep every attempt under `runs/v2/`. No session retries, API fallback, or
+  model substitution. Codex can retry transport requests internally.
+- Six sessions share 600 seconds of agent time; each session is capped at 120
+  seconds. Preserve this budget. A failed session leaves the run unscored.
+- Export with `.venv/bin/python web/scripts/sync-agent-v2-data.py`. Commit code,
+  saved attempts, `web/data/agent-v2.json`, and `web/public/evidence/v2/` together.
+- Never merge v2 into `results.json`. Compare only matching suite hashes, seeds,
+  levels, budgets, and runtimes. A single run is not a ranking.
+- A substantive contract, generator, budget, or scoring change after v2 publishes
+  requires a new version. Keep v1.3 and all earlier suites frozen.
+
+## Frozen version: 1.3
 
 - Read `docs/mager-bench-1.3.md`. Use `bench_v1_3.py` for two algorithmic and
   three everyday JavaScript tasks with 60 deterministic checks and zero model judge calls.
 - **Always run evals at the lowest supported reasoning effort.** Speed is the
-  purpose of this benchmark. The active runner selects and records the minimum
+  purpose of this benchmark. The v1.3 runner selects and records the minimum
   from the Codex catalog; do not override it upwards. For frozen reproduction
   scripts, preserve original code and pass the lowest supported effort explicitly.
 - Dry-run first. Use the local ChatGPT subscription only. Save every attempt
