@@ -37,3 +37,19 @@ These are public synthetic projects. One run is not a ranking. Match suite hash,
 seed, level, budget, and runtime when comparing results. New capabilities belong
 in new versions. Versions 1.3, 1.2, 1.1, and the original thirteen-task suite are
 frozen in the [archive](https://bench.mager.co/archive).
+
+## Checks
+
+```sh
+.venv/bin/python -m pip install -r requirements-dev-v2.txt
+npm ci --prefix web
+./scripts/check-v2.sh
+npm --prefix web run build
+```
+
+The check command runs Ruff, all harness tests, a read-only evidence replay and
+export check, ESLint, and TypeScript. It makes no model calls. CI runs the same
+checks and the production build on pushes and pull requests. The legacy-provider
+tests mock the API SDK; no API key is required. `ruff.toml` records the reviewed
+exceptions for deterministic RNG, equal-length list comparison, and CLI calls.
+Scored source files and saved evidence remain unchanged.

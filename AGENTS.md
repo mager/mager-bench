@@ -21,6 +21,16 @@
 - A substantive contract, generator, budget, or scoring change after v2 publishes
   requires a new version. Keep v1.3 and all earlier suites frozen.
 
+## Development checks
+
+- Install `requirements-dev-v2.txt` and run `./scripts/check-v2.sh` before a commit.
+  It runs static analysis, all tests, and read-only validation of generated data.
+- Run `npm --prefix web run build` for frontend or data changes.
+- Static analysis covers active v2 Python files. Frozen historical source must
+  keep its original bytes. Ruff exceptions in `ruff.toml` are narrow and documented.
+- Do not fix analyzer findings by weakening the types, ignoring new warnings,
+  changing saved scores, or regenerating artifacts under a different suite hash.
+
 ## Frozen version: 1.3
 
 - Read `docs/mager-bench-1.3.md`. Use `bench_v1_3.py` for two algorithmic and

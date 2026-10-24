@@ -1,0 +1,15 @@
+target-version = "py313"
+
+[lint]
+# Runtime errors, unused imports, likely bugs, and security-sensitive patterns.
+select = ["E9", "F", "B", "S"]
+
+[lint.per-file-ignores]
+# Deterministic public inputs need reproducible RNG, not cryptographic randomness.
+"agent_bench_v2/cases.py" = ["S311"]
+# equal() checks list lengths before zip(); the short-circuit is intentional.
+# Preserve the graded source bytes so existing suite fingerprints still replay.
+"agent_bench_v2/grader.py" = ["B905"]
+# Reviewed argv arrays, shell=False, fixed tools from the user's PATH.
+# No command text or executable is read from model output.
+"agent_bench_v2/runner.py" = ["S603", "S607"]

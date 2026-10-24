@@ -1,0 +1,4 @@
+-r requirements-v2.txt
+ruff==0.14.3
+# Imported by mocked legacy-provider tests; v2 never calls the API SDK.
+openai==3.19.2

@@ -12,14 +12,19 @@ export type Phase = {
   phase: number;
   status: string;
   error: string | null;
-  elapsed_ms: number;
+  elapsed_ms: number | null;
   usage: Record<string, number> | null;
   command_count: number | null;
   diff: string | null;
   sources: Record<string, string> | null;
   response: string | null;
   integrity_errors: string[] | null;
-  score: (Score & { groups: Record<string, Score>; failures: Check[] }) | null;
+  score:
+    | (Score & {
+        groups: { contract: Score; generated: Score; regression?: Score };
+        failures: Check[];
+      })
+    | null;
 };
 export type Run = {
   id: string;
@@ -40,7 +45,7 @@ export type Run = {
   tasks: { id: string; phases: Phase[] }[];
   probe: { stderr: string; error: string | null; elapsed_ms: number } | null;
 };
-export const agentBench = data as unknown as {
+type BenchData = {
   version: string;
   suite_sha256: string;
   phase_seconds: number;
@@ -56,6 +61,18 @@ export const agentBench = data as unknown as {
     starter: Record<string, string>;
   }[];
   runs: Run[];
+};
+// Check the generated JSON's structure at compile time. Narrow its discriminator
+// at runtime because TypeScript widens JSON string literals to `string`.
+function checkedRun(run: Omit<Run, "kind"> & { kind: string }): Run {
+  if (run.kind !== "evaluation" && run.kind !== "preflight") {
+    throw new Error(`Unknown run kind: ${run.kind}`);
+  }
+  return { ...run, kind: run.kind };
+}
+export const agentBench: BenchData = {
+  ...data,
+  runs: data.runs.map(checkedRun),
 };
 export const evaluations = agentBench.runs.filter(
   (run) => run.kind === "evaluation",
